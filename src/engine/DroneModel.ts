@@ -44,7 +44,6 @@ import {
   surfaceSlab,
   tint,
   torus,
-  tube,
   wingLoft,
   xf,
   type LoftStation,
@@ -850,33 +849,6 @@ BUILDERS['payload-bay'] = (b) => {
     }
 };
 
-
-// ───────────────────────────────────────────────────────── landing gear
-for (const side of [1, -1] as const) {
-  BUILDERS[side > 0 ? 'gear-port' : 'gear-starboard'] = (b) => {
-    const x = side * BOOM.x;
-    for (const z of [BOOM.rotorFrontZ - 0.02, BOOM.rotorRearZ + 0.02]) {
-      // short faired leg + rubber pad under each motor nacelle
-      const top = BOOM_Y - BOOM.nacelle + 0.004;
-      b.add('shell', rbox(0.012, 0.03, 0.03, 0.004, [x, top - 0.012, z]));
-      b.add('rubber', rbox(0.022, 0.008, 0.044, 0.003, [x, top - 0.03, z]));
-    }
-  };
-}
-
-BUILDERS['belly-skid'] = (b) => {
-  for (const s of [1, -1]) {
-    const pts: V3[] = [];
-    for (let k = 0; k <= 8; k++) {
-      const z = -0.08 + (k / 8) * 0.42;
-      const [w, yc, , hb] = fuselageProfile(z);
-      const x = s * 0.024;
-      const y = yc - hb * Math.pow(Math.max(0, 1 - Math.pow(Math.abs(x) / w, SE)), 1 / SE) - 0.004;
-      pts.push([x, y, z]);
-    }
-    b.add('rubber', tube(pts, 0.004, 24, 8));
-  }
-};
 
 // ───────────────────────────────────────────────────────── assemble
 export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D | null, parts?: PartModels): DroneModel {

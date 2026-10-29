@@ -75,12 +75,6 @@ export const TAIL = {
 /** Lowest point of the aircraft (EO/IR turret), used to place the floor. */
 export const LOWEST_Y = -0.235;
 
-export const GEAR = {
-  /** compact landing pads under the booms (the CAD shows no tall gear) */
-  footY: 0.0,
-  bellySkidY: -0.155,
-} as const;
-
 /** dihedral rise of the wing chord line at spanwise station |x| */
 export const wingY = (x: number) => WING.y + Math.abs(x) * Math.tan((WING.dihedralDeg * Math.PI) / 180);
 

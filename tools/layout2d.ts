@@ -37,8 +37,6 @@ export const LAYOUT_2D: Record<string, Place> = {
   // lift booms
   'boom-port': { offset: port([boomOut, -0.08, 0]) },
   'boom-starboard': { offset: stbd([boomOut, -0.08, 0]) },
-  'gear-port': { offset: port([boomOut, -0.17, 0]) },
-  'gear-starboard': { offset: stbd([boomOut, -0.17, 0]) },
   'lift-motor-02': { offset: port([boomOut, 0.03, 0]) },
   'lift-motor-03': { offset: port([boomOut, 0.03, 0]) },
   'lift-motor-01': { offset: stbd([boomOut, 0.03, 0]) },
@@ -60,7 +58,6 @@ export const LAYOUT_2D: Record<string, Place> = {
   'solar-tail': { offset: [0, 0.2, -0.04] },
   rudder: { offset: [0, 0, -0.08] },
   'payload-bay': { offset: [0, -0.1, 0] },
-  'belly-skid': { offset: [0, -0.18, 0] },
   'lidar-down': { offset: [0, -0.14, 0] },
   pitot: { offset: [-0.12, 0, 0.06] },
 

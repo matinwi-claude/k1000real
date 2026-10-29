@@ -17,7 +17,6 @@ import {
   CRUISE,
   ENVELOPE,
   FUSELAGE,
-  GEAR,
   LIFT_LAYOUT,
   LIFT_PROP_Y,
   MOTOR_BASE_Y,
@@ -36,8 +35,7 @@ export type CategoryId =
   | 'avionics'
   | 'sensors'
   | 'camera'
-  | 'payload'
-  | 'landing-gear';
+  | 'payload';
 
 export type Status = 'operational' | 'attention' | 'standby';
 
@@ -93,7 +91,6 @@ export const CATEGORIES: Category[] = [
   { id: 'sensors', label: 'Sensors', code: 'SNS' },
   { id: 'camera', label: 'Camera', code: 'CAM' },
   { id: 'payload', label: 'Payload', code: 'PLD' },
-  { id: 'landing-gear', label: 'Landing Gear', code: 'LDG' },
 ];
 
 /** Aircraft-level facts from the public product page (shown in the status panel). */
@@ -661,7 +658,7 @@ export const COMPONENTS: DroneComponent[] = [
     description: 'Downward rangefinder for precise height above ground during vertical landing.',
     position: [0, -0.11, -0.05],
     location: 'Fuselage · belly',
-    relatedComponents: ['belly-skid'],
+    relatedComponents: ['fuselage'],
     status: 'standby',
     statusNote: 'Illustrative: active during eVTOL phases only.',
     illustrativeSpecifications: [P('Operations', 'Launch and land anywhere — runway independent'), { label: 'Type', value: 'Time-of-flight (illustrative)' }],
@@ -749,58 +746,6 @@ export const COMPONENTS: DroneComponent[] = [
     explodeDelay: 0.2,
   },
 
-  // ───────────────────────── LANDING GEAR
-  {
-    id: 'gear-port',
-    name: 'Landing Pads · Port Boom',
-    category: 'landing-gear',
-    system: 'Landing Gear',
-    type: 'Landing Pads',
-    partNumber: 'K1-LDG-L01',
-    description: 'Low-profile pads under the port motor nacelles. The CAD shows no tall landing gear, so these are an illustrative interpretation.',
-    position: [BOOM.x, BOOM_Y - BOOM.nacelle - 0.02, 0.07],
-    location: 'Port boom · underside',
-    relatedComponents: ['boom-port', 'gear-starboard', 'belly-skid'],
-    status: 'operational',
-    illustrativeSpecifications: [P('Operations', 'Runway independent — launch and land anywhere'), { label: 'Type', value: 'Fixed pads (illustrative)' }],
-    layer: 'structure',
-    explode: [0.12, -0.3, 0],
-    explodeDelay: 0.12,
-  },
-  {
-    id: 'gear-starboard',
-    name: 'Landing Pads · Starboard Boom',
-    category: 'landing-gear',
-    system: 'Landing Gear',
-    type: 'Landing Pads',
-    partNumber: 'K1-LDG-R01',
-    description: 'Low-profile pads under the starboard motor nacelles. The CAD shows no tall landing gear, so these are an illustrative interpretation.',
-    position: [-BOOM.x, BOOM_Y - BOOM.nacelle - 0.02, 0.07],
-    location: 'Starboard boom · underside',
-    relatedComponents: ['boom-starboard', 'gear-port', 'belly-skid'],
-    status: 'operational',
-    illustrativeSpecifications: [P('Operations', 'Runway independent — launch and land anywhere'), { label: 'Type', value: 'Fixed pads (illustrative)' }],
-    layer: 'structure',
-    explode: [-0.12, -0.3, 0],
-    explodeDelay: 0.12,
-  },
-  {
-    id: 'belly-skid',
-    name: 'Belly Skid',
-    category: 'landing-gear',
-    system: 'Landing Gear',
-    type: 'Protective Skid',
-    partNumber: 'K1-LDG-B01',
-    description: 'Replaceable wear skid protecting the fuselage belly and payload bay.',
-    position: [0, GEAR.bellySkidY, 0.05],
-    location: 'Fuselage · belly',
-    relatedComponents: ['fuselage', 'payload-bay', 'gear-port'],
-    status: 'operational',
-    illustrativeSpecifications: [{ label: 'Material', value: 'Replaceable polymer (illustrative)' }],
-    layer: 'structure',
-    explode: [0, -0.32, 0],
-    explodeDelay: 0.14,
-  },
 ];
 
 export const COMPONENT_MAP: Record<string, DroneComponent> = Object.fromEntries(COMPONENTS.map((c) => [c.id, c]));

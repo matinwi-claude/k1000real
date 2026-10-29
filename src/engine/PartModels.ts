@@ -34,7 +34,6 @@ export const CAD_FUSELAGE_FIT: Record<string, Fit> = {
   gimbal: shift(0, 0, 0.05),
   'eo-ir': shift(0, 0, 0.05),
   'payload-bay': shift(0, 0.049, 0),
-  'belly-skid': shift(0, 0.024, 0),
   'lidar-down': shift(0, 0.008, 0),
 };
 
