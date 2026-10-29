@@ -33,8 +33,22 @@ export async function loadPartModels(url = PARTS_URL): Promise<PartModels> {
         console.warn('[K1000] parts.glb: ignoring mesh', mesh.name);
         return;
       }
-      const geom = mesh.geometry.clone().applyMatrix4(mesh.matrixWorld);
-      for (const name of Object.keys(geom.attributes)) if (name !== 'position' && name !== 'normal') geom.deleteAttribute(name);
+      // meshopt quantizes positions/normals to normalized ints: expand to floats before
+      // baking the node transform, or values outside ±1 overflow
+      const geom = new THREE.BufferGeometry();
+      for (const name of ['position', 'normal'] as const) {
+        const src = mesh.geometry.getAttribute(name);
+        if (!src) continue;
+        const out = new Float32Array(src.count * 3);
+        for (let i = 0; i < src.count; i++) {
+          out[i * 3] = src.getX(i);
+          out[i * 3 + 1] = src.getY(i);
+          out[i * 3 + 2] = src.getZ(i);
+        }
+        geom.setAttribute(name, new THREE.BufferAttribute(out, 3));
+      }
+      if (mesh.geometry.index) geom.setIndex(mesh.geometry.index.clone());
+      geom.applyMatrix4(mesh.matrixWorld);
       if (!parts.has(id)) parts.set(id, []);
       parts.get(id)!.push({ mat: mat as MatKey, geom, spin: flag === 'spin' });
     });

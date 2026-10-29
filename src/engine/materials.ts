@@ -57,6 +57,7 @@ export type MatKey =
   | 'rubber'
   | 'plastic'
   | 'plasticLight'
+  | 'grey'
   | 'glass'
   | 'lens'
   | 'pcb'
@@ -96,6 +97,7 @@ export function createMaterialLibrary(): MaterialLibrary {
     blackMatte: std({ color: '#0b0c0e', roughness: 0.85, metalness: 0.05 }),
     rubber: std({ color: '#131416', roughness: 0.95, metalness: 0 }),
     plastic: std({ color: '#23272c', roughness: 0.62, metalness: 0.05 }),
+    grey: std({ color: '#7c8289', roughness: 0.55, metalness: 0.1 }),
     plasticLight: phys({ color: '#b9bec4', roughness: 0.42, metalness: 0.1, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
     glass: phys({ color: '#05080c', roughness: 0.04, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.02 }),
     lens: phys({

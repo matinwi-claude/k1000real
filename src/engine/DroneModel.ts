@@ -23,6 +23,7 @@ import {
   LIFT,
   LIFT_LAYOUT,
   MOTOR_BASE_Y,
+  TAIL,
   WING,
   pad,
   wingStation,
@@ -130,6 +131,8 @@ type BuildFn = (b: Builder, ctx: BuildCtx) => void;
 
 interface BuildCtx {
   data: DroneComponent;
+  /** CAD replacements, for parts that sit on a CAD surface */
+  parts?: PartModels;
 }
 
 // fastener geometry: socket-cap screw head with dark hex socket (vertex coloured)
@@ -290,7 +293,60 @@ const solarMat = () => {
   return _solarTex;
 };
 
+/**
+ * Solar cells laid onto a CAD surface: a grid of downward rays onto `target` gives the
+ * skin height, lifted slightly so the cells sit on top. UVs run 0..1 across the panel.
+ */
+function drapedPanel(target: THREE.Mesh, x0: number, x1: number, z0: number, z1: number, nu = 14, nv = 6, lift = 0.0007) {
+  const ray = new THREE.Raycaster();
+  const down = new THREE.Vector3(0, -1, 0);
+  const pos: number[] = [];
+  const uv: number[] = [];
+  for (let j = 0; j <= nv; j++)
+    for (let i = 0; i <= nu; i++) {
+      const x = x0 + ((x1 - x0) * i) / nu;
+      const z = z0 + ((z1 - z0) * j) / nv;
+      ray.set(new THREE.Vector3(x, 5, z), down);
+      const hit = ray.intersectObject(target, false)[0];
+      pos.push(x, (hit ? hit.point.y : 0) + lift, z);
+      uv.push(i / nu, j / nv);
+    }
+  const idx: number[] = [];
+  for (let j = 0; j < nv; j++)
+    for (let i = 0; i < nu; i++) {
+      const a = j * (nu + 1) + i;
+      idx.push(a, a + 1, a + nu + 1, a + 1, a + nu + 2, a + nu + 1);
+    }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeVertexNormals();
+  if (g.attributes.normal.getY(0) < 0) {
+    g.setIndex(idx.map((_, k) => idx[k - (k % 3) + 2 - (k % 3)]));
+    g.computeVertexNormals();
+  }
+  return g;
+}
+
 const BUILDERS: Record<string, BuildFn> = {};
+
+// solar cells on the CAD horizontal stabilizer (two panels per side, clear of the fin)
+BUILDERS['solar-tail'] = (b, ctx) => {
+  const stab = ctx.parts?.get('horizontal-stabilizer');
+  if (!stab) return;
+  const target = new THREE.Mesh(merge(stab.map((p) => p.geom)));
+  const z0 = TAIL.stabTE + 0.062;
+  const z1 = TAIL.stabLE - 0.012;
+  for (const side of [1, -1] as const)
+    for (const [a, c] of [
+      [0.035, 0.315],
+      [0.325, 0.605],
+    ]) {
+      const g = drapedPanel(target, side * a, side * c, z0, z1);
+      b.addCustom(g, new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 }));
+    }
+};
 
 // centre wing section: spans both booms and sits on the fuselage pod
 BUILDERS['wing-center'] = (b) => {
@@ -385,9 +441,8 @@ BUILDERS['wing-spar'] = (b) => {
     const p1 = new THREE.Vector3(side * 2.25, wingY(2.25) + 0.008, zs - 0.01);
     const len = p0.distanceTo(p1);
     const g = cyl(0.0065, 0.012, len, 20);
-    scaleUV(g, 3, 60);
     alignY(g, p1.clone().sub(p0).normalize(), p0.clone().lerp(p1, 0.5));
-    b.add('carbon', g);
+    b.add('blackMatte', g);
     for (let k = 1; k <= 6; k++) {
       const x = k * 0.35;
       const st = wingStation(x);
@@ -457,8 +512,7 @@ for (const side of [1, -1] as const) {
     const stub = cyl(0.011, 0.011, 0.36, 20);
     stub.rotateZ(Math.PI / 2);
     stub.translate(x + side * 0.1, wingY(BOOM.x) + 0.012, 0.165);
-    scaleUV(stub, 3, 10);
-    b.add('carbon', stub);
+    b.add('blackMatte', stub);
     // motor mount pads
     for (const z of [BOOM.rotorFrontZ, BOOM.rotorRearZ]) {
       b.add('anodized', cyl(0.026, 0.028, 0.006, 32, [x, MOTOR_BASE_Y - 0.003, z]));
@@ -779,7 +833,7 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
       continue;
     }
     const b = new Builder();
-    fn(b, { data });
+    fn(b, { data, parts });
     const anchor = node.basePosition;
     const matCache = new Map<MatKey, THREE.Material>();
     const getMat = (key: MatKey) => {

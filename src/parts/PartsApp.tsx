@@ -1,6 +1,6 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LABELS, type AtlasLabel } from './labels';
-import { AIRCRAFT, CATEGORIES, COMPONENTS, COMPONENT_MAP, type CategoryId, type DroneComponent } from '../data/components';
+import { AIRCRAFT, CATEGORIES, COMPONENTS, COMPONENT_MAP, specSheet, type CategoryId, type DroneComponent } from '../data/components';
 import { EmbedCodeDialog } from '../components/EmbedCodeDialog';
 import { IconClose, IconEmbed } from '../components/Icons';
 
@@ -422,7 +422,7 @@ export function PartsApp({ art }: { art: LineArt }) {
 
       {!compact && !sel && <p className="pa-note">Line art traced from the K1000ULE digital twin · loose parts shown enlarged · click any part</p>}
 
-      {sel && <InfoPanel c={sel} onClose={() => select(null)} onPick={select} onStep={step} />}
+      {sel && <InfoPanel c={sel} onClose={() => select(null)} onStep={step} />}
 
       {embedOpen && (
         <EmbedCodeDialog
@@ -475,57 +475,31 @@ function Label({
   );
 }
 
-function InfoPanel({ c, onClose, onPick, onStep }: { c: DroneComponent; onClose: () => void; onPick: (id: string) => void; onStep: (d: 1 | -1) => void }) {
-  const cat = CATEGORIES.find((x) => x.id === c.category)!;
-  const i = ORDER.indexOf(c.id) + 1;
-  const related = c.relatedComponents.filter((id) => COMPONENT_MAP[id]);
+function InfoPanel({ c, onClose, onStep }: { c: DroneComponent; onClose: () => void; onStep: (d: 1 | -1) => void }) {
+  const spec = specSheet(c.id);
   return (
-    <aside className="pa-panel" key={c.id} aria-label={`${c.name} details`} onPointerDown={(e) => e.stopPropagation()}>
+    <aside className="pa-panel" key={c.id} aria-label={`${c.name} specifications`} onPointerDown={(e) => e.stopPropagation()}>
       <header>
-        <div className="pa-meta">
-          <span>
-            {cat.code} · {String(i).padStart(2, '0')}/{ORDER.length}
-          </span>
-          <span>{c.partNumber}</span>
-        </div>
-        <h2>{c.name}</h2>
-        <div className="pa-type">
-          {c.type} · {c.system}
-        </div>
-        <button className="pa-x" onClick={onClose} aria-label="Close details">
+        <h2>Specifications</h2>
+        <button className="pa-x" onClick={onClose} aria-label="Close specifications">
           <IconClose size={15} />
         </button>
       </header>
       <div className="pa-body">
-        <p className="pa-desc">{c.description}</p>
         <dl className="pa-specs">
           <div>
-            <dt>Location</dt>
-            <dd>{c.location}</dd>
+            <dt>Name</dt>
+            <dd>{c.name}</dd>
           </div>
-          {c.illustrativeSpecifications.map((sp) => (
-            <div key={sp.label}>
-              <dt>{sp.label}</dt>
-              <dd>
-                {sp.value}
-                {sp.published && <em className="pa-pub">PUBLISHED</em>}
-              </dd>
-            </div>
-          ))}
+          <div>
+            <dt>Group</dt>
+            <dd>{spec.group}</dd>
+          </div>
+          <div>
+            <dt>Material</dt>
+            <dd>{spec.material}</dd>
+          </div>
         </dl>
-        {related.length > 0 && (
-          <>
-            <h4>Connected parts</h4>
-            <div className="pa-related">
-              {related.map((id) => (
-                <button key={id} onClick={() => onPick(id)}>
-                  {COMPONENT_MAP[id].name}
-                </button>
-              ))}
-            </div>
-          </>
-        )}
-        <p className="pa-fine">Values without the PUBLISHED tag are illustrative placeholders, not official {AIRCRAFT.name} specifications.</p>
       </div>
       <footer>
         <button onClick={() => onStep(-1)} aria-label="Previous part">

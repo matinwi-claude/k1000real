@@ -811,33 +811,12 @@ kbd {
   padding: 16px 18px 14px;
   border-bottom: 1px solid var(--line);
 }
-.k-insp-meta {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-right: 26px;
-  font-family: var(--sans);
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.08em;
-}
-.k-pn {
-  font-family: var(--sans);
-  font-size: 9px;
-  color: var(--dim);
-  letter-spacing: 0.08em;
-}
 .k-insp-head h2 {
-  margin: 10px 0 4px;
-  font-size: 17px;
-  font-weight: 400;
-  letter-spacing: 0.2em;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.24em;
   color: var(--text-hi);
-}
-.k-insp-system {
-  font-size: 9px;
-  letter-spacing: 0.26em;
-  color: var(--accent);
 }
 .k-insp-close {
   position: absolute;
@@ -846,10 +825,9 @@ kbd {
 }
 .k-insp-facts {
   margin: 0;
-  padding: 12px 18px;
+  padding: 14px 18px 16px;
   display: grid;
-  gap: 8px;
-  border-bottom: 1px solid var(--line);
+  gap: 10px;
 }
 .k-insp-facts > div {
   display: flex;
@@ -871,70 +849,10 @@ kbd {
   align-items: center;
   gap: 7px;
 }
-.k-insp-facts dd.st-operational {
-  color: var(--ok);
-  font-family: var(--sans);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-.k-insp-facts dd.st-attention {
-  color: var(--warn);
-  font-family: var(--sans);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-.k-insp-facts dd.st-standby {
-  color: var(--standby);
-  font-family: var(--sans);
-  font-size: 10px;
-  letter-spacing: 0.08em;
-}
-.k-tabs {
-  display: flex;
-  border-bottom: 1px solid var(--line);
-  padding: 0 10px;
-}
-.k-tabs button {
-  position: relative;
-  flex: 1;
-  padding: 10px 2px;
-  font-size: 8.5px;
-  letter-spacing: 0.16em;
-  color: var(--dim);
-  transition: color 0.2s;
-}
-.k-tabs button:hover {
-  color: var(--text);
-}
-.k-tabs button.on {
-  color: var(--text-hi);
-}
-.k-tabs button.on::after {
-  content: '';
-  position: absolute;
-  left: 20%;
-  right: 20%;
-  bottom: -1px;
-  height: 1px;
-  background: var(--accent);
-}
-.k-tab-body {
-  padding: 14px 18px 16px;
-  overflow: auto;
-  scrollbar-width: thin;
-  animation: fadeIn 0.3s var(--ease);
-}
 @keyframes fadeIn {
   from {
     opacity: 0;
   }
-}
-.k-desc {
-  margin: 0;
-  font-size: 11.5px;
-  line-height: 1.65;
-  color: var(--text);
-  user-select: text;
 }
 .k-note {
   margin: 12px 0 0;
@@ -944,173 +862,6 @@ kbd {
 }
 .k-note.warn {
   color: var(--warn);
-}
-.k-insp-actions {
-  display: flex;
-  gap: 6px;
-  margin-top: 14px;
-}
-.k-insp-actions button {
-  flex: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 8px 0;
-  border: 1px solid var(--line);
-  font-size: 8.5px;
-  letter-spacing: 0.16em;
-  color: var(--text);
-  transition: border-color 0.2s, color 0.2s, background 0.2s;
-}
-.k-insp-actions button:hover {
-  border-color: var(--accent);
-  color: var(--text-hi);
-  background: var(--accent-dim);
-}
-.k-specs {
-  width: 100%;
-  border-collapse: collapse;
-}
-.k-specs th,
-.k-specs td {
-  padding: 6px 0;
-  border-bottom: 1px dashed var(--line);
-  font-weight: 400;
-  text-align: left;
-  vertical-align: top;
-}
-.k-specs th {
-  font-size: 9.5px;
-  color: var(--dim);
-  letter-spacing: 0.06em;
-  width: 42%;
-}
-.k-specs td {
-  font-family: var(--sans);
-  font-size: 10.5px;
-  color: var(--text-hi);
-}
-.k-loc-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 1px;
-  background: var(--line);
-  border: 1px solid var(--line);
-}
-.k-loc-grid > div {
-  background: var(--panel-solid);
-  padding: 8px 10px;
-}
-.k-loc-grid dt {
-  font-size: 8.5px;
-  letter-spacing: 0.2em;
-  color: var(--dim);
-}
-.k-loc-grid dd {
-  margin: 3px 0 0;
-  font-family: var(--sans);
-  font-size: 11px;
-  color: var(--text-hi);
-}
-.k-locator {
-  display: block;
-  width: 100%;
-  margin-top: 12px;
-  border: 1px solid var(--line);
-  background: repeating-linear-gradient(0deg, transparent 0 15px, rgba(150, 180, 210, 0.04) 15px 16px),
-    repeating-linear-gradient(90deg, transparent 0 15px, rgba(150, 180, 210, 0.04) 15px 16px);
-}
-.k-locator text {
-  font-family: var(--sans);
-  font-size: 6.5px;
-  fill: var(--dim);
-  letter-spacing: 0.1em;
-}
-.k-locator line {
-  stroke: var(--line-strong);
-}
-.k-locator line.axis {
-  stroke: rgba(127, 192, 255, 0.18);
-  stroke-dasharray: 2 2;
-}
-.k-locator circle {
-  fill: none;
-  stroke: var(--line-strong);
-}
-.k-locator circle.disc {
-  stroke: rgba(150, 180, 210, 0.12);
-  stroke-dasharray: 2 2;
-}
-.k-locator .body {
-  fill: rgba(150, 180, 210, 0.06);
-  stroke: var(--line-strong);
-}
-.k-locator .nose {
-  fill: var(--dim);
-}
-.k-locator .mark {
-  fill: var(--accent);
-  stroke: none;
-}
-.k-locator .mark-ring {
-  stroke: var(--accent);
-}
-.k-assembly-path {
-  margin-top: 12px;
-  font-family: var(--sans);
-  font-size: 9.5px;
-  color: var(--text);
-}
-.k-assembly-path span {
-  color: var(--dim2);
-  margin: 0 4px;
-}
-.k-related {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.k-related button {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 8px 4px;
-  border-bottom: 1px dashed var(--line);
-  text-align: left;
-  font-size: 11px;
-  color: var(--text);
-  transition: color 0.15s, background 0.15s;
-}
-.k-related button span {
-  flex: 1;
-}
-.k-related button small {
-  font-family: var(--sans);
-  font-size: 9px;
-  color: var(--dim);
-}
-.k-related button:hover {
-  color: var(--text-hi);
-  background: rgba(127, 192, 255, 0.05);
-}
-.k-hidden-note {
-  border: 1px dashed rgba(224, 102, 42, 0.45);
-  padding: 12px 14px;
-  background: rgba(224, 102, 42, 0.05);
-}
-.k-hidden-tag {
-  font-family: var(--sans);
-  font-size: 8.5px;
-  color: var(--orange);
-  letter-spacing: 0.16em;
-}
-.k-hidden-note p {
-  margin: 8px 0 0;
-  font-size: 11px;
-  line-height: 1.6;
-  color: var(--text-hi);
 }
 
 /* ───────────────────────────────────────────────────────────── dock (bottom centre) */
@@ -1537,9 +1288,6 @@ input[type='range']::-moz-range-thumb {
     max-height: 50vh;
     animation: panelUp 0.35s var(--ease);
   }
-  .k-insp-facts {
-    display: none;
-  }
   .k-callout-anchor {
     display: none;
   }
@@ -1597,16 +1345,6 @@ input[type='range']::-moz-range-thumb {
 }
 .k-note .k-pub {
   margin: 0 2px 0 0;
-}
-.k-specs tr.pub td {
-  color: var(--text-hi);
-}
-.k-locator .boom {
-  stroke: var(--line-strong);
-  stroke-width: 1.5;
-}
-.k-locator polygon.body {
-  fill: rgba(150, 180, 210, 0.08);
 }
 
 /* avoid stacking panels */

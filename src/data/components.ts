@@ -75,6 +75,13 @@ export interface DroneComponent {
   hiddenNote?: string;
 }
 
+/** Shown in the Specifications panel. */
+export type SpecGroup = 'Airframe' | 'Payload' | 'Feature';
+export interface SpecSheet {
+  group: SpecGroup;
+  material: string;
+}
+
 export interface Category {
   id: CategoryId;
   label: string;
@@ -507,6 +514,23 @@ export const COMPONENTS: DroneComponent[] = [
 
   // ───────────────────────── AVIONICS
   {
+    id: 'solar-tail',
+    name: 'Solar Array · Stabilizer',
+    category: 'power',
+    system: 'Solar Power',
+    type: 'Solar Cells',
+    partNumber: 'K1-PWR-S03',
+    description: 'Solar cells across the upper surface of the horizontal stabilizer.',
+    position: [0, TAIL.stabY + 0.009, (TAIL.stabLE + TAIL.stabTE) / 2],
+    location: 'Tail · stabilizer upper surface',
+    relatedComponents: ['horizontal-stabilizer'],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0.46, -0.55],
+    explodeDelay: 0.2,
+  },
+  {
     id: 'gnss',
     name: 'GNSS Receiver',
     category: 'avionics',
@@ -602,6 +626,44 @@ export const COMPONENTS: DroneComponent[] = [
   // ───────────────────────── PAYLOAD
 
 ];
+
+const CF = 'Carbon fiber';
+const SPECS: Record<string, SpecSheet> = {
+  fuselage: { group: 'Airframe', material: CF },
+  'avionics-hatch': { group: 'Airframe', material: CF },
+  'wing-center': { group: 'Airframe', material: CF },
+  'wing-port': { group: 'Airframe', material: CF },
+  'wing-starboard': { group: 'Airframe', material: CF },
+  'aileron-port': { group: 'Airframe', material: CF },
+  'aileron-starboard': { group: 'Airframe', material: CF },
+  'wing-spar': { group: 'Airframe', material: 'Wood' },
+  'boom-port': { group: 'Airframe', material: CF },
+  'boom-starboard': { group: 'Airframe', material: CF },
+  'tail-boom': { group: 'Airframe', material: CF },
+  rudder: { group: 'Airframe', material: CF },
+  'horizontal-stabilizer': { group: 'Airframe', material: CF },
+  elevator: { group: 'Airframe', material: CF },
+  fasteners: { group: 'Airframe', material: 'Stainless steel' },
+  'cruise-motor': { group: 'Feature', material: 'Aluminum' },
+  'cruise-prop': { group: 'Feature', material: CF },
+  'lift-motor-01': { group: 'Feature', material: 'Aluminum' },
+  'lift-motor-02': { group: 'Feature', material: 'Aluminum' },
+  'lift-motor-03': { group: 'Feature', material: 'Aluminum' },
+  'lift-motor-04': { group: 'Feature', material: 'Aluminum' },
+  'lift-prop-01': { group: 'Feature', material: CF },
+  'lift-prop-02': { group: 'Feature', material: CF },
+  'lift-prop-03': { group: 'Feature', material: CF },
+  'lift-prop-04': { group: 'Feature', material: CF },
+  'solar-port': { group: 'Feature', material: 'Solar cells' },
+  'solar-starboard': { group: 'Feature', material: 'Solar cells' },
+  'solar-tail': { group: 'Feature', material: 'Solar cells' },
+  gnss: { group: 'Feature', material: 'Plastic' },
+  'antenna-01': { group: 'Feature', material: 'Plastic' },
+  'antenna-02': { group: 'Feature', material: 'Plastic' },
+  pitot: { group: 'Feature', material: 'Aluminum probe · 3D-printed cover' },
+  'eo-ir': { group: 'Payload', material: 'Aluminum' },
+};
+export const specSheet = (id: string): SpecSheet => SPECS[id] ?? { group: 'Airframe', material: CF };
 
 export const COMPONENT_MAP: Record<string, DroneComponent> = Object.fromEntries(COMPONENTS.map((c) => [c.id, c]));
 

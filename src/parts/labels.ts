@@ -28,8 +28,8 @@ export const LABELS: AtlasLabel[] = [
   {
     kind: 'group',
     text: 'T-Tail',
-    sub: 'Boom · fin · stabilizer',
-    ids: ['tail-boom', 'rudder', 'horizontal-stabilizer', 'elevator'],
+    sub: 'Solar stabilizer',
+    ids: ['tail-boom', 'rudder', 'horizontal-stabilizer', 'elevator', 'solar-tail'],
     at: [706, 178],
   },
   {

@@ -52,6 +52,7 @@ export const LAYOUT_2D: Record<string, Place> = {
   'cruise-motor': { offset: [0, 0, 0.28] },
   'cruise-prop': { offset: [0, 0, 0.44] },
   'horizontal-stabilizer': { offset: [0, 0.14, -0.04] },
+  'solar-tail': { offset: [0, 0.14, -0.04] },
   elevator: { offset: [0, 0.14, -0.1] },
   rudder: { offset: [0, 0, -0.08] },
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
