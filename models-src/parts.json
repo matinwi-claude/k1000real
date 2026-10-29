@@ -160,14 +160,14 @@
       "file": "pitot-cover.stl",
       "units": "mm",
       "axes": [
-        "x",
+        "-x",
         "z",
-        "-y"
+        "y"
       ],
       "offset": [
         0.8946,
         0.1392,
-        0.278
+        0.0568
       ],
       "default": {
         "id": "pitot",
