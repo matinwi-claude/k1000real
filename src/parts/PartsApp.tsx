@@ -20,7 +20,7 @@ export interface LineArt {
 }
 
 const CAT_ORDER = CATEGORIES.map((c) => c.id);
-const ORDER: string[] = COMPONENTS.filter((c) => !['fasteners', 'wiring-harness', 'wing-spar'].includes(c.id))
+const ORDER: string[] = COMPONENTS.filter((c) => !['fasteners', 'wing-spar'].includes(c.id))
   .sort((a, b) => CAT_ORDER.indexOf(a.category) - CAT_ORDER.indexOf(b.category) || COMPONENTS.indexOf(a) - COMPONENTS.indexOf(b))
   .map((c) => c.id);
 const CAT_COUNT = Object.fromEntries(CATEGORIES.map((c) => [c.id, ORDER.filter((id) => COMPONENT_MAP[id].category === c.id).length]));

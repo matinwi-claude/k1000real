@@ -20,6 +20,7 @@ import { COMPONENT_MAP } from '../data/components';
 export const SECTION_RANGE = { top: 0.15, side: 2.6, front: 1.3 } as const;
 import { LOWEST_Y } from '../data/layout';
 import { buildDroneModel, type ComponentNode, type DroneModel } from './DroneModel';
+import type { PartModels } from './PartModels';
 import { createMaterialLibrary, globalUniforms } from './materials';
 import { LIGHT_PRESETS, clonePreset, lerpPreset, type LightPreset } from './lighting';
 import { createGridMaterial } from '../shaders/grid';
@@ -55,6 +56,8 @@ interface MeasureLine {
 export interface EngineDom {
   /** optional real model (glTF scene) that replaces the procedural geometry */
   external?: THREE.Object3D | null;
+  /** CAD replacements for individual components (public/models/parts.glb) */
+  parts?: PartModels;
   host: HTMLElement;
   hud: SVGSVGElement;
   gizmo: SVGSVGElement;
@@ -312,7 +315,7 @@ export class DroneEngine {
 
   private setupModel() {
     const lib = createMaterialLibrary();
-    this.model = buildDroneModel(lib, this.dom.external);
+    this.model = buildDroneModel(lib, this.dom.external, this.dom.parts);
     this.scene.add(this.model.root);
     for (const o of this.model.pickables) {
       const m = o as THREE.Mesh;

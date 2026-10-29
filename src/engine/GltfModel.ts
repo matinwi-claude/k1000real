@@ -4,7 +4,7 @@
  * Drop a glTF binary of the aircraft at public/models/k1000ule.glb and it replaces
  * the procedural visualization automatically. Name meshes (or their parent nodes)
  * after component ids from src/data/components.ts — e.g. "wing-port",
- * "lift-motor-03", "battery" — or set `extras.componentId` in the glTF, and each
+ * "lift-motor-03", "eo-ir" — or set `extras.componentId` in the glTF, and each
  * part becomes individually selectable, explodable and hideable. Unnamed meshes are
  * grouped under the fuselage.
  *

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { batteryLabel, carbonTexture, fcLidLabel } from './textures';
+import { carbonTexture } from './textures';
 import { MATERIAL_PATCH_FRAGMENT, MATERIAL_PATCH_UNIFORMS } from '../shaders/materialPatch';
 
 /** Uniforms shared by every drone material. */
@@ -74,8 +74,6 @@ export type MatKey =
   | 'ledGreen'
   | 'ledWhite'
   | 'ledBlue'
-  | 'batteryLabel'
-  | 'fcLid'
   | 'fastener'
   | 'decal';
 
@@ -125,8 +123,6 @@ export function createMaterialLibrary(): MaterialLibrary {
     ledGreen: std({ color: '#031', emissive: '#22ff6a', emissiveIntensity: 2.2, roughness: 0.3 }),
     ledWhite: std({ color: '#222', emissive: '#ffffff', emissiveIntensity: 2.0, roughness: 0.3 }),
     ledBlue: std({ color: '#012', emissive: '#4aa3ff', emissiveIntensity: 2.0, roughness: 0.3 }),
-    batteryLabel: std({ map: batteryLabel(), roughness: 0.6, metalness: 0.05, polygonOffset: true, polygonOffsetFactor: -2 }),
-    fcLid: std({ map: fcLidLabel(), roughness: 0.45, metalness: 0.5, polygonOffset: true, polygonOffsetFactor: -2 }),
     fastener: std({ color: '#ffffff', vertexColors: true, roughness: 0.28, metalness: 1 }),
     decal: std({ color: '#ffffff', transparent: true, roughness: 0.5, metalness: 0.2, depthWrite: false }),
   };

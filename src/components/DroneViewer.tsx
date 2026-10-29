@@ -18,11 +18,11 @@ export function DroneViewer() {
     let cancelled = false;
     let engine: import('../engine/DroneEngine').DroneEngine | null = null;
     useStore.setState({ loadProgress: 0.15 });
-    Promise.all([import('../engine/DroneEngine'), import('../engine/GltfModel')])
-      .then(async ([{ DroneEngine }, { loadExternalModel }]) => {
+    Promise.all([import('../engine/DroneEngine'), import('../engine/GltfModel'), import('../engine/PartModels')])
+      .then(async ([{ DroneEngine }, { loadExternalModel }, { loadPartModels }]) => {
         if (cancelled) return;
         useStore.setState({ loadProgress: 0.45 });
-        const external = await loadExternalModel();
+        const [external, parts] = await Promise.all([loadExternalModel(), loadPartModels()]);
         if (cancelled) return;
         useStore.setState({ loadProgress: 0.7, modelSource: external ? 'cad' : 'procedural' });
         // let fonts settle so canvas-drawn labels use the right typeface
@@ -35,6 +35,7 @@ export function DroneViewer() {
         try {
           engine = new DroneEngine({
             external,
+            parts,
             host: hostRef.current!,
             hud: hudRef.current!,
             gizmo: gizmoRef.current!,

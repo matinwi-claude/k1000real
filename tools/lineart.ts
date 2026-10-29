@@ -1,7 +1,7 @@
 /**
  * Line-art generator for the 2D parts page (/parts).
  *
- * Builds the same procedural K1000ULE model the 3D viewer uses, spreads the parts
+ * Builds the same K1000ULE model the 3D viewer uses (procedural parts + CAD replacements), spreads the parts
  * out (exploded layout below), renders an isometric depth + id buffer and keeps
  * only the visible silhouette, crease and boundary edges of every component. The
  * result is a compact vector drawing: src/parts/lineart.json.
@@ -14,6 +14,7 @@ import { mergeVertices } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { contours } from 'd3-contour';
 import { buildDroneModel } from '../src/engine/DroneModel';
 import { createMaterialLibrary } from '../src/engine/materials';
+import { loadPartModels, type PartModels } from '../src/engine/PartModels';
 import { LAYOUT_2D, LAYOUT_2D_PORTRAIT, VIEW_2D, EXCLUDE_2D } from './layout2d';
 
 const VARIANT = new URLSearchParams(location.search).get('variant') === 'portrait' ? 'portrait' : 'landscape';
@@ -29,9 +30,9 @@ const log = (s: string) => {
   document.getElementById('log')!.textContent += `\n${s}`;
 };
 
-function run() {
+function run(cad: PartModels) {
   const lib = createMaterialLibrary();
-  const model = buildDroneModel(lib);
+  const model = buildDroneModel(lib, null, cad);
   const scene = new THREE.Scene();
   scene.add(model.root);
 
@@ -442,9 +443,9 @@ function rdpOpen(pts: [number, number][], eps: number): [number, number][] {
   return pts.filter((_, i) => keepIdx[i]);
 }
 
-try {
-  run();
-} catch (e) {
-  log(String((e as Error).stack ?? e));
-  (window as unknown as Record<string, unknown>).__lineartError = String(e);
-}
+loadPartModels()
+  .then(run)
+  .catch((e) => {
+    log(String((e as Error).stack ?? e));
+    (window as unknown as Record<string, unknown>).__lineartError = String(e);
+  });

@@ -139,23 +139,6 @@ export function labelTexture(o: LabelOpts) {
   return finish(c);
 }
 
-export function batteryLabel() {
-  return labelTexture({
-    w: 1024,
-    h: 512,
-    bg: '#15181c',
-    border: 'rgba(200,210,220,0.25)',
-    stripes: true,
-    lines: [
-      { text: 'K1000', size: 120, weight: 300, y: 120, font: 'Inter, sans-serif', color: '#e9eef3' },
-      { text: 'SMART FLIGHT BATTERY', size: 40, y: 210, color: '#8fa3b5' },
-      { text: '12S · 22 Ah · 980 Wh', size: 44, y: 290 },
-      { text: 'ILLUSTRATIVE VALUES — NOT AN OFFICIAL SPECIFICATION', size: 22, y: 360, color: '#6f8090' },
-      { text: '⚠  HANDLE WITH CARE · DO NOT PUNCTURE', size: 26, y: 410, color: '#e0662a' },
-    ],
-  });
-}
-
 export function serialPlate(text: string, sub: string) {
   return labelTexture({
     w: 1024,
@@ -167,36 +150,6 @@ export function serialPlate(text: string, sub: string) {
       { text: sub, size: 40, y: 182, color: '#2b3239' },
     ],
   });
-}
-
-export function fcLidLabel() {
-  const { c, ctx } = canvas(512, 512);
-  ctx.fillStyle = '#1b1f24';
-  ctx.fillRect(0, 0, 512, 512);
-  ctx.strokeStyle = 'rgba(160,190,220,0.35)';
-  ctx.lineWidth = 6;
-  ctx.strokeRect(24, 24, 464, 464);
-  // forward arrow
-  ctx.fillStyle = '#c9d6e3';
-  ctx.beginPath();
-  ctx.moveTo(256, 70);
-  ctx.lineTo(316, 170);
-  ctx.lineTo(276, 170);
-  ctx.lineTo(276, 250);
-  ctx.lineTo(236, 250);
-  ctx.lineTo(236, 170);
-  ctx.lineTo(196, 170);
-  ctx.closePath();
-  ctx.fill();
-  ctx.textAlign = 'center';
-  ctx.font = '300 64px Inter, sans-serif';
-  ctx.fillText('K1 · FCU', 256, 330);
-  ctx.font = '500 26px "JetBrains Mono", monospace';
-  ctx.fillStyle = '#7f93a6';
-  ctx.fillText('TRIPLE IMU · ILLUSTRATIVE', 256, 390);
-  ctx.font = '500 18px "JetBrains Mono", monospace';
-  ctx.fillText('K1-FW 4.7.2-illustrative', 256, 440);
-  return finish(c);
 }
 
 export function armDecal(index: number) {

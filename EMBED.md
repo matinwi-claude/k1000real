@@ -34,7 +34,7 @@ Set these as attributes on the placeholder. Each one maps to a URL parameter on 
 | `data-height` | number (px) | Fixed height. If omitted, the viewer keeps an aspect ratio. |
 | `data-aspect` | e.g. `21/9` | Aspect ratio used when no height is set. Default `16/9`. |
 | `data-radius` | number (px) | Corner radius. Default `12`. |
-| `data-component` | component id | Opens with that part selected, e.g. `battery`, `wing-port`, `lift-motor-03`. |
+| `data-component` | component id | Opens with that part selected, e.g. `eo-ir`, `wing-port`, `lift-motor-03`. |
 | `data-view` | `exploded`, `xray` | Starting view. Combine with commas. |
 | `data-light` | `studio`, `technical`, `night`, `inspection` | Lighting preset. |
 | `data-mode` | `inspection`, `measure` | Starting tool. |
@@ -70,7 +70,7 @@ The atlas understands the `select` and `reset` commands below, plus `viewer.cate
 ```js
 const viewer = K1000.get(document.querySelector('[data-k1000]'));
 
-viewer.select('battery');        // fly to and inspect a component (null clears)
+viewer.select('eo-ir');        // fly to and inspect a component (null clears)
 viewer.view('top');              // reset | front | side | top | bottom
 viewer.explode(1);               // 0 = assembled … 1 = fully exploded
 viewer.send('xray', true);       // x-ray on/off
@@ -97,7 +97,7 @@ el.addEventListener('k1000:select', (e) => console.log(e.detail));
 If you use a plain iframe without `embed.js`, use `postMessage` directly:
 
 ```js
-iframe.contentWindow.postMessage({ k1000: 'select', value: 'battery' }, 'https://YOUR-VIEWER-HOST');
+iframe.contentWindow.postMessage({ k1000: 'select', value: 'eo-ir' }, 'https://YOUR-VIEWER-HOST');
 window.addEventListener('message', (e) => { if (e.data?.k1000 === 'select') console.log(e.data); });
 ```
 

@@ -14,7 +14,7 @@ export interface Place {
 export const VIEW_2D = { azimuth: -38, elevation: 30 };
 
 /** Not drawn: too small or purely internal plumbing. */
-export const EXCLUDE_2D = ['fasteners', 'wiring-harness', 'wing-spar'];
+export const EXCLUDE_2D = ['fasteners', 'wing-spar'];
 
 const WING_UP = 0.34;
 const wingOut = 0.75;
@@ -65,36 +65,12 @@ export const LAYOUT_2D: Record<string, Place> = {
   pitot: { offset: [-0.12, 0, 0.06] },
 
   // enlarged detail parts (screen = metres right / up of the model origin on the drawing)
-  'flight-controller': { screen: [-2.05, 1.05], scale: 3.2 },
-  'companion-computer': { screen: [-1.55, 1.18], scale: 3.2 },
-  datalink: { screen: [-1.0, 1.3], scale: 3.4 },
-  battery: { screen: [0.95, -1.1], scale: 1.7 },
-  mppt: { screen: [1.55, -1.0], scale: 3.2 },
-  'power-distribution': { screen: [2.05, -0.9], scale: 3.2 },
-  'cruise-esc': { screen: [2.45, -0.62], scale: 3.2 },
-  'esc-01': { screen: [1.3, -1.45], scale: 3.2 },
-  'esc-02': { screen: [1.65, -1.38], scale: 3.2 },
-  'esc-03': { screen: [2.0, -1.31], scale: 3.2 },
-  'esc-04': { screen: [2.35, -1.24], scale: 3.2 },
   'eo-ir': { screen: [-1.2, -1.25], scale: 2.6 },
   gimbal: { screen: [-1.2, -1.0], scale: 2.6 },
-  'payload-module': { screen: [-0.55, -1.3], scale: 2.6 },
 };
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
-  'flight-controller': { screen: [-1.75, -2.0], scale: 7 },
-  'companion-computer': { screen: [0.05, -1.95], scale: 7 },
-  datalink: { screen: [1.8, -1.9], scale: 6.2 },
   gimbal: { screen: [-1.85, -3.05], scale: 5.4 },
   'eo-ir': { screen: [-1.85, -3.75], scale: 5.4 },
-  'payload-module': { screen: [0.1, -3.4], scale: 4.6 },
-  'cruise-esc': { screen: [1.95, -3.3], scale: 6.6 },
-  battery: { screen: [-1.3, -4.95], scale: 3.2 },
-  mppt: { screen: [0.55, -4.85], scale: 6.2 },
-  'power-distribution': { screen: [2.0, -4.75], scale: 6.2 },
-  'esc-01': { screen: [-1.95, -5.9], scale: 6 },
-  'esc-02': { screen: [-0.65, -5.9], scale: 6 },
-  'esc-03': { screen: [0.65, -5.9], scale: 6 },
-  'esc-04': { screen: [1.95, -5.9], scale: 6 },
 };

@@ -7,7 +7,7 @@ export type EmbedTarget = '3d' | 'parts';
 export interface EmbedCodeDialogProps {
   onClose: () => void;
   initialTarget?: EmbedTarget;
-  /** current-view attributes per target, e.g. { component: 'battery' } */
+  /** current-view attributes per target, e.g. { component: 'eo-ir' } */
   current?: Partial<Record<EmbedTarget, Record<string, string>>>;
 }
 

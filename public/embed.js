@@ -13,7 +13,7 @@
  * Optional attributes on the placeholder:
  *   data-height="600"            fixed height in px (default: 16:9 responsive)
  *   data-aspect="21/9"           aspect ratio when no height is given
- *   data-component="battery"     open with a component selected
+ *   data-component="eo-ir"     open with a component selected
  *   data-view="exploded"         exploded | xray (comma separated)
  *   data-light="night"           studio | technical | night | inspection
  *   data-autorotate="0"          disable the idle rotation
@@ -27,7 +27,7 @@
  *   viewer.send('lighting', 'night');         // any command, see EMBED.md
  *   viewer.on('select', (e) => console.log(e.id, e.name));
  *
- * Also available as custom elements: <k1000-viewer component="battery"></k1000-viewer>
+ * Also available as custom elements: <k1000-viewer component="eo-ir"></k1000-viewer>
  * and <k1000-parts theme="light"></k1000-parts>.
  */
 (function () {

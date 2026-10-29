@@ -1,7 +1,7 @@
 /**
  * postMessage bridge for embedded viewers.
  *
- * Host page → viewer:   iframe.contentWindow.postMessage({ k1000: 'select', value: 'battery' }, '*')
+ * Host page → viewer:   iframe.contentWindow.postMessage({ k1000: 'select', value: 'eo-ir' }, '*')
  * Viewer → host page:   { k1000: 'ready' | 'select' | 'state', ... }
  *
  * Commands are harmless view changes on a read-only visualization, so any origin may

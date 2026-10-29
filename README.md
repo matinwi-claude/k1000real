@@ -1,6 +1,6 @@
 # K1000 Interactive
 
-An explorable digital-twin website for the **Kraus Hamdani Aerospace K1000ULE**, a solar-recharged eVTOL UAV that flies for a very long time. The whole site is the aircraft: rotate it, zoom in on tiny parts, explode it, X-ray it, cut sections through it and inspect any of its 55 components.
+An explorable digital-twin website for the **Kraus Hamdani Aerospace K1000ULE**, a solar-recharged eVTOL UAV that flies for a very long time. The whole site is the aircraft: rotate it, zoom in on tiny parts, explode it, X-ray it, cut sections through it and inspect any of its 43 components.
 
 Built with React, TypeScript, Vite and Three.js, and deployed on Cloudflare Workers (static assets + a tiny `/api/status` Worker).
 
@@ -44,15 +44,31 @@ The Worker name in the dashboard must match `name = "k1000"` in `wrangler.toml`.
 
 Use `<div data-k1000="parts"></div>` instead to embed the **2D parts atlas**: an exploded line drawing where every part can be clicked (full page at `/parts`).
 
-The embedded viewer doesn't take over the host page's scrolling, loads lazily, pauses while off-screen, and can be controlled from the host page (`viewer.select('battery')`, `viewer.explode(1)`, …). See **[EMBED.md](EMBED.md)** for options, the API, events and allowed-domain settings, and `/embed-demo.html` for a live example.
+The embedded viewer doesn't take over the host page's scrolling, loads lazily, pauses while off-screen, and can be controlled from the host page (`viewer.select('eo-ir')`, `viewer.explode(1)`, …). See **[EMBED.md](EMBED.md)** for options, the API, events and allowed-domain settings, and `/embed-demo.html` for a live example.
 
 ## Using the real K1000ULE model
 
 Put a glTF binary at **`public/models/k1000ule.glb`**. If it's there, it replaces the generated model automatically. If it's missing, the generated model is used.
 
 - **Coordinate frame:** +Y up, nose toward +Z, units in metres. Files in other units are rescaled to a 5 m span and re-centred.
-- **Interactive parts:** name each mesh (or its parent node) after a component id from `src/data/components.ts`, e.g. `wing-port`, `lift-motor-03`, `battery`. Alternatively, set `extras.componentId` on the mesh. Matching parts can then be selected, exploded, hidden and inspected on their own. Meshes that don't match a component are grouped under `fuselage`.
+- **Interactive parts:** name each mesh (or its parent node) after a component id from `src/data/components.ts`, e.g. `wing-port`, `lift-motor-03`, `eo-ir`. Alternatively, set `extras.componentId` on the mesh. Matching parts can then be selected, exploded, hidden and inspected on their own. Meshes that don't match a component are grouped under `fuselage`.
 - **CAD files:** convert STEP/IGES to glTF first, e.g. with Blender, CAD Exchanger or FreeCAD.
+
+## Replacing individual parts with CAD (STL)
+
+Single parts can be swapped for real CAD while every other part keeps its generated geometry. The fuselage (with its four antenna masts) already comes from `models-src/fuselage-goldie-antenna-suite.stl`.
+
+1. Put the STL in `models-src/`.
+2. Add it to `models-src/parts.json`:
+   - `units`: `mm`, `cm`, `m` or `in`.
+   - `axes`: which source axis becomes the viewer's x (port), y (up) and z (nose). For example, `["x", "z", "-y"]` is Z-up with the nose toward −Y.
+   - `offset`: metres to shift the part after conversion, so it lines up with the rest of the aircraft.
+   - `default`: the component id and material for the whole file.
+   - `pieces` (optional): send some of the file's separate bodies to other components. Rules use the source coordinates, e.g. `{ "min_z_gt": -20, "center_x_gt": 40 }`.
+3. Run `python3 tools/import-parts.py`. It needs `pip install trimesh scipy networkx rtree` and Node. It writes `public/models/parts.glb`, which the viewer loads automatically.
+4. Regenerate the 2D drawing (see below) so the parts atlas shows the new geometry.
+
+Generated parts that attach to the fuselage (the nose, the camera turret and the belly parts) are refitted to the CAD fuselage in `src/engine/PartModels.ts` (`CAD_FUSELAGE_FIT`).
 
 ## 2D parts atlas (`/parts`)
 

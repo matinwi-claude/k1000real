@@ -60,6 +60,7 @@ import {
   type MaterialLibrary,
 } from './materials';
 import { glowTexture, serialPlate, solarTexture, wearMark } from './textures';
+import { CAD_FUSELAGE_FIT, fitMatrix, type PartModels } from './PartModels';
 
 export interface ComponentNode {
   id: string;
@@ -707,15 +708,6 @@ for (const a of LIFT_LAYOUT) {
   };
 }
 
-for (const a of LIFT_LAYOUT) {
-  BUILDERS[`esc-${pad(a.index)}`] = (b, ctx) => {
-    const [x, y, z] = ctx.data.position;
-    b.add('pcbBlack', rbox(0.03, 0.003, 0.06, 0.001, [x, y - 0.008, z]));
-    b.add('anodized', rbox(0.026, 0.01, 0.054, 0.002, [x, y - 0.0005, z]));
-    b.add('ledBlue', box(0.002, 0.001, 0.002, [x + 0.01, y + 0.0048, z]));
-  };
-}
-
 BUILDERS['cruise-motor'] = (b) => {
   b.add('motorBell', cyl(0.0142, 0.0142, 0.009, 32, [0, NOSE_Y, 0.8055], [Math.PI / 2, 0, 0]));
   b.add('aluminum', torus(0.0143, 0.0006, [0, NOSE_Y, 0.809], [0, 0, 0], 6, 32));
@@ -749,122 +741,14 @@ BUILDERS['cruise-prop'] = (b) => {
   }
 };
 
-BUILDERS['cruise-esc'] = (b) => {
-  b.add('anodized', rbox(0.028, 0.022, 0.05, 0.004, [0, -0.032, 0.66]));
-  const fins: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 4; k++) fins.push(box(0.0012, 0.006, 0.044, [-0.009 + k * 0.006, -0.018, 0.66]));
-  b.add('anodized', merge(fins));
-};
 
 // ───────────────────────────────────────────────────────── power
-BUILDERS['battery'] = (b) => {
-  const cz = 0.27;
-  const L = 0.32;
-  const y = 0.022;
-  b.add('plastic', rbox(0.07, 0.08, L, 0.007, [0, y, cz]));
-  b.add('accent', rbox(0.072, 0.082, 0.006, 0.004, [0, y, cz + L / 2 - 0.02]));
-  b.add('anodized', rbox(0.074, 0.084, 0.014, 0.005, [0, y, cz - L / 2 + 0.005]));
-  for (let k = 0; k < 4; k++) b.add('ledBlue', box(0.004, 0.003, 0.002, [-0.012 + k * 0.008, y + 0.02, cz - L / 2 - 0.0025]));
-  const lg = new THREE.PlaneGeometry(0.064, 0.032);
-  lg.rotateX(-Math.PI / 2);
-  lg.rotateY(Math.PI / 2);
-  lg.translate(0, y + 0.0401, cz + 0.02);
-  b.add('batteryLabel', lg);
-  const sg = new THREE.PlaneGeometry(0.04, 0.01);
-  sg.rotateX(Math.PI / 2);
-  sg.translate(0, y - 0.0421, cz - L / 2 + 0.005);
-  b.addCustom(
-    sg,
-    new THREE.MeshStandardMaterial({
-      map: serialPlate('CYCLE 0147 · CELL Δ 4 mV', 'K1-PWR-B01 · ILLUSTRATIVE'),
-      roughness: 0.4,
-      metalness: 0.6,
-      polygonOffset: true,
-      polygonOffsetFactor: -2,
-    }),
-  );
-};
 
-BUILDERS['mppt'] = (b) => {
-  b.add('anodized', rbox(0.05, 0.022, 0.07, 0.003, [0, 0.04, -0.12]));
-  const fins: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 6; k++) fins.push(box(0.0014, 0.007, 0.064, [-0.0175 + k * 0.007, 0.0545, -0.12]));
-  b.add('anodized', merge(fins));
-  b.add('ledGreen', box(0.0025, 0.0015, 0.0025, [0.02, 0.0515, -0.09]));
-};
 
-BUILDERS['power-distribution'] = (b) => {
-  b.add('pcb', rbox(0.066, 0.004, 0.07, 0.002, [0, -0.035, 0.065]));
-  b.add('copper', box(0.04, 0.0016, 0.012, [0, -0.0325, 0.04]));
-  for (const x of [-0.02, 0.02]) {
-    b.add('plastic', cyl(0.004, 0.004, 0.01, 14, [x, -0.028, 0.09]));
-    b.add('aluminum', cyl(0.0041, 0.0041, 0.0015, 14, [x, -0.0225, 0.09]));
-  }
-  b.add('blackMatte', rbox(0.016, 0.008, 0.012, 0.001, [0.016, -0.029, 0.055]));
-};
 
-BUILDERS['wiring-harness'] = (b) => {
-  const pair = (pts: V3[], r = 0.0022, off: V3 = [0.004, 0, 0]) => {
-    b.add('wireRed', tube(pts, r, 32, 8));
-    b.add('wireBlack', tube(pts.map((p) => [p[0] + off[0], p[1] + off[1], p[2] + off[2]] as V3), r, 32, 8));
-  };
-  // battery → PDB
-  pair([[-0.01, 0.0, 0.12], [-0.01, -0.02, 0.105], [-0.006, -0.031, 0.09]], 0.0028);
-  // PDB → cruise ESC
-  pair([[0.03, -0.038, 0.11], [0.05, -0.06, 0.3], [0.03, -0.045, 0.56], [0.012, -0.03, 0.776]]);
-  // PDB → wing root → spar → booms → lift ESCs
-  for (const side of [1, -1] as const) {
-    const x = side * BOOM.x;
-    const up: V3[] = [
-      [side * 0.03, -0.03, 0.05],
-      [side * 0.068, 0.0, 0.02],
-      [side * 0.05, 0.075, 0.08],
-      [side * 0.03, wingY(0.03) + 0.006, 0.155],
-      [side * 0.4, wingY(0.4) + 0.006, 0.156],
-      [x - side * 0.02, wingY(BOOM.x) + 0.004, 0.156],
-      [x, BOOM_Y + 0.01, 0.15],
-    ];
-    pair(up, 0.0018, [0, 0, 0.005]);
-    for (const zEnd of [BOOM.rotorFrontZ - 0.1, BOOM.rotorRearZ + 0.1]) {
-      pair([[x, BOOM_Y + 0.008, 0.15], [x, BOOM_Y + 0.006, (0.15 + zEnd) / 2], [x, BOOM_Y + 0.003, zEnd]], 0.0016, [side * 0.004, 0, 0]);
-    }
-  }
-  // solar → MPPT
-  b.add('wireYellow', tube([[0.012, 0.046, -0.095], [0.012, 0.085, -0.02], [0.012, wingY(0) + 0.004, 0.1], [0.03, wingY(0.03) + 0.01, 0.165]], 0.0016, 24, 6));
-  // signal: FC → SATCOM, datalink, mission computer
-  b.add('wireSignal', tube([[0, 0.042, 0.0], [0, 0.062, -0.08], [0, 0.074, -0.128]], 0.0014, 20, 6));
-  b.add('wireSignal', tube([[0.015, 0.03, -0.01], [0.02, 0.04, -0.15], [0.008, 0.048, -0.28]], 0.0014, 24, 6));
-  b.add('wireSignal', tube([[0, 0.042, 0.065], [0, 0.064, 0.3], [0, 0.046, 0.555]], 0.0014, 24, 6));
-  b.add('wireBlack', tube([[0, 0.029, -0.302], [0, 0.012, -0.292], [0, fuselageBottom(-0.282) + 0.004, -0.282]], 0.0015, 10, 6));
-};
 
 // ───────────────────────────────────────────────────────── avionics
-BUILDERS['flight-controller'] = (b) => {
-  for (const [x, z] of [
-    [0.028, 0.058],
-    [-0.028, 0.058],
-    [0.028, 0.002],
-    [-0.028, 0.002],
-  ])
-    b.add('rubber', cyl(0.005, 0.005, 0.01, 12, [x, 0.012, z]));
-  b.add('anodized', rbox(0.07, 0.022, 0.07, 0.004, [0, 0.028, 0.03]));
-  const lid = new THREE.PlaneGeometry(0.062, 0.062);
-  lid.rotateX(-Math.PI / 2);
-  lid.translate(0, 0.0392, 0.03);
-  b.add('fcLid', lid);
-  for (let k = 0; k < 4; k++) b.add('plasticLight', rbox(0.01, 0.005, 0.004, 0.0006, [-0.022 + k * 0.0147, 0.023, 0.0665]));
-  b.add('ledGreen', box(0.0025, 0.0015, 0.0025, [0.028, 0.0395, 0.002]));
-};
 
-BUILDERS['companion-computer'] = (b) => {
-  const z = 0.56;
-  b.add('pcb', rbox(0.05, 0.003, 0.1, 0.002, [0, -0.02, z]));
-  b.add('anodized', rbox(0.044, 0.005, 0.08, 0.001, [0, -0.0145, z]));
-  const fins: THREE.BufferGeometry[] = [];
-  for (let k = 0; k < 6; k++) fins.push(box(0.0013, 0.016, 0.08, [-0.0175 + k * 0.007, -0.0035, z]));
-  b.add('anodized', merge(fins));
-  b.add('gold', box(0.024, 0.002, 0.004, [0, -0.0178, z - 0.047]));
-};
 
 BUILDERS['satcom'] = (b) => {
   const z = 0.02;
@@ -877,11 +761,6 @@ BUILDERS['satcom'] = (b) => {
   b.add('radome', g);
 };
 
-BUILDERS['datalink'] = (b) => {
-  b.add('anodized', rbox(0.032, 0.026, 0.08, 0.004, [0, 0.055, -0.3]));
-  b.add('gold', cyl(0.003, 0.003, 0.008, 12, [0, 0.038, -0.28], [0, 0, 0]));
-  b.add('ledBlue', box(0.003, 0.002, 0.001, [0.01, 0.06, -0.2597]));
-};
 
 BUILDERS['gnss'] = (b) => {
   const z = -0.66;
@@ -971,11 +850,6 @@ BUILDERS['payload-bay'] = (b) => {
     }
 };
 
-BUILDERS['payload-module'] = (b) => {
-  b.add('anodized', rbox(0.06, 0.06, 0.22, 0.006, [0, -0.075, 0.3]));
-  b.add('accent', rbox(0.02, 0.004, 0.004, 0.001, [0.015, -0.0445, 0.39]));
-  b.add('gold', box(0.03, 0.003, 0.006, [0, -0.0445, 0.21]));
-};
 
 // ───────────────────────────────────────────────────────── landing gear
 for (const side of [1, -1] as const) {
@@ -1005,7 +879,7 @@ BUILDERS['belly-skid'] = (b) => {
 };
 
 // ───────────────────────────────────────────────────────── assemble
-export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D | null): DroneModel {
+export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D | null, parts?: PartModels): DroneModel {
   const root = new THREE.Group();
   root.name = 'K1000';
   const nodes = new Map<string, ComponentNode>();
@@ -1064,13 +938,29 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
 
   for (const data of COMPONENTS) {
     const node = nodes.get(data.id)!;
-    const fn = external ? undefined : BUILDERS[data.id];
+    const cad = parts?.get(data.id);
+    const fn: BuildFn | undefined = external
+      ? undefined
+      : cad
+        ? (b) => {
+            for (const p of cad) b.add(p.mat, p.geom);
+          }
+        : BUILDERS[data.id];
     if (!fn) {
       if (!external) console.warn('No builder for component', data.id);
       continue;
     }
     const b = new Builder();
     fn(b, { data });
+    const fit = parts?.has('fuselage') ? CAD_FUSELAGE_FIT[data.id] : undefined;
+    if (fit) {
+      const m = fitMatrix(fit);
+      for (const p of [...b.pending, ...b.spinPending, ...b.custom]) p.geom.applyMatrix4(m);
+      for (const bolt of b.bolts) bolt.p.applyMatrix4(m);
+      for (const e of b.extras) e.position.applyMatrix4(m);
+      node.basePosition.applyMatrix4(m);
+      node.group.position.copy(node.basePosition);
+    }
     const anchor = node.basePosition;
     const matCache = new Map<MatKey, THREE.Material>();
     const getMat = (key: MatKey) => {
