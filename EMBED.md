@@ -37,7 +37,7 @@ Set these as attributes on the placeholder. Each one maps to a URL parameter on 
 | `data-component` | component id | Opens with that part selected, e.g. `eo-ir`, `wing-port`, `lift-motor-03`. |
 | `data-view` | `exploded`, `xray` | Starting view. Combine with commas. |
 | `data-light` | `studio`, `technical`, `night`, `inspection` | Lighting preset. |
-| `data-mode` | `inspection`, `measure` | Starting tool. |
+| `data-mode` | `inspection` | Starting tool. |
 | `data-autorotate` | `0` / `1` | Turns the idle rotation off or on. |
 
 The full list of component ids is in `src/data/components.ts`. The viewer also sends it in the `ready` event (see below).
@@ -76,7 +76,7 @@ viewer.explode(1);               // 0 = assembled … 1 = fully exploded
 viewer.send('xray', true);       // x-ray on/off
 viewer.send('section', 'side');  // top | side | front | null
 viewer.send('lighting', 'night');
-viewer.send('mode', 'inspect');  // explore | inspect | measure
+viewer.send('mode', 'inspect');  // explore | inspect
 viewer.send('autoRotate', false);
 viewer.reset();                  // back to the default state
 ```

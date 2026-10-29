@@ -21,13 +21,6 @@ export const IconSettings = ({ size, ...p }: P) => (
   </svg>
 );
 
-export const IconMeasure = ({ size, ...p }: P) => (
-  <svg {...base(size)} {...p}>
-    <path d="M4 17 17 4l3 3L7 20z" />
-    <path d="M8 13l1.5 1.5M10.5 10.5l2 2M13 8l1.5 1.5M15.5 5.5l1.5 1.5" />
-  </svg>
-);
-
 export const IconExplode = ({ size, ...p }: P) => (
   <svg {...base(size)} {...p}>
     <rect x="9.5" y="9.5" width="5" height="5" rx="0.6" />

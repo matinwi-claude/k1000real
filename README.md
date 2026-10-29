@@ -90,7 +90,6 @@ An exploded, isometric line drawing of every part, styled like a technical broch
   - **X-ray:** fresnel-style see-through rendering.
   - **Cross-section:** cut from the top, side or front with a slider, showing hatched cut faces.
 - **Tools:**
-  - Measurements between any two points. Multiple measurements are allowed, and each line stays attached to its parts in exploded view.
   - Lighting presets: Studio, Technical, Night and Inspection.
   - Free cam (WASD + Q/E) and presentation mode.
 - **Shareable URL state:**
@@ -107,7 +106,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 
 ### Keyboard
 
-`1–5` views · `E` explode · `I` inspect · `M` measure · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `C` free cam · `P` presentation · `F` focus · `H` hide part · `Esc` back
+`1–5` views · `E` explode · `I` inspect · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `C` free cam · `P` presentation · `F` focus · `H` hide part · `Esc` back
 
 ## Performance
 
@@ -120,7 +119,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 ```
 src/
   components/   DroneViewer, ComponentInspector, Controls, ExplodedView,
-                SectionControl, MeasurementTool, StatusPanel, IntroOverlay, …
+                SectionControl, StatusPanel, IntroOverlay, …
   data/         components.ts (component database), layout.ts (traced proportions)
   engine/       DroneEngine (renderer, camera, interaction, animation), DroneModel (generated model),
                 GltfModel (real-model loader), Hud (SVG overlay), materials, lighting, geometry, textures

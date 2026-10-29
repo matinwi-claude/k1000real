@@ -83,9 +83,8 @@ function Tooltip({ innerRef }: { innerRef: React.RefObject<HTMLDivElement | null
   const hovered = useStore((s) => s.hovered);
   const source = useStore((s) => s.hoverSource);
   const selected = useStore((s) => s.selected);
-  const mode = useStore((s) => s.mode);
   const c = getComponent(hovered);
-  const show = !!c && source === 'canvas' && mode !== 'measure';
+  const show = !!c && source === 'canvas';
   return (
     <div ref={innerRef} className={`k-tooltip ${show ? 'show' : ''}`} aria-hidden>
       {c && (

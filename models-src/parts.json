@@ -137,6 +137,42 @@
         }
       ],
       "keep": 0.3
+    },
+    {
+      "file": "pitot.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0.8946,
+        0.1454,
+        0.313
+      ],
+      "default": {
+        "id": "pitot",
+        "material": "aluminum"
+      }
+    },
+    {
+      "file": "pitot-cover.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0.8946,
+        0.1454,
+        0.313
+      ],
+      "default": {
+        "id": "pitot",
+        "material": "shell"
+      }
     }
   ]
 }

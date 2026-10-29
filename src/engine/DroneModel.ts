@@ -766,15 +766,6 @@ for (const side of [1, -1] as const) {
 }
 
 // ───────────────────────────────────────────────────────── sensors
-BUILDERS['pitot'] = (b) => {
-  const x = -0.924;
-  const st = wingStation(x);
-  const yl = wingY(x) - 0.006;
-  b.add('shell', rbox(0.008, 0.03, 0.03, 0.003, [x, yl - 0.012, st.le - 0.04]));
-  b.add('aluminum', cyl(0.0035, 0.0035, 0.16, 14, [x, yl - 0.026, st.le + 0.03], [Math.PI / 2, 0, 0]));
-  b.add('blackMatte', cyl(0.0037, 0.0037, 0.006, 14, [x, yl - 0.026, st.le + 0.11], [Math.PI / 2, 0, 0]));
-};
-
 BUILDERS['nav-lights'] = (b) => {
   navLight(b, 'ledWhite', [0, TAIL.finTipY + 0.022, TAIL.stabTE + 0.012], '#ffffff');
   b.add('shell', rbox(0.012, 0.012, 0.03, 0.004, [0, TAIL.finTipY + 0.014, TAIL.stabTE + 0.02]));

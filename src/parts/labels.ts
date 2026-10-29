@@ -20,7 +20,7 @@ const LIFT_PORT = ['boom-port', 'lift-motor-02', 'lift-motor-03', 'lift-prop-02'
 const LIFT_STBD = ['boom-starboard', 'lift-motor-01', 'lift-motor-04', 'lift-prop-01', 'lift-prop-04'];
 
 export const LABELS: AtlasLabel[] = [
-  { kind: 'group', text: 'Outer Wing', sub: 'Port · solar', ids: ['wing-port', 'solar-port', 'aileron-port'], at: [1330, 248] },
+  { kind: 'group', text: 'Outer Wing', sub: 'Port · solar', ids: ['wing-port', 'solar-port', 'aileron-port', 'pitot'], at: [1330, 248] },
   { kind: 'group', text: 'Outer Wing', sub: 'Starboard · solar', ids: ['wing-starboard', 'solar-starboard', 'aileron-starboard'], at: [70, 690] },
   { kind: 'group', text: 'Centre Wing', sub: 'SATCOM dome', ids: ['wing-center', 'satcom'], at: [668, 296] },
   { kind: 'group', text: 'VTOL', sub: 'Lift boom · port', ids: LIFT_PORT, at: [1238, 478] },
@@ -36,7 +36,7 @@ export const LABELS: AtlasLabel[] = [
     kind: 'group',
     text: 'Fuselage',
     sub: 'Canopy · masts',
-    ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'tail-boom', 'gnss', 'pitot'],
+    ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'tail-boom', 'gnss'],
     at: [962, 458],
   },
   { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },

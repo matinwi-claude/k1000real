@@ -1,9 +1,9 @@
-import type { InteractionMode, LightingMode, SectionAxis, State } from '../store';
+import type { LightingMode, SectionAxis, State } from '../store';
 import { COMPONENT_MAP } from '../data/components';
 
 /**
  * Shareable URL state. Supported params:
- *   mode=inspection|measure     component=motor-04
+ *   mode=inspection             component=motor-04
  *   view=exploded,xray          explode=0..1
  *   light=studio|technical|night|inspection
  *   section=top|side|front      cut=-1..1
@@ -14,7 +14,6 @@ export function readUrlState(search = window.location.search): Partial<State> {
   const out: Partial<State> = {};
   const mode = q.get('mode');
   if (mode === 'inspection' || mode === 'inspect') out.mode = 'inspect';
-  else if (mode === 'measure') out.mode = 'measure' as InteractionMode;
   const comp = q.get('component');
   if (comp && COMPONENT_MAP[comp]) out.selected = comp;
   const views = (q.get('view') ?? '').split(',').map((v) => v.trim().toLowerCase());
@@ -47,7 +46,6 @@ export function readUrlState(search = window.location.search): Partial<State> {
 export function writeUrlState(s: State) {
   const q = new URLSearchParams();
   if (s.mode === 'inspect') q.set('mode', 'inspection');
-  if (s.mode === 'measure') q.set('mode', 'measure');
   if (s.selected) q.set('component', s.selected);
   const views: string[] = [];
   if (s.explode >= 0.999) views.push('exploded');

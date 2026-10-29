@@ -37,7 +37,7 @@ function handle(cmd: string, value: unknown) {
       set({ explode: Math.min(1, Math.max(0, Number(value) || 0)), interacted: true });
       return;
     case 'mode':
-      if (value === 'inspect' || value === 'measure' || value === 'explore') set({ mode: value });
+      if (value === 'inspect' || value === 'explore') set({ mode: value });
       return;
     case 'xray':
       set({ view: value ? 'xray' : 'exterior' });

@@ -56,7 +56,7 @@ export const LAYOUT_2D: Record<string, Place> = {
   elevator: { offset: [0, 0.14, -0.1] },
   'solar-tail': { offset: [0, 0.2, -0.04] },
   rudder: { offset: [0, 0, -0.08] },
-  pitot: { offset: [-0.12, 0, 0.06] },
+  pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
   // enlarged detail parts (screen = metres right / up of the model origin on the drawing)
   'eo-ir': { screen: [-1.2, -1.25], scale: 2.6 },

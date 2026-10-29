@@ -1,6 +1,6 @@
 /**
  * Screen-space technical HUD drawn in a single SVG layer above the canvas:
- * measurement lines, inspection brackets, callout leaders and the axis gizmo. Updated imperatively by the engine each rendered frame — no React
+ * inspection brackets, callout leaders and the axis gizmo. Updated imperatively by the engine each rendered frame — no React
  * re-renders on the hot path.
  */
 const NS = 'http://www.w3.org/2000/svg';
@@ -20,10 +20,8 @@ export interface Pt {
 
 export class Hud {
   svg: SVGSVGElement;
-  gMeasure: SVGGElement;
   gCallout: SVGGElement;
   gBrackets: SVGGElement;
-  private measurePool: SVGGElement[] = [];
   private calloutLine: SVGPolylineElement;
   private calloutDot: SVGCircleElement;
   private calloutRing: SVGCircleElement;
@@ -36,7 +34,6 @@ export class Hud {
     svg.innerHTML = '';
     this.gBrackets = el('g', { class: 'hud-brackets' }, svg);
     this.gCallout = el('g', { class: 'hud-callout' }, svg);
-    this.gMeasure = el('g', { class: 'hud-measure' }, svg);
 
     this.calloutLine = el('polyline', { class: 'hud-line hud-callout-line', fill: 'none' }, this.gCallout);
     this.calloutRing = el('circle', { class: 'hud-ring', r: 7 }, this.gCallout);
@@ -52,71 +49,6 @@ export class Hud {
     this.svg.setAttribute('viewBox', `0 0 ${w} ${h}`);
     this.svg.setAttribute('width', String(w));
     this.svg.setAttribute('height', String(h));
-  }
-
-  // ───────────────────────────── measurement
-  private measureItem(i: number) {
-    while (this.measurePool.length <= i) {
-      const g = el('g', { class: 'hud-m' }, this.gMeasure);
-      el('line', { class: 'hud-mline' }, g);
-      el('line', { class: 'hud-mtick' }, g);
-      el('line', { class: 'hud-mtick' }, g);
-      el('circle', { class: 'hud-mdot', r: 2.6 }, g);
-      el('circle', { class: 'hud-mdot', r: 2.6 }, g);
-      el('rect', { class: 'hud-mbox', rx: 1 }, g);
-      el('text', { class: 'hud-text hud-mcap' }, g).textContent = 'DISTANCE';
-      el('text', { class: 'hud-text hud-mval' }, g);
-      this.measurePool.push(g);
-    }
-    return this.measurePool[i];
-  }
-
-  drawMeasurements(items: { a: Pt; b: Pt; mm: number; pending?: boolean; index: number }[]) {
-    items.forEach((m, i) => {
-      const g = this.measureItem(i);
-      const ok = m.a.ok && m.b.ok;
-      g.style.display = ok ? '' : 'none';
-      if (!ok) return;
-      g.classList.toggle('pending', !!m.pending);
-      const [line, t1, t2, d1, d2, rect, cap, val] = Array.from(g.children) as SVGElement[];
-      line.setAttribute('x1', String(m.a.x));
-      line.setAttribute('y1', String(m.a.y));
-      line.setAttribute('x2', String(m.b.x));
-      line.setAttribute('y2', String(m.b.y));
-      const dx = m.b.x - m.a.x;
-      const dy = m.b.y - m.a.y;
-      const L = Math.hypot(dx, dy) || 1;
-      const nx = (-dy / L) * 7;
-      const ny = (dx / L) * 7;
-      t1.setAttribute('x1', String(m.a.x - nx));
-      t1.setAttribute('y1', String(m.a.y - ny));
-      t1.setAttribute('x2', String(m.a.x + nx));
-      t1.setAttribute('y2', String(m.a.y + ny));
-      t2.setAttribute('x1', String(m.b.x - nx));
-      t2.setAttribute('y1', String(m.b.y - ny));
-      t2.setAttribute('x2', String(m.b.x + nx));
-      t2.setAttribute('y2', String(m.b.y + ny));
-      d1.setAttribute('cx', String(m.a.x));
-      d1.setAttribute('cy', String(m.a.y));
-      d2.setAttribute('cx', String(m.b.x));
-      d2.setAttribute('cy', String(m.b.y));
-      d2.style.display = m.pending ? 'none' : '';
-      const mx = (m.a.x + m.b.x) / 2 + nx * 2.6;
-      const my = (m.a.y + m.b.y) / 2 + ny * 2.6;
-      const label = `${m.mm.toFixed(m.mm < 100 ? 1 : 0)} mm`;
-      val.textContent = label;
-      cap.textContent = `M${String(m.index).padStart(2, '0')} · DISTANCE`;
-      cap.setAttribute('x', String(mx));
-      cap.setAttribute('y', String(my - 7));
-      val.setAttribute('x', String(mx));
-      val.setAttribute('y', String(my + 8));
-      const w = Math.max(label.length * 7.4, 92) + 14;
-      rect.setAttribute('x', String(mx - w / 2));
-      rect.setAttribute('y', String(my - 19));
-      rect.setAttribute('width', String(w));
-      rect.setAttribute('height', '34');
-    });
-    for (let i = items.length; i < this.measurePool.length; i++) this.measurePool[i].style.display = 'none';
   }
 
   // ───────────────────────────── callout from component to inspector panel

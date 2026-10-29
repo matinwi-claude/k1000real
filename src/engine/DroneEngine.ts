@@ -1,6 +1,6 @@
 /**
  * DroneEngine — owns the WebGL renderer, scene, camera rig, post-processing,
- * interaction (hover / click / measure), and all animated state (explode, x-ray,
+ * interaction (hover / click), and all animated state (explode, x-ray,
  * section, lighting, overlays). React talks to it through the zustand store and a
  * handful of imperative methods (camera views, focus, stats).
  */
@@ -41,17 +41,6 @@ const FIT_RADIUS = 1.75;
 const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 const approach = (cur: number, target: number, k: number) => cur + (target - cur) * k;
-
-interface MPoint {
-  node: ComponentNode | null;
-  local: THREE.Vector3;
-}
-interface MeasureLine {
-  id: number;
-  a: MPoint;
-  b: MPoint;
-  mm: number;
-}
 
 export interface EngineDom {
   /** optional real model (glTF scene) that replaces the procedural geometry */
@@ -135,13 +124,6 @@ export class DroneEngine {
   private pickTargets: THREE.Object3D[] = [];
   private pickDirty = true;
   private keys = new Set<string>();
-
-  // measurement
-  private measures: MeasureLine[] = [];
-  private pending: MPoint | null = null;
-  private pendingHover: THREE.Vector3 | null = null;
-  private measureId = 0;
-  private lastMeasureSync = 0;
 
   private guides!: THREE.LineSegments<THREE.BufferGeometry, THREE.LineDashedMaterial>;
 
@@ -495,18 +477,6 @@ export class DroneEngine {
       if (s.selected && (s.mode === 'inspect' || s.focusOnSelect)) this.focusComponent(s.selected);
       if (s.focusOnSelect) useStore.setState({ focusOnSelect: false });
     }
-    if (s.mode !== p.mode) {
-      if (s.mode !== 'measure') {
-        this.pending = null;
-        this.pendingHover = null;
-        if (s.measurePending) useStore.setState({ measurePending: false });
-      }
-      this.renderer.domElement.style.cursor = s.mode === 'measure' ? 'crosshair' : '';
-    }
-    if (s.measurements !== p.measurements && s.measurements.length === 0 && this.measures.length) {
-      this.measures = [];
-      this.pending = null;
-    }
     if (s.cinematic !== p.cinematic) {
       if (s.cinematic) {
         this.cineStart = this.time;
@@ -656,7 +626,7 @@ export class DroneEngine {
   private onDblClick = (e: MouseEvent) => {
     this.setPointer(e);
     const hit = this.pick();
-    if (hit && getState().mode !== 'measure') {
+    if (hit) {
       const id = hit.object.userData.componentId as string;
       useStore.setState({ selected: id });
       this.focusComponent(id);
@@ -744,11 +714,6 @@ export class DroneEngine {
   private handleClick() {
     const s = getState();
     const hit = this.pick();
-    if (s.mode === 'measure') {
-      if (!hit) return;
-      this.addMeasurePoint(hit);
-      return;
-    }
     if (!hit) {
       if (s.selected) useStore.setState({ selected: null });
       return;
@@ -757,66 +722,6 @@ export class DroneEngine {
     if (id === s.selected) return;
     useStore.setState({ selected: id, interacted: true, autoRotate: false });
     sound.select();
-  }
-
-  // ─────────────────────────────────────────────────────────── measurement
-  private toMPoint(hit: THREE.Intersection): MPoint {
-    let o: THREE.Object3D | null = hit.object;
-    let node: ComponentNode | null = null;
-    while (o) {
-      const n = this.model.nodes.get(o.name);
-      if (n && n.group === o) {
-        node = n;
-        break;
-      }
-      o = o.parent;
-    }
-    if (node) {
-      node.group.updateMatrixWorld();
-      return { node, local: node.group.worldToLocal(hit.point.clone()) };
-    }
-    return { node: null, local: hit.point.clone() };
-  }
-
-  private worldOf(mp: MPoint, out = new THREE.Vector3()) {
-    out.copy(mp.local);
-    if (mp.node) mp.node.group.localToWorld(out);
-    return out;
-  }
-
-  private addMeasurePoint(hit: THREE.Intersection) {
-    const mp = this.toMPoint(hit);
-    if (!this.pending) {
-      this.pending = mp;
-      useStore.setState({ measurePending: true });
-      sound.tick();
-    } else {
-      const a = this.pending;
-      const mm = this.worldOf(a).distanceTo(this.worldOf(mp)) * 1000;
-      this.measures.push({ id: ++this.measureId, a, b: mp, mm });
-      this.pending = null;
-      this.pendingHover = null;
-      this.syncMeasurements(true);
-      useStore.setState({ measurePending: false });
-      sound.confirm();
-    }
-    this.needsRender = true;
-  }
-
-  private syncMeasurements(force = false) {
-    const now = performance.now();
-    if (!force && now - this.lastMeasureSync < 150) return;
-    this.lastMeasureSync = now;
-    const cur = getState().measurements;
-    const next = this.measures.map((m) => ({ id: m.id, distanceMm: Math.round(m.mm * 10) / 10 }));
-    const same = cur.length === next.length && cur.every((c, i) => c.id === next[i].id && Math.abs(c.distanceMm - next[i].distanceMm) < 0.5);
-    if (!same) useStore.setState({ measurements: next });
-  }
-
-  removeMeasurement(id: number) {
-    this.measures = this.measures.filter((m) => m.id !== id);
-    this.syncMeasurements(true);
-    this.needsRender = true;
   }
 
   // ─────────────────────────────────────────────────────────── helpers
@@ -947,13 +852,7 @@ export class DroneEngine {
     if (this.pointerDirty && !this.downInfo && this.pointerInside && !s.cinematic) {
       this.pointerDirty = false;
       const hit = this.pick();
-      if (s.mode === 'measure') {
-        this.pendingHover = hit ? hit.point.clone() : null;
-        this.setHover(null);
-        this.needsRender = true;
-      } else {
-        this.setHover(hit ? (hit.object.userData.componentId as string) : null);
-      }
+      this.setHover(hit ? (hit.object.userData.componentId as string) : null);
     }
 
     // night strobes need continuous frames
@@ -976,7 +875,6 @@ export class DroneEngine {
       this.fpsFrames = 0;
       this.fpsTime = 0;
     }
-    this.syncMeasurements();
   };
 
   private freeFly(dt: number) {
@@ -1182,29 +1080,6 @@ export class DroneEngine {
       return [a.x, a.y, a.z] as [number, number, number];
     });
     this.gizmo.update(axes);
-
-    // measurements
-    const items: { a: Pt; b: Pt; mm: number; pending?: boolean; index: number }[] = [];
-    const wa = new THREE.Vector3();
-    const wb = new THREE.Vector3();
-    for (const m of this.measures) {
-      this.worldOf(m.a, wa);
-      this.worldOf(m.b, wb);
-      m.mm = wa.distanceTo(wb) * 1000;
-      items.push({ a: this.project(wa), b: this.project(wb), mm: m.mm, index: m.id });
-    }
-    if (this.pending && s.mode === 'measure') {
-      this.worldOf(this.pending, wa);
-      const a = this.project(wa);
-      if (this.pendingHover) {
-        items.push({ a, b: this.project(this.pendingHover), mm: wa.distanceTo(this.pendingHover) * 1000, pending: true, index: this.measureId + 1 });
-      } else {
-        const r = this.renderer.domElement.getBoundingClientRect();
-        items.push({ a, b: { x: this.pointerClient.x - r.left, y: this.pointerClient.y - r.top, ok: true }, mm: 0, pending: true, index: this.measureId + 1 });
-        items[items.length - 1].mm = NaN;
-      }
-    }
-    this.hud.drawMeasurements(items.filter((i) => !Number.isNaN(i.mm) || i.pending).map((i) => (Number.isNaN(i.mm) ? { ...i, mm: 0 } : i)));
 
     // selection callout + brackets
     const node = this.selectionNode;

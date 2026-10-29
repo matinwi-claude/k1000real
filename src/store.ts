@@ -1,16 +1,11 @@
 import { create } from 'zustand';
 
-export type InteractionMode = 'explore' | 'inspect' | 'measure';
+export type InteractionMode = 'explore' | 'inspect';
 export type ViewMode = 'exterior' | 'xray';
 export type SectionAxis = 'top' | 'side' | 'front';
 export type LightingMode = 'studio' | 'technical' | 'night' | 'inspection';
 export type Configuration = 'fixed-wing' | 'evtol';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
-
-export interface Measurement {
-  id: number;
-  distanceMm: number;
-}
 
 export interface State {
   ready: boolean;
@@ -48,8 +43,6 @@ export interface State {
   sound: boolean;
 
   hidden: Record<string, boolean>;
-  measurements: Measurement[];
-  measurePending: boolean;
 
   /** Last resting camera pose, serialised for the URL (px,py,pz,tx,ty,tz). */
   camParam: string | null;
@@ -103,8 +96,6 @@ export const useStore = create<State>((set, get) => ({
   sound: false,
 
   hidden: {},
-  measurements: [],
-  measurePending: false,
 
   camParam: null,
   focusOnSelect: false,

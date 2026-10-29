@@ -5,7 +5,6 @@ import { SettingsMenu, ToolRail, ViewButtons } from './components/Controls';
 import { ComponentInspector } from './components/ComponentInspector';
 import { ExplodedView } from './components/ExplodedView';
 import { SectionControl } from './components/SectionControl';
-import { MeasurementTool } from './components/MeasurementTool';
 import { FrameMarks } from './components/FrameMarks';
 import { IntroOverlay } from './components/IntroOverlay';
 import { EngineerPanel, ExitChip, Letterbox, Toast } from './components/Misc';
@@ -55,7 +54,6 @@ export default function App() {
         <ToolRail />
         <ViewButtons />
         <BrandLogo />
-        <MeasurementTool />
         <EngineerPanel />
         <ComponentInspector />
         <div className="k-dock">

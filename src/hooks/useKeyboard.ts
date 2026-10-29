@@ -33,7 +33,6 @@ export function useKeyboard() {
         case '5': return actions.cameraView('bottom');
         case 'e': return actions.toggleExplode();
         case 'i': return actions.setMode('inspect');
-        case 'm': return actions.setMode('measure');
         case 'x': return actions.toggleView('xray');
         case 's': return actions.toggleSection();
         case 'l': return actions.cycleLighting();

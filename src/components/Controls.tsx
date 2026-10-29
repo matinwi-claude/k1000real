@@ -8,7 +8,6 @@ import {
   IconEmbed,
   IconLayers,
   IconLink,
-  IconMeasure,
   IconPresent,
   IconRotate,
   IconSection,
@@ -30,7 +29,6 @@ function RailButton({ active, onClick, icon, label, hint }: { active?: boolean; 
 
 /** Right-edge tool rail. */
 export function ToolRail() {
-  const mode = useStore((s) => s.mode);
   const explode = useStore((s) => s.explode);
   const view = useStore((s) => s.view);
   const section = useStore((s) => s.section);
@@ -38,10 +36,6 @@ export function ToolRail() {
   const embedOpen = useStore((s) => s.embedOpen);
   return (
     <nav className="k-rail fade-on-idle" aria-label="Inspection tools">
-      <div className="k-rail-group">
-        <RailButton active={mode === 'measure'} onClick={() => actions.setMode('measure')} icon={<IconMeasure />} label="MEASURE" hint="M" />
-      </div>
-      <div className="k-rail-sep" />
       <div className="k-rail-group">
         <RailButton active={explode > 0.01} onClick={actions.toggleExplode} icon={<IconExplode />} label="EXPLODE" hint="E" />
         <RailButton active={view === 'xray'} onClick={() => actions.toggleView('xray')} icon={<IconXray />} label="X-RAY" hint="X" />
@@ -164,7 +158,6 @@ export function SettingsMenu() {
               <span><kbd>1</kbd>–<kbd>5</kbd> views</span>
               <span><kbd>E</kbd> explode</span>
               <span><kbd>I</kbd> inspect</span>
-              <span><kbd>M</kbd> measure</span>
               <span><kbd>L</kbd> lighting</span>
               <span><kbd>X</kbd> x-ray</span>
               <span><kbd>S</kbd> section</span>

@@ -161,38 +161,6 @@ kbd {
 .hud-coord.dim {
   fill: var(--dim);
 }
-.hud-mline {
-  stroke: #e9f3ff;
-  stroke-width: 1;
-}
-.hud-m.pending .hud-mline {
-  stroke-dasharray: 4 3;
-  stroke: var(--accent);
-}
-.hud-mtick {
-  stroke: #e9f3ff;
-  stroke-width: 1;
-}
-.hud-mdot {
-  fill: #06080a;
-  stroke: var(--accent);
-  stroke-width: 1.4;
-}
-.hud-mbox {
-  fill: rgba(6, 9, 12, 0.82);
-  stroke: var(--line-strong);
-}
-.hud-mcap {
-  font-size: 8px;
-  fill: var(--dim);
-  text-anchor: middle;
-  letter-spacing: 0.14em;
-}
-.hud-mval {
-  font-size: 12px;
-  fill: var(--text-hi);
-  text-anchor: middle;
-}
 
 /* gizmo */
 .k-gizmo-wrap {
@@ -1270,17 +1238,6 @@ input[type='range']::-moz-range-thumb {
   background: var(--bg);
   border: 1px solid var(--accent);
 }
-
-/* ───────────────────────────────────────────────────────────── measure */
-.k-measure {
-  position: absolute;
-  left: var(--inset);
-  top: 50%;
-  transform: translateY(-40%);
-  width: 220px;
-  padding: 12px 14px;
-  animation: panelUp 0.3s var(--ease);
-}
 .k-panel-title {
   display: flex;
   align-items: center;
@@ -1294,32 +1251,6 @@ input[type='range']::-moz-range-thumb {
 }
 .k-panel-title svg {
   color: var(--accent);
-}
-.k-measure-hint {
-  margin: 10px 0 0;
-  font-family: var(--sans);
-  font-size: 9px;
-  color: var(--accent);
-  letter-spacing: 0.1em;
-  animation: pulse 2.2s ease-in-out infinite;
-}
-.k-measure-list {
-  list-style: none;
-  margin: 10px 0 0;
-  padding: 0;
-}
-.k-measure-list li {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 5px 0;
-  border-bottom: 1px dashed var(--line);
-  font-size: 11px;
-}
-.k-measure-list li span:nth-child(2) {
-  flex: 1;
-  color: var(--text-hi);
-  text-align: right;
 }
 .k-btn-line {
   width: 100%;
@@ -1621,11 +1552,6 @@ input[type='range']::-moz-range-thumb {
   }
   .app.has-selection .k-dock {
     display: none;
-  }
-  .k-measure {
-    top: 64px;
-    transform: none;
-    width: 190px;
   }
   .k-eng {
     bottom: auto;

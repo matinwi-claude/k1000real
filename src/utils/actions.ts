@@ -13,7 +13,6 @@ export const actions = {
     const next = cur === mode ? 'explore' : mode;
     set({ mode: next, interacted: true });
     sound.mode();
-    if (next === 'measure') getState().notify('MEASURE · CLICK TWO POINTS ON THE DRONE');
     if (next === 'inspect') getState().notify('INSPECTION MODE · CLICK ANY COMPONENT');
   },
   toggleExplode() {
@@ -113,10 +112,6 @@ export const actions = {
       getState().notify('COPY FAILED — USE THE ADDRESS BAR');
     }
   },
-  clearMeasurements() {
-    set({ measurements: [], measurePending: false });
-    sound.tick();
-  },
   /** ESC: unwind the most specific state first. */
   escape() {
     const s = getState();
@@ -125,10 +120,6 @@ export const actions = {
     if (s.freeCam) return set({ freeCam: false });
     if (s.embedOpen) return set({ embedOpen: false });
     if (s.settingsOpen) return set({ settingsOpen: false });
-    if (s.mode === 'measure' && s.measurePending) {
-      set({ mode: 'explore' });
-      return;
-    }
     if (s.selected) return set({ selected: null });
     if (s.mode !== 'explore') return set({ mode: 'explore' });
   },
