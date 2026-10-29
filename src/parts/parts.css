@@ -245,18 +245,24 @@
 }
 .pa-brand {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  align-items: baseline;
+  gap: 12px;
+  white-space: nowrap;
   color: inherit;
   text-decoration: none;
 }
 .pa-logo {
   font-size: 19px;
-  font-weight: 300;
+  font-weight: 700;
   letter-spacing: 0.32em;
 }
+.pa-divider {
+  font-size: 17px;
+  font-weight: 300;
+  color: var(--pa-dim);
+}
 .pa-sub {
-  font: 9.5px var(--sans);
+  font: 11px var(--sans);
   letter-spacing: 0.24em;
   color: var(--pa-dim);
 }
@@ -540,7 +546,21 @@
   padding-top: 12px;
 }
 .pa-root.compact .pa-logo {
-  font-size: 15px;
+  font-size: 14px;
+  letter-spacing: 0.24em;
+}
+.pa-root.compact .pa-brand {
+  gap: 7px;
+}
+.pa-root.compact .pa-divider {
+  font-size: 13px;
+}
+.pa-root.compact .pa-sub {
+  font-size: 8.5px;
+  letter-spacing: 0.16em;
+}
+.pa-root.compact .pa-btn {
+  white-space: nowrap;
 }
 .pa-root.compact .pa-foot {
   justify-content: flex-start;
