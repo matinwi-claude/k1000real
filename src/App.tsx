@@ -2,12 +2,11 @@ import { useStore } from './store';
 import { DroneViewer } from './components/DroneViewer';
 import { StatusPanel } from './components/StatusPanel';
 import { SettingsMenu, ToolRail, ViewButtons } from './components/Controls';
-import { ComponentTree } from './components/ComponentTree';
 import { ComponentInspector } from './components/ComponentInspector';
 import { ExplodedView } from './components/ExplodedView';
 import { SectionControl } from './components/SectionControl';
 import { MeasurementTool } from './components/MeasurementTool';
-import { FrameMarks, TechnicalOverlay } from './components/TechnicalOverlay';
+import { FrameMarks } from './components/FrameMarks';
 import { IntroOverlay } from './components/IntroOverlay';
 import { EngineerPanel, ExitChip, Letterbox, Toast } from './components/Misc';
 import { ContextLost, EmbedChrome } from './components/EmbedChrome';
@@ -49,14 +48,12 @@ export default function App() {
   return (
     <div className={cls}>
       <DroneViewer />
-      <TechnicalOverlay />
       <div className="k-ui">
         <FrameMarks />
         <StatusPanel />
         <SettingsMenu />
         <ToolRail />
         <ViewButtons />
-        <ComponentTree />
         <MeasurementTool />
         <EngineerPanel />
         <ComponentInspector />

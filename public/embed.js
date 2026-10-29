@@ -14,7 +14,7 @@
  *   data-height="600"            fixed height in px (default: 16:9 responsive)
  *   data-aspect="21/9"           aspect ratio when no height is given
  *   data-component="battery"     open with a component selected
- *   data-view="exploded"         exploded | internal | xray (comma separated)
+ *   data-view="exploded"         exploded | xray (comma separated)
  *   data-light="night"           studio | technical | night | inspection
  *   data-autorotate="0"          disable the idle rotation
  *   data-radius="12"             corner radius in px
@@ -60,7 +60,7 @@
     u.searchParams.set('embed', '1');
     var map = parts
       ? { component: 'component', category: 'category', theme: 'theme', accent: 'accent', ink: 'ink', labels: 'labels' }
-      : { component: 'component', view: 'view', light: 'light', autorotate: 'autorotate', mode: 'mode', overlay: 'overlay' };
+      : { component: 'component', view: 'view', light: 'light', autorotate: 'autorotate', mode: 'mode' };
     Object.keys(map).forEach(function (k) {
       var v = attr(el, k);
       if (v != null && v !== '') u.searchParams.set(map[k], v);

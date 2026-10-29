@@ -5,14 +5,10 @@ import {
   IconCamera,
   IconClose,
   IconExplode,
-  IconInspect,
-  IconInternal,
-  IconLight,
   IconEmbed,
   IconLayers,
   IconLink,
   IconMeasure,
-  IconOverlay,
   IconPresent,
   IconRotate,
   IconSection,
@@ -38,27 +34,18 @@ export function ToolRail() {
   const explode = useStore((s) => s.explode);
   const view = useStore((s) => s.view);
   const section = useStore((s) => s.section);
-  const overlay = useStore((s) => s.overlay);
-  const lighting = useStore((s) => s.lighting);
   const embed = useStore((s) => s.embed);
   const embedOpen = useStore((s) => s.embedOpen);
   return (
     <nav className="k-rail fade-on-idle" aria-label="Inspection tools">
       <div className="k-rail-group">
-        <RailButton active={mode === 'inspect'} onClick={() => actions.setMode('inspect')} icon={<IconInspect />} label="INSPECT" hint="I" />
         <RailButton active={mode === 'measure'} onClick={() => actions.setMode('measure')} icon={<IconMeasure />} label="MEASURE" hint="M" />
       </div>
       <div className="k-rail-sep" />
       <div className="k-rail-group">
         <RailButton active={explode > 0.01} onClick={actions.toggleExplode} icon={<IconExplode />} label="EXPLODE" hint="E" />
-        <RailButton active={view === 'internal'} onClick={() => actions.toggleView('internal')} icon={<IconInternal />} label="INTERNAL" hint="T" />
         <RailButton active={view === 'xray'} onClick={() => actions.toggleView('xray')} icon={<IconXray />} label="X-RAY" hint="X" />
         <RailButton active={!!section} onClick={() => actions.toggleSection()} icon={<IconSection />} label="SECTION" hint="S" />
-      </div>
-      <div className="k-rail-sep" />
-      <div className="k-rail-group">
-        <RailButton active={overlay} onClick={actions.toggleOverlay} icon={<IconOverlay />} label="OVERLAY" hint="O" />
-        <RailButton active={lighting !== 'studio'} onClick={actions.cycleLighting} icon={<IconLight />} label={lighting.toUpperCase()} hint="L" />
       </div>
       {!embed && (
         <>
@@ -178,13 +165,11 @@ export function SettingsMenu() {
               <span><kbd>E</kbd> explode</span>
               <span><kbd>I</kbd> inspect</span>
               <span><kbd>M</kbd> measure</span>
-              <span><kbd>T</kbd> internal</span>
+              <span><kbd>L</kbd> lighting</span>
               <span><kbd>X</kbd> x-ray</span>
               <span><kbd>S</kbd> section</span>
-              <span><kbd>O</kbd> overlay</span>
               <span><kbd>F</kbd> focus</span>
               <span><kbd>H</kbd> hide part</span>
-              <span><kbd>B</kbd> components</span>
               <span><kbd>ESC</kbd> back</span>
             </div>
           </section>

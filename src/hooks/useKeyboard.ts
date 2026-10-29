@@ -16,7 +16,7 @@ export function useKeyboard() {
       buffer = (buffer + k).slice(-SECRET.length);
       if (buffer === SECRET) {
         buffer = '';
-        useStore.setState({ cinematic: true, settingsOpen: false, treeOpen: false, selected: null, interacted: true, autoRotate: false });
+        useStore.setState({ cinematic: true, settingsOpen: false, selected: null, interacted: true, autoRotate: false });
         getState().notify('CINEMATIC SEQUENCE');
         sound.unlock();
         return;
@@ -34,17 +34,14 @@ export function useKeyboard() {
         case 'e': return actions.toggleExplode();
         case 'i': return actions.setMode('inspect');
         case 'm': return actions.setMode('measure');
-        case 't': return actions.toggleView('internal');
         case 'x': return actions.toggleView('xray');
         case 's': return actions.toggleSection();
-        case 'o': return actions.toggleOverlay();
         case 'l': return actions.cycleLighting();
         case 'r': return actions.toggleAutoRotate();
         case 'c': return actions.toggleFreeCam();
         case 'p': return actions.togglePresentation();
         case 'f': return actions.focusSelected();
         case 'h': return actions.hideSelected();
-        case 'b': return useStore.setState({ treeOpen: !s.treeOpen });
         case '?': return useStore.setState({ settingsOpen: !s.settingsOpen });
       }
     };

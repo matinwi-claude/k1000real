@@ -77,8 +77,6 @@ export interface DroneComponent {
   explodeDelay: number;
   /** Revealed only to people who look closely (see Easter eggs). */
   hiddenNote?: string;
-  /** Show a label for this component in the technical overlay. */
-  overlayLabel?: boolean;
 }
 
 export interface Category {
@@ -98,7 +96,7 @@ export const CATEGORIES: Category[] = [
   { id: 'landing-gear', label: 'Landing Gear', code: 'LDG' },
 ];
 
-/** Aircraft-level facts from the public product page (shown in the status panel / overlay). */
+/** Aircraft-level facts from the public product page (shown in the status panel). */
 export const AIRCRAFT = {
   name: 'K1000ULE',
   maker: 'Kraus Hamdani Aerospace',
@@ -142,7 +140,6 @@ const liftMotors: DroneComponent[] = LIFT_LAYOUT.map((a) => ({
   layer: 'structure',
   explode: [0, 0.22, 0],
   explodeDelay: 0.24,
-  overlayLabel: a.index === 3,
 }));
 
 const liftProps: DroneComponent[] = LIFT_LAYOUT.map((a) => ({
@@ -241,7 +238,6 @@ const wing = (side: 1 | -1): DroneComponent => ({
   layer: 'exterior',
   explode: [side * 0.6, 0.2, 0],
   explodeDelay: 0.06,
-  overlayLabel: side > 0,
 });
 
 const wingCenter: DroneComponent = {
@@ -428,7 +424,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'structure',
     explode: [0, 0.4, -0.55],
     explodeDelay: 0.18,
-    overlayLabel: true,
   },
   {
     id: 'elevator',
@@ -526,7 +521,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'structure',
     explode: [0, 0, 0.72],
     explodeDelay: 0.22,
-    overlayLabel: true,
   },
   {
     id: 'cruise-esc',
@@ -570,7 +564,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'structure',
     explode: [0.55, 0.62, 0],
     explodeDelay: 0.0,
-    overlayLabel: true,
   },
   {
     id: 'solar-starboard',
@@ -630,7 +623,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'internal',
     explode: [0, -0.45, 0.05],
     explodeDelay: 0.34,
-    overlayLabel: true,
     hiddenNote: 'Cycle count on the end-cap plate reads 0147. Look under the aft end of the pack.',
   },
   {
@@ -746,7 +738,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'structure',
     explode: [0, 0.55, -0.1],
     explodeDelay: 0.12,
-    overlayLabel: true,
   },
   {
     id: 'datalink',
@@ -912,7 +903,6 @@ export const COMPONENTS: DroneComponent[] = [
     layer: 'structure',
     explode: [0, -0.45, 0.14],
     explodeDelay: 0.3,
-    overlayLabel: true,
     hiddenNote: 'The tiny red dot next to the window is the record lamp — it blinks in Night lighting.',
   },
 

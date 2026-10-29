@@ -35,10 +35,9 @@ Set these as attributes on the placeholder. Each one maps to a URL parameter on 
 | `data-aspect` | e.g. `21/9` | Aspect ratio used when no height is set. Default `16/9`. |
 | `data-radius` | number (px) | Corner radius. Default `12`. |
 | `data-component` | component id | Opens with that part selected, e.g. `battery`, `wing-port`, `lift-motor-03`. |
-| `data-view` | `exploded`, `internal`, `xray` | Starting view. Combine with commas. |
+| `data-view` | `exploded`, `xray` | Starting view. Combine with commas. |
 | `data-light` | `studio`, `technical`, `night`, `inspection` | Lighting preset. |
 | `data-mode` | `inspection`, `measure` | Starting tool. |
-| `data-overlay` | `1` | Shows the technical overlay. |
 | `data-autorotate` | `0` / `1` | Turns the idle rotation off or on. |
 
 The full list of component ids is in `src/data/components.ts`. The viewer also sends it in the `ready` event (see below).
@@ -75,10 +74,8 @@ viewer.select('battery');        // fly to and inspect a component (null clears)
 viewer.view('top');              // reset | front | side | top | bottom
 viewer.explode(1);               // 0 = assembled … 1 = fully exploded
 viewer.send('xray', true);       // x-ray on/off
-viewer.send('internal', true);   // ghost the skin
 viewer.send('section', 'side');  // top | side | front | null
 viewer.send('lighting', 'night');
-viewer.send('overlay', true);
 viewer.send('mode', 'inspect');  // explore | inspect | measure
 viewer.send('autoRotate', false);
 viewer.reset();                  // back to the default state

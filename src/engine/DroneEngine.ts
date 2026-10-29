@@ -14,11 +14,11 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 import { getState, useStore, type CameraView, type State } from '../store';
-import { COMPONENT_MAP, ENVELOPE } from '../data/components';
+import { COMPONENT_MAP } from '../data/components';
 
 /** Half-range of the cross-section cut slider per axis, in metres (illustrative scale). */
 export const SECTION_RANGE = { top: 0.15, side: 2.6, front: 1.3 } as const;
-import { CRUISE, FUSELAGE, LIFT, LIFT_LAYOUT, LOWEST_Y, TAIL, WING, pad } from '../data/layout';
+import { LOWEST_Y } from '../data/layout';
 import { buildDroneModel, type ComponentNode, type DroneModel } from './DroneModel';
 import { createMaterialLibrary, globalUniforms } from './materials';
 import { LIGHT_PRESETS, clonePreset, lerpPreset, type LightPreset } from './lighting';
@@ -107,7 +107,6 @@ export class DroneEngine {
   private explodeCur = 0;
   private xrayCur = 0;
   private ghostCur = 0;
-  private overlayCur = 0;
   private sectionAmt = 0;
   private sectionActive = false;
   private sectionAxis: 'top' | 'side' | 'front' = 'top';
@@ -141,12 +140,7 @@ export class DroneEngine {
   private measureId = 0;
   private lastMeasureSync = 0;
 
-  // overlays
-  private overlayGroup = new THREE.Group();
-  private overlayMats: (THREE.LineBasicMaterial | THREE.LineDashedMaterial)[] = [];
-  private rotorDiscs: THREE.Line[] = [];
   private guides!: THREE.LineSegments<THREE.BufferGeometry, THREE.LineDashedMaterial>;
-  private dimAnchors: { p: THREE.Vector3; text: string }[] = [];
 
   // render bookkeeping
   private needsRender = true;
@@ -212,7 +206,6 @@ export class DroneEngine {
 
     this.setupEnvironment();
     this.setupModel();
-    this.setupOverlay();
     this.setupSectionVisual();
     this.bindEvents();
     this.resize();
@@ -327,24 +320,6 @@ export class DroneEngine {
         m.geometry.computeBoundsTree();
       }
     }
-    // rotor discs (overlay) parented to each propeller so they follow the explode
-    const disc = (radius: number, vertical: boolean) => {
-      const pts: THREE.Vector3[] = [];
-      for (let k = 0; k <= 96; k++) {
-        const a = (k / 96) * Math.PI * 2;
-        pts.push(vertical ? new THREE.Vector3(Math.cos(a) * radius, Math.sin(a) * radius, 0) : new THREE.Vector3(Math.cos(a) * radius, 0, Math.sin(a) * radius));
-      }
-      const g = new THREE.BufferGeometry().setFromPoints(pts);
-      const m = new THREE.LineDashedMaterial({ color: '#6fb7ff', dashSize: 0.03, gapSize: 0.02, transparent: true, opacity: 0, depthWrite: false });
-      const line = new THREE.Line(g, m);
-      line.computeLineDistances();
-      line.visible = false;
-      this.rotorDiscs.push(line);
-      this.overlayMats.push(m);
-      return line;
-    };
-    for (const a of LIFT_LAYOUT) this.model.nodes.get(`lift-prop-${pad(a.index)}`)?.group.add(disc(LIFT.propRadius, false));
-    this.model.nodes.get('cruise-prop')?.group.add(disc(CRUISE.propRadius, true));
     // explode guide lines
     const n = this.model.nodes.size;
     const gg = new THREE.BufferGeometry();
@@ -356,97 +331,6 @@ export class DroneEngine {
     this.guides.frustumCulled = false;
     this.guides.visible = false;
     this.model.root.add(this.guides);
-  }
-
-  private setupOverlay() {
-    const g = this.overlayGroup;
-    g.visible = false;
-    this.scene.add(g);
-    const mk = (pts: number[], color: string, dashed: boolean, opacity = 0.6) => {
-      const geo = new THREE.BufferGeometry();
-      geo.setAttribute('position', new THREE.Float32BufferAttribute(pts, 3));
-      const mat = dashed
-        ? new THREE.LineDashedMaterial({ color, dashSize: 0.03, gapSize: 0.02, transparent: true, opacity: 0, depthWrite: false })
-        : new THREE.LineBasicMaterial({ color, transparent: true, opacity: 0, depthWrite: false });
-      mat.userData.base = opacity;
-      const line = new THREE.LineSegments(geo, mat);
-      if (dashed) line.computeLineDistances();
-      g.add(line);
-      this.overlayMats.push(mat);
-      return line;
-    };
-    const fy = this.grid.position.y + 0.003;
-    const half = ENVELOPE.span / 2000;
-    const noseZ = FUSELAGE.noseZ + 0.07;
-    const tailZ = FUSELAGE.tailEndZ;
-    const zL = tailZ - 0.35;
-    const xL = half + 0.3;
-    const tick = 0.06;
-    const top = TAIL.finTipY + 0.03;
-    // centerlines through the datum
-    mk([-half - 0.4, WING.y, 0, half + 0.4, WING.y, 0, 0, WING.y, tailZ - 0.4, 0, WING.y, noseZ + 0.4, 0, fy, 0, 0, top + 0.2, 0], '#6f9fcf', true, 0.55);
-    // span dimension (floor, aft of the tail)
-    mk(
-      [
-        -half, fy, zL, half, fy, zL,
-        -half, fy, zL - tick, -half, fy, zL + tick,
-        half, fy, zL - tick, half, fy, zL + tick,
-        -half, fy, zL + tick, -half, fy, WING.teZ - 0.1,
-        half, fy, zL + tick, half, fy, WING.teZ - 0.1,
-      ],
-      '#8fb8e0',
-      false,
-      0.55,
-    );
-    // length dimension (floor, outboard of the port tip)
-    mk(
-      [
-        xL, fy, tailZ, xL, fy, noseZ,
-        xL - tick, fy, tailZ, xL + tick, fy, tailZ,
-        xL - tick, fy, noseZ, xL + tick, fy, noseZ,
-      ],
-      '#8fb8e0',
-      false,
-      0.55,
-    );
-    // height dimension
-    mk(
-      [
-        xL, LOWEST_Y, zL, xL, top, zL,
-        xL - tick, LOWEST_Y, zL, xL + tick, LOWEST_Y, zL,
-        xL - tick, top, zL, xL + tick, top, zL,
-      ],
-      '#8fb8e0',
-      false,
-      0.5,
-    );
-    // axis triad at floor datum
-    mk([0, fy, 0, 0.45, fy, 0], '#d26a5c', false, 0.9);
-    mk([0, fy, 0, 0, fy + 0.45, 0], '#7cc48a', false, 0.9);
-    mk([0, fy, 0, 0, fy, 0.45], '#5d9ae0', false, 0.9);
-    // bounding brackets
-    const y0 = LOWEST_Y - 0.01;
-    const y1 = top;
-    const sB = 0.18;
-    const corners: number[] = [];
-    for (const x of [-half - 0.05, half + 0.05])
-      for (const y of [y0, y1])
-        for (const z of [tailZ - 0.05, noseZ + 0.05]) {
-          const sx = -Math.sign(x) * sB;
-          const sy = -Math.sign(y - (y0 + y1) / 2) * sB * 0.5;
-          const sz = -Math.sign(z - (tailZ + noseZ) / 2) * sB;
-          corners.push(x, y, z, x + sx, y, z, x, y, z, x, y + sy, z, x, y, z, x, y, z + sz);
-        }
-    mk(corners, '#6f9fcf', false, 0.45);
-
-    this.dimAnchors = [
-      { p: new THREE.Vector3(0, fy, zL - 0.12), text: `SPAN ${ENVELOPE.span} mm` },
-      { p: new THREE.Vector3(xL + 0.22, fy, (tailZ + noseZ) / 2), text: `LENGTH ${ENVELOPE.length} mm` },
-      { p: new THREE.Vector3(xL + 0.15, (LOWEST_Y + top) / 2, zL), text: `H ${ENVELOPE.height} mm` },
-      { p: new THREE.Vector3(0.52, fy, 0), text: '+X' },
-      { p: new THREE.Vector3(0, fy + 0.52, 0), text: '+Y' },
-      { p: new THREE.Vector3(0, fy, 0.55), text: '+Z  FWD' },
-    ];
   }
 
   private setupSectionVisual() {
@@ -1019,7 +903,7 @@ export class DroneEngine {
 
     // ── view modes
     const xrT = s.view === 'xray' ? 1 : 0;
-    const ghT = s.view === 'internal' || (s.view === 'exterior' && this.autoGhost(s)) ? 1 : 0;
+    const ghT = s.view === 'exterior' && this.autoGhost(s) ? 1 : 0;
     if (Math.abs(this.xrayCur - xrT) > 0.001 || Math.abs(this.ghostCur - ghT) > 0.001) {
       this.xrayCur = approach(this.xrayCur, xrT, k);
       this.ghostCur = approach(this.ghostCur, ghT, k);
@@ -1029,13 +913,6 @@ export class DroneEngine {
     }
     globalUniforms.uXray.value = this.xrayCur;
     globalUniforms.uGhost.value = this.ghostCur;
-
-    // ── overlay
-    const ovT = s.overlay ? 1 : 0;
-    if (Math.abs(this.overlayCur - ovT) > 0.002) {
-      this.overlayCur = approach(this.overlayCur, ovT, k);
-      active = true;
-    } else this.overlayCur = ovT;
 
     // ── section
     if (this.sectionActive) active = this.updateSection(s, k) || active;
@@ -1144,8 +1021,7 @@ export class DroneEngine {
     this.rim.intensity = L.rim;
     this.rim.color.copy(L.rimColor);
     const g = this.grid.material.uniforms;
-    g.uOpacity.value = L.grid * (1 + this.overlayCur * 0.6) * (s.presentation ? 0.6 : 1);
-    g.uOverlay.value = this.overlayCur;
+    g.uOpacity.value = L.grid * (s.presentation ? 0.6 : 1);
     this.shadow.material.opacity = L.shadow;
 
     const night = clamp((L.led - 1) / 4, 0, 1);
@@ -1291,11 +1167,6 @@ export class DroneEngine {
       this.guides.computeLineDistances();
       this.guides.material.opacity = 0.32 * clamp(E * 3, 0, 1);
     }
-    // overlay objects
-    const ov = this.overlayCur;
-    this.overlayGroup.visible = ov > 0.005;
-    for (const m of this.overlayMats) m.opacity = (m.userData.base ?? 0.5) * ov;
-    for (const r of this.rotorDiscs) r.visible = ov > 0.005;
     return changed;
   }
 
@@ -1357,26 +1228,6 @@ export class DroneEngine {
     } else {
       this.hud.drawCallout(null, null);
       this.hud.drawBrackets(null);
-    }
-
-    // overlay labels + dimensions
-    const ov = uiHidden ? 0 : this.overlayCur;
-    if (ov > 0.01) {
-      const origin = this.project(new THREE.Vector3(0, TARGET.y, 0));
-      const labels: { p: Pt; text: string; code: string; cx: number; cy: number }[] = [];
-      for (const n of this.model.nodes.values()) {
-        if (!n.data.overlayLabel || s.hidden[n.id]) continue;
-        const c = this.worldBox(n).getCenter(new THREE.Vector3());
-        labels.push({ p: this.project(c), text: n.data.name.toUpperCase(), code: n.data.partNumber, cx: origin.x, cy: origin.y });
-      }
-      this.hud.drawLabels(labels, ov);
-      this.hud.drawDims(
-        this.dimAnchors.map((d) => ({ p: this.project(d.p), text: d.text })),
-        ov,
-      );
-    } else {
-      this.hud.drawLabels([], 0);
-      this.hud.drawDims([], 0);
     }
   }
 

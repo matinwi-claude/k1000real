@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 
 export type InteractionMode = 'explore' | 'inspect' | 'measure';
-export type ViewMode = 'exterior' | 'internal' | 'xray';
+export type ViewMode = 'exterior' | 'xray';
 export type SectionAxis = 'top' | 'side' | 'front';
 export type LightingMode = 'studio' | 'technical' | 'night' | 'inspection';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
@@ -36,7 +36,6 @@ export interface State {
   section: SectionAxis | null;
   sectionOffset: number;
   lighting: LightingMode;
-  overlay: boolean;
   autoRotate: boolean;
   freeCam: boolean;
   presentation: boolean;
@@ -57,7 +56,6 @@ export interface State {
 
   settingsOpen: boolean;
   embedOpen: boolean;
-  treeOpen: boolean;
   uiIdle: boolean;
   toast: { text: string; id: number } | null;
 
@@ -92,7 +90,6 @@ export const useStore = create<State>((set, get) => ({
   section: null,
   sectionOffset: 0,
   lighting: 'studio',
-  overlay: false,
   autoRotate: true,
   freeCam: false,
   presentation: false,
@@ -111,7 +108,6 @@ export const useStore = create<State>((set, get) => ({
 
   settingsOpen: false,
   embedOpen: false,
-  treeOpen: false,
   uiIdle: false,
   toast: null,
 

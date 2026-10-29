@@ -42,23 +42,17 @@ function handle(cmd: string, value: unknown) {
     case 'xray':
       set({ view: value ? 'xray' : 'exterior' });
       return;
-    case 'internal':
-      set({ view: value ? 'internal' : 'exterior' });
-      return;
     case 'section':
       set({ section: (['top', 'side', 'front'] as const).includes(value as SectionAxis) ? (value as SectionAxis) : null });
       return;
     case 'lighting':
       if (LIGHTS.includes(value as LightingMode)) set({ lighting: value as LightingMode });
       return;
-    case 'overlay':
-      set({ overlay: !!value });
-      return;
     case 'autoRotate':
       set({ autoRotate: !!value });
       return;
     case 'reset':
-      set({ selected: null, explode: 0, view: 'exterior', section: null, mode: 'explore', overlay: false, hidden: {} });
+      set({ selected: null, explode: 0, view: 'exterior', section: null, mode: 'explore', hidden: {} });
       engineRef.current?.setCameraView('reset');
       return;
   }

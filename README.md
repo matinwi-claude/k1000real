@@ -73,18 +73,16 @@ An exploded, isometric line drawing of every part, styled like a technical broch
   - Selecting an internal part ghosts the skin automatically so you can see it.
 - **Views:**
   - **Exploded:** animated, staggered separation of the assemblies, controlled with an ASSEMBLY slider. Guide lines connect each part to where it belongs.
-  - **Internal:** the skin is ghosted so the inside shows.
   - **X-ray:** fresnel-style see-through rendering.
   - **Cross-section:** cut from the top, side or front with a slider, showing hatched cut faces.
 - **Tools:**
   - Measurements between any two points. Multiple measurements are allowed, and each line stays attached to its parts in exploded view.
-  - Technical overlay: centrelines, rotor discs, envelope dimensions, axes, labels and the published facts.
   - Lighting presets: Studio, Technical, Night and Inspection.
-  - Free cam (WASD + Q/E), presentation mode and a component tree with per-part and per-category visibility.
+  - Free cam (WASD + Q/E) and presentation mode.
 - **Shareable URL state:**
   - `?mode=inspection&component=lift-motor-04`
-  - `?view=exploded` · `?view=internal` · `?view=xray` · `?section=side&cut=0.2`
-  - `?light=night&overlay=1&cam=…`
+  - `?view=exploded` · `?view=xray` · `?section=side&cut=0.2`
+  - `?light=night&cam=…`
   - Use **Copy link** in settings.
 - **Easter eggs:**
   - Click the logo five times to turn on Engineer mode (diagnostics, rotor spin test, wireframe, hidden field notes).
@@ -95,7 +93,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 
 ### Keyboard
 
-`1–5` views · `E` explode · `I` inspect · `M` measure · `T` internal · `X` x-ray · `S` section · `O` overlay · `L` lighting · `R` auto-rotate · `C` free cam · `P` presentation · `F` focus · `H` hide part · `B` components · `Esc` back
+`1–5` views · `E` explode · `I` inspect · `M` measure · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `C` free cam · `P` presentation · `F` focus · `H` hide part · `Esc` back
 
 ## Performance
 
@@ -107,8 +105,8 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 
 ```
 src/
-  components/   DroneViewer, ComponentInspector, ComponentTree, Controls, ExplodedView,
-                SectionControl, MeasurementTool, TechnicalOverlay, StatusPanel, IntroOverlay, …
+  components/   DroneViewer, ComponentInspector, Controls, ExplodedView,
+                SectionControl, MeasurementTool, StatusPanel, IntroOverlay, …
   data/         components.ts (component database), layout.ts (traced proportions)
   engine/       DroneEngine (renderer, camera, interaction, animation), DroneModel (generated model),
                 GltfModel (real-model loader), Hud (SVG overlay), materials, lighting, geometry, textures

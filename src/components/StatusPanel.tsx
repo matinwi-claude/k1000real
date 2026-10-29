@@ -38,14 +38,14 @@ export function StatusPanel() {
   };
 
   const inspection = mode === 'inspect' ? (selected ? 'ACTIVE' : 'ARMED') : mode === 'measure' ? 'MEASURE' : 'READY';
-  const config = [explode > 0.01 ? 'EXPLODED' : 'ASSEMBLED', view === 'exterior' ? null : view === 'xray' ? 'X-RAY' : 'INTERNAL']
+  const config = [explode > 0.01 ? 'EXPLODED' : 'ASSEMBLED', view === 'xray' ? 'X-RAY' : null]
     .filter(Boolean)
     .join(' · ');
 
   return (
     <div className="k-status">
-      <button className="k-brand" onClick={onLogo} aria-label="K1000">
-        <span className="k-brand-mark">K1000</span>
+      <button className="k-brand" onClick={onLogo} aria-label="K1000ULE">
+        <span className="k-brand-mark">K1000ULE</span>
         {engineer && (
           <span className="k-brand-sub">
             <em>ENG</em>

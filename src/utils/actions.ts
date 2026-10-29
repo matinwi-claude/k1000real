@@ -39,10 +39,6 @@ export const actions = {
   setSectionOffset(v: number) {
     set({ sectionOffset: v });
   },
-  toggleOverlay() {
-    set({ overlay: !getState().overlay, interacted: true });
-    sound.toggle();
-  },
   setLighting(l: LightingMode) {
     set({ lighting: l });
     sound.mode();
@@ -60,7 +56,7 @@ export const actions = {
   },
   toggleFreeCam() {
     const next = !getState().freeCam;
-    set({ freeCam: next, autoRotate: false, settingsOpen: false, treeOpen: false, interacted: true });
+    set({ freeCam: next, autoRotate: false, settingsOpen: false, interacted: true });
     if (next) getState().notify('FREE CAM · WASD MOVE · Q / E ELEVATE · ESC EXIT');
     sound.mode();
   },
@@ -135,6 +131,5 @@ export const actions = {
     }
     if (s.selected) return set({ selected: null });
     if (s.mode !== 'explore') return set({ mode: 'explore' });
-    if (s.treeOpen) return set({ treeOpen: false });
   },
 };

@@ -1,7 +1,6 @@
 /**
  * Screen-space technical HUD drawn in a single SVG layer above the canvas:
- * measurement lines, inspection brackets, callout leaders, overlay labels and the
- * axis gizmo. Updated imperatively by the engine each rendered frame — no React
+ * measurement lines, inspection brackets, callout leaders and the axis gizmo. Updated imperatively by the engine each rendered frame — no React
  * re-renders on the hot path.
  */
 const NS = 'http://www.w3.org/2000/svg';
@@ -24,11 +23,7 @@ export class Hud {
   gMeasure: SVGGElement;
   gCallout: SVGGElement;
   gBrackets: SVGGElement;
-  gLabels: SVGGElement;
-  gDims: SVGGElement;
   private measurePool: SVGGElement[] = [];
-  private labelPool: SVGGElement[] = [];
-  private dimPool: SVGTextElement[] = [];
   private calloutLine: SVGPolylineElement;
   private calloutDot: SVGCircleElement;
   private calloutRing: SVGCircleElement;
@@ -39,8 +34,6 @@ export class Hud {
   constructor(svg: SVGSVGElement) {
     this.svg = svg;
     svg.innerHTML = '';
-    this.gDims = el('g', { class: 'hud-dims' }, svg);
-    this.gLabels = el('g', { class: 'hud-labels' }, svg);
     this.gBrackets = el('g', { class: 'hud-brackets' }, svg);
     this.gCallout = el('g', { class: 'hud-callout' }, svg);
     this.gMeasure = el('g', { class: 'hud-measure' }, svg);
@@ -170,64 +163,6 @@ export class Hud {
       this.coord2.setAttribute('x', String(x0));
       this.coord2.setAttribute('y', String(y1 + 28));
     }
-  }
-
-  // ───────────────────────────── overlay labels with leader lines
-  drawLabels(items: { p: Pt; text: string; code: string; cx: number; cy: number }[], opacity: number) {
-    this.gLabels.style.opacity = String(opacity);
-    this.gLabels.style.display = opacity < 0.01 ? 'none' : '';
-    if (opacity < 0.01) return;
-    items.forEach((it, i) => {
-      while (this.labelPool.length <= i) {
-        const g = el('g', { class: 'hud-lab' }, this.gLabels);
-        el('polyline', { class: 'hud-line hud-leader', fill: 'none' }, g);
-        el('circle', { class: 'hud-dot', r: 1.8 }, g);
-        el('text', { class: 'hud-text hud-labname' }, g);
-        el('text', { class: 'hud-text hud-labcode' }, g);
-        this.labelPool.push(g);
-      }
-      const g = this.labelPool[i];
-      g.style.display = it.p.ok ? '' : 'none';
-      if (!it.p.ok) return;
-      const [line, dot, name, code] = Array.from(g.children) as SVGElement[];
-      const dx = it.p.x - it.cx;
-      const dy = it.p.y - it.cy;
-      const L = Math.hypot(dx, dy) || 1;
-      const ex = it.p.x + (dx / L) * 46;
-      const ey = it.p.y + (dy / L) * 46;
-      const right = dx >= 0;
-      const lw = Math.max(54, it.text.length * 6.6 + 10);
-      const hx = ex + (right ? lw : -lw);
-      line.setAttribute('points', `${it.p.x},${it.p.y} ${ex},${ey} ${hx},${ey}`);
-      dot.setAttribute('cx', String(it.p.x));
-      dot.setAttribute('cy', String(it.p.y));
-      name.textContent = it.text;
-      code.textContent = it.code;
-      const anchor = right ? 'start' : 'end';
-      const tx = ex + (right ? 4 : -4);
-      name.setAttribute('text-anchor', anchor);
-      code.setAttribute('text-anchor', anchor);
-      name.setAttribute('x', String(tx));
-      name.setAttribute('y', String(ey - 5));
-      code.setAttribute('x', String(tx));
-      code.setAttribute('y', String(ey + 11));
-    });
-    for (let i = items.length; i < this.labelPool.length; i++) this.labelPool[i].style.display = 'none';
-  }
-
-  // ───────────────────────────── dimension texts (overlay)
-  drawDims(items: { p: Pt; text: string }[], opacity: number) {
-    this.gDims.style.opacity = String(opacity);
-    this.gDims.style.display = opacity < 0.01 ? 'none' : '';
-    if (opacity < 0.01) return;
-    items.forEach((it, i) => {
-      while (this.dimPool.length <= i) this.dimPool.push(el('text', { class: 'hud-text hud-dim', 'text-anchor': 'middle' }, this.gDims));
-      const t = this.dimPool[i];
-      t.style.display = it.p.ok ? '' : 'none';
-      t.textContent = it.text;
-      t.setAttribute('x', String(it.p.x));
-      t.setAttribute('y', String(it.p.y));
-    });
   }
 }
 
