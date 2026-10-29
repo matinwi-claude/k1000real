@@ -56,7 +56,7 @@ Put a glTF binary at **`public/models/k1000ule.glb`**. If it's there, it replace
 
 ## Replacing individual parts with CAD (STL)
 
-Single parts can be swapped for real CAD while every other part keeps its generated geometry. The fuselage (with its four antenna masts) already comes from `models-src/fuselage-goldie-antenna-suite.stl`.
+Single parts can be swapped for real CAD while every other part keeps its generated geometry. The fuselage (with its four antenna masts and skids), canopy hatch, HD40 gimbal camera, cruise motor and cruise propeller already come from the STLs in `models-src/`.
 
 1. Put the STL in `models-src/`.
 2. Add it to `models-src/parts.json`:
@@ -65,10 +65,8 @@ Single parts can be swapped for real CAD while every other part keeps its genera
    - `offset`: metres to shift the part after conversion, so it lines up with the rest of the aircraft.
    - `default`: the component id and material for the whole file.
    - `pieces` (optional): send some of the file's separate bodies to other components. Rules use the source coordinates, e.g. `{ "min_z_gt": -20, "center_x_gt": 40 }`.
-3. Run `python3 tools/import-parts.py`. It needs `pip install trimesh scipy networkx rtree` and Node. It writes `public/models/parts.glb`, which the viewer loads automatically.
+3. Run `python3 tools/import-parts.py`. It needs `pip install trimesh scipy networkx rtree fast-simplification` and Node. Add `"keep": 0.3` to a source to simplify heavy meshes to that fraction of their triangles. It writes `public/models/parts.glb`, which the viewer loads automatically.
 4. Regenerate the 2D drawing (see below) so the parts atlas shows the new geometry.
-
-Generated parts that attach to the fuselage (the nose, the camera turret and the belly parts) are refitted to the CAD fuselage in `src/engine/PartModels.ts` (`CAD_FUSELAGE_FIT`).
 
 ## 2D parts atlas (`/parts`)
 

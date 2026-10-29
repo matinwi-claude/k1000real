@@ -39,9 +39,8 @@ export const LABELS: AtlasLabel[] = [
     ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'tail-boom', 'gnss', 'pitot'],
     at: [962, 458],
   },
-  { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['nose-cone', 'cruise-motor', 'cruise-prop'], at: [1112, 640] },
-  { kind: 'group', text: 'Payload', ids: ['eo-ir', 'gimbal'], at: [412, 718], atPortrait: [183, 1252] },
+  { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },
+  { kind: 'group', text: 'Camera', ids: ['eo-ir'], at: [412, 718], atPortrait: [183, 1252] },
 
-  { kind: 'detail', text: 'Gimbal Mount', ids: ['gimbal'], at: [500, 776], atPortrait: [356, 1372], align: 'start' },
-  { kind: 'detail', text: 'EO/IR Turret', ids: ['eo-ir'] },
+  { kind: 'detail', text: 'HD40 Gimbal Camera', ids: ['eo-ir'] },
 ];

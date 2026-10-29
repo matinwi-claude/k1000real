@@ -6,10 +6,12 @@ Each source in models-src/parts.json is converted from its own units and axes in
 the viewer frame (metres, +Y up, +Z nose, +X port), shifted by `offset` (metres), and
 split into components: every connected body goes to the first `pieces` entry whose
 `where` rule matches it (rules use the SOURCE coordinates/units), otherwise to
-`default`. Meshes are written as "<component-id>__<material>" and replace that
-component's procedural geometry at runtime (src/engine/PartModels.ts).
+`default`. Meshes are written as "<component-id>__<material>[__spin]" and replace that
+component's procedural geometry at runtime (src/engine/PartModels.ts). `"spin": true`
+puts a source on its component's rotor group (propellers); `"keep": 0.3` decimates
+large meshes to that fraction of their triangles.
 
-Requires: pip install trimesh scipy networkx rtree ; Node (npx) for meshopt compression.
+Requires: pip install trimesh scipy networkx rtree fast-simplification ; Node (npx) for meshopt compression.
 """
 import json, subprocess, sys, tempfile
 from pathlib import Path
@@ -61,11 +63,18 @@ def convert(src):
         part = mesh.submesh([np.concatenate(parts)], append=True)
         part.vertices = part.vertices @ rot.T + np.array(src['offset'])
         part.merge_vertices()
+        keep = src.get('keep')
+        if keep and keep < 1 and len(part.faces) > 20000:
+            # quadric decimation: keep this fraction of the triangles
+            part = part.simplify_quadric_decimation(percent=1 - keep)
         # split normals at creases so CAD edges stay crisp and curved panels stay smooth
         part = trimesh.graph.smooth_shade(part, angle=np.radians(35))
-        out[f'{cid}__{mat}'] = part
+        name = f'{cid}__{mat}' + ('__spin' if src.get('spin') else '')
+        if name in out:
+            part = trimesh.util.concatenate([out[name], part])
+        out[name] = part
         lo, hi = part.bounds
-        print(f'  {cid:<14} {mat:<8} {len(part.faces):>7} tris  x {lo[0]:+.3f}..{hi[0]:+.3f}  y {lo[1]:+.3f}..{hi[1]:+.3f}  z {lo[2]:+.3f}..{hi[2]:+.3f}')
+        print(f'  {cid:<14} {mat:<12} {len(part.faces):>7} tris  x {lo[0]:+.3f}..{hi[0]:+.3f}  y {lo[1]:+.3f}..{hi[1]:+.3f}  z {lo[2]:+.3f}..{hi[2]:+.3f}')
     return out
 
 
@@ -74,6 +83,8 @@ def main():
     scene = trimesh.Scene()
     for src in cfg['sources']:
         for name, part in convert(src).items():
+            if name in scene.geometry:
+                sys.exit(f'{name} comes from two sources; give one of them a different material')
             part.visual = trimesh.visual.ColorVisuals(part)
             scene.add_geometry(part, node_name=name, geom_name=name)
     OUT.parent.mkdir(parents=True, exist_ok=True)

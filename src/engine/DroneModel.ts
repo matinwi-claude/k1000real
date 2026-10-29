@@ -59,7 +59,7 @@ import {
   type MaterialLibrary,
 } from './materials';
 import { glowTexture, serialPlate, solarTexture, wearMark } from './textures';
-import { CAD_FUSELAGE_FIT, fitMatrix, type PartModels } from './PartModels';
+import type { PartModels } from './PartModels';
 
 export interface ComponentNode {
   id: string;
@@ -348,27 +348,6 @@ function logoTexture() {
   _logo = t;
   return t;
 }
-
-BUILDERS['nose-cone'] = (b) => {
-  // short fairing between the conical pod and the cruise motor
-  b.add(
-    'shell',
-    latheZ(
-      [
-        [0, 0.772],
-        [0.0192, 0.772],
-        [0.0178, 0.786],
-        [0.0158, 0.797],
-        [0.0145, 0.801],
-        [0, 0.801],
-      ],
-      36,
-      0,
-      NOSE_Y,
-    ),
-  );
-  b.add('seam', torus(0.0191, 0.0005, [0, NOSE_Y, 0.7725], [0, 0, 0], 6, 36));
-};
 
 for (const side of [1, -1] as const) {
   BUILDERS[side > 0 ? 'wing-port' : 'wing-starboard'] = (b) => {
@@ -802,19 +781,6 @@ BUILDERS['nav-lights'] = (b) => {
 };
 
 // ───────────────────────────────────────────────────────── camera
-BUILDERS['gimbal'] = (b) => {
-  const z = 0.62;
-  const bot = fuselageBottom(z);
-  b.add('anodized', cyl(0.034, 0.034, 0.01, 40, [0, bot + 0.002, z]));
-  b.add('motorBell', cyl(0.028, 0.03, 0.016, 40, [0, bot - 0.011, z]));
-  b.add('aluminum', torus(0.0285, 0.0012, [0, bot - 0.004, z], [Math.PI / 2, 0, 0], 6, 40));
-  for (const s of [1, -1]) {
-    b.add('plasticLight', rbox(0.01, 0.05, 0.03, 0.004, [s * 0.05, bot - 0.042, z]));
-    b.add('plasticLight', rbox(0.05, 0.01, 0.03, 0.004, [s * 0.026, bot - 0.02, z]));
-    b.add('motorBell', cyl(0.012, 0.012, 0.008, 24, [s * 0.046, bot - 0.055, z], [0, 0, Math.PI / 2]));
-  }
-};
-
 BUILDERS['eo-ir'] = (b) => {
   const z = 0.62;
   const cy = fuselageBottom(z) - 0.055;
@@ -898,7 +864,7 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
       ? undefined
       : cad
         ? (b) => {
-            for (const p of cad) b.add(p.mat, p.geom);
+            for (const p of cad) (p.spin ? b.addSpin : b.add).call(b, p.mat, p.geom);
           }
         : BUILDERS[data.id];
     if (!fn) {
@@ -907,15 +873,6 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
     }
     const b = new Builder();
     fn(b, { data });
-    const fit = parts?.has('fuselage') ? CAD_FUSELAGE_FIT[data.id] : undefined;
-    if (fit) {
-      const m = fitMatrix(fit);
-      for (const p of [...b.pending, ...b.spinPending, ...b.custom]) p.geom.applyMatrix4(m);
-      for (const bolt of b.bolts) bolt.p.applyMatrix4(m);
-      for (const e of b.extras) e.position.applyMatrix4(m);
-      node.basePosition.applyMatrix4(m);
-      node.group.position.copy(node.basePosition);
-    }
     const anchor = node.basePosition;
     const matCache = new Map<MatKey, THREE.Material>();
     const getMat = (key: MatKey) => {

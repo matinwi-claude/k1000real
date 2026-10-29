@@ -50,7 +50,6 @@ export const LAYOUT_2D: Record<string, Place> = {
   'avionics-hatch': { offset: [0, 0.2, 0.02] },
   'antenna-01': { offset: [0, 0.1, 0] },
   'antenna-02': { offset: [0, 0.1, 0] },
-  'nose-cone': { offset: [0, 0, 0.14] },
   'cruise-motor': { offset: [0, 0, 0.28] },
   'cruise-prop': { offset: [0, 0, 0.44] },
   'horizontal-stabilizer': { offset: [0, 0.14, -0.04] },
@@ -61,11 +60,9 @@ export const LAYOUT_2D: Record<string, Place> = {
 
   // enlarged detail parts (screen = metres right / up of the model origin on the drawing)
   'eo-ir': { screen: [-1.2, -1.25], scale: 2.6 },
-  gimbal: { screen: [-1.2, -1.0], scale: 2.6 },
 };
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
-  gimbal: { screen: [-1.85, -3.05], scale: 5.4 },
   'eo-ir': { screen: [-1.85, -3.75], scale: 5.4 },
 };

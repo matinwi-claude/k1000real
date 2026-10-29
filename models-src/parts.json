@@ -54,6 +54,89 @@
         "id": "avionics-hatch",
         "material": "shell"
       }
+    },
+    {
+      "file": "hd40-gimbal.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0.119,
+        0.25
+      ],
+      "default": {
+        "id": "eo-ir",
+        "material": "plastic"
+      },
+      "keep": 0.3
+    },
+    {
+      "file": "cruise-motor-tmotor-at5220b.stl",
+      "units": "mm",
+      "axes": [
+        "-x",
+        "y",
+        "-z"
+      ],
+      "offset": [
+        0,
+        -0.012,
+        1.0146
+      ],
+      "default": {
+        "id": "cruise-motor",
+        "material": "motorBell"
+      },
+      "pieces": [
+        {
+          "id": "cruise-motor",
+          "material": "aluminum",
+          "where": {
+            "max_x_lt": 4.5
+          }
+        }
+      ],
+      "keep": 0.5
+    },
+    {
+      "file": "cruise-propeller.stl",
+      "units": "mm",
+      "axes": [
+        "-x",
+        "z",
+        "y"
+      ],
+      "offset": [
+        0,
+        -0.012,
+        1.0569
+      ],
+      "spin": true,
+      "default": {
+        "id": "cruise-prop",
+        "material": "aluminum"
+      },
+      "pieces": [
+        {
+          "id": "cruise-prop",
+          "material": "plastic",
+          "where": {
+            "max_x_gt": 100
+          }
+        },
+        {
+          "id": "cruise-prop",
+          "material": "plastic",
+          "where": {
+            "min_x_lt": -100
+          }
+        }
+      ],
+      "keep": 0.3
     }
   ]
 }
