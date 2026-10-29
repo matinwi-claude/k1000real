@@ -4,6 +4,7 @@ export type InteractionMode = 'explore' | 'inspect' | 'measure';
 export type ViewMode = 'exterior' | 'xray';
 export type SectionAxis = 'top' | 'side' | 'front';
 export type LightingMode = 'studio' | 'technical' | 'night' | 'inspection';
+export type Configuration = 'fixed-wing' | 'evtol';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
 
 export interface Measurement {
@@ -40,6 +41,7 @@ export interface State {
   freeCam: boolean;
   presentation: boolean;
   cinematic: boolean;
+  configuration: Configuration;
   engineer: boolean;
   spinTest: boolean;
   wireframe: boolean;
@@ -94,6 +96,7 @@ export const useStore = create<State>((set, get) => ({
   freeCam: false,
   presentation: false,
   cinematic: false,
+  configuration: 'evtol',
   engineer: false,
   spinTest: false,
   wireframe: false,

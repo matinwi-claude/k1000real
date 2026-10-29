@@ -201,7 +201,7 @@ kbd {
 .k-gizmo-wrap {
   position: absolute;
   right: calc(var(--inset) + 2px);
-  bottom: 66px;
+  bottom: calc(var(--inset) + 50px);
   width: 64px;
   height: 64px;
   pointer-events: none;
@@ -323,7 +323,8 @@ kbd {
 }
 .app.is-free .k-rail,
 .app.is-free .k-views,
-.app.is-free .k-status-grid,
+.app.is-free .k-config,
+.app.is-free .k-maker,
 .app.is-free .k-inspector,
 .app.is-free .k-dock,
 .app.is-free .k-frame {
@@ -407,32 +408,57 @@ kbd {
   font-style: normal;
   color: var(--orange);
 }
-.k-status-grid {
+.k-config {
   display: grid;
-  grid-template-columns: auto auto;
-  column-gap: 18px;
-  row-gap: 5px;
-  margin: 18px 0 0;
+  justify-items: start;
+  gap: 2px;
+  margin-top: 18px;
   padding-top: 12px;
   border-top: 1px solid var(--line);
   font-size: 9px;
   letter-spacing: 0.14em;
-  width: max-content;
+  min-width: 150px;
 }
-.k-status-grid dt {
+.k-config-title {
   color: var(--dim2);
+  margin-bottom: 6px;
 }
-.k-status-grid dd {
-  margin: 0;
-  font-family: var(--mono);
-  color: var(--text);
-  letter-spacing: 0.06em;
+.k-config button {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
+  padding: 4px 0;
+  font-family: var(--mono);
+  font-size: 9px;
+  letter-spacing: 0.06em;
+  color: var(--dim);
+  transition: color 0.2s;
 }
-.k-status-grid dd.accent {
-  color: var(--accent);
+.k-config button:hover,
+.k-config button.on {
+  color: var(--text-hi);
+}
+.k-config button i {
+  width: 7px;
+  height: 7px;
+  border: 1px solid var(--line-strong);
+  border-radius: 50%;
+  transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
+}
+.k-config button.on i {
+  background: var(--accent);
+  border-color: var(--accent);
+  box-shadow: 0 0 6px rgba(127, 192, 255, 0.5);
+}
+.k-maker {
+  position: absolute;
+  right: var(--inset);
+  bottom: var(--inset);
+  width: 132px;
+  height: auto;
+  opacity: 0.85;
+  pointer-events: none;
+  user-select: none;
 }
 .k-dot {
   width: 5px;
@@ -446,9 +472,6 @@ kbd {
 .k-dot.operational {
   background: var(--ok);
   box-shadow: 0 0 6px rgba(94, 211, 154, 0.6);
-}
-.k-status-grid .k-dot.ok {
-  animation: pulse 2.8s ease-in-out infinite;
 }
 @keyframes pulse {
   50% {
@@ -1492,8 +1515,14 @@ input[type='range']::-moz-range-thumb {
   .k-brand-mark {
     font-size: 17px;
   }
-  .k-status-grid {
-    display: none;
+  .k-config {
+    margin-top: 12px;
+    padding-top: 8px;
+  }
+  .k-maker {
+    top: 64px;
+    bottom: auto;
+    width: 92px;
   }
   .k-frame {
     display: none;
@@ -1562,7 +1591,7 @@ input[type='range']::-moz-range-thumb {
     right: auto;
     left: 8px;
     bottom: auto;
-    top: 60px;
+    top: 132px;
     width: 46px;
     height: 46px;
   }
@@ -1667,7 +1696,6 @@ input[type='range']::-moz-range-thumb {
 .app.is-embed {
   --inset: 16px;
 }
-.app.is-embed .k-status-grid,
 .app.is-embed .k-frame {
   display: none;
 }

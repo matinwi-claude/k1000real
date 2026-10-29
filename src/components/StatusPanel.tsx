@@ -1,29 +1,17 @@
-import { useEffect, useRef, useState } from 'react';
-import { useStore } from '../store';
-import { COMPONENTS } from '../data/components';
+import { useRef } from 'react';
+import { useStore, type Configuration } from '../store';
 import { sound } from '../utils/sound';
 
-/** Brand mark + compact system status (top-left). Logo ×5 → Engineer Mode. */
-export function StatusPanel() {
-  const mode = useStore((s) => s.mode);
-  const selected = useStore((s) => s.selected);
-  const engineer = useStore((s) => s.engineer);
-  const view = useStore((s) => s.view);
-  const explode = useStore((s) => s.explode);
-  const modelSource = useStore((s) => s.modelSource);
-  const [edge, setEdge] = useState<string>('—');
-  const clicks = useRef<number[]>([]);
+const CONFIGS: { id: Configuration; label: string }[] = [
+  { id: 'fixed-wing', label: 'FIXED WING' },
+  { id: 'evtol', label: 'eVTOL' },
+];
 
-  useEffect(() => {
-    let alive = true;
-    fetch('/api/status', { headers: { accept: 'application/json' } })
-      .then((r) => (r.ok && r.headers.get('content-type')?.includes('json') ? r.json() : Promise.reject()))
-      .then((d: { edge?: string }) => alive && setEdge(d.edge ?? 'EDGE'))
-      .catch(() => alive && setEdge('LOCAL'));
-    return () => {
-      alive = false;
-    };
-  }, []);
+/** Brand mark + configuration picker (top-left). Logo ×5 → Engineer Mode. */
+export function StatusPanel() {
+  const engineer = useStore((s) => s.engineer);
+  const configuration = useStore((s) => s.configuration);
+  const clicks = useRef<number[]>([]);
 
   const onLogo = () => {
     const now = performance.now();
@@ -37,11 +25,6 @@ export function StatusPanel() {
     }
   };
 
-  const inspection = mode === 'inspect' ? (selected ? 'ACTIVE' : 'ARMED') : mode === 'measure' ? 'MEASURE' : 'READY';
-  const config = [explode > 0.01 ? 'EXPLODED' : 'ASSEMBLED', view === 'xray' ? 'X-RAY' : null]
-    .filter(Boolean)
-    .join(' · ');
-
   return (
     <div className="k-status">
       <button className="k-brand" onClick={onLogo} aria-label="K1000ULE">
@@ -52,24 +35,31 @@ export function StatusPanel() {
           </span>
         )}
       </button>
-      <dl className="k-status-grid fade-on-idle">
-        <dt>SYSTEM STATUS</dt>
-        <dd>
-          <i className="k-dot ok" /> ONLINE
-        </dd>
-        <dt>AIRFRAME</dt>
-        <dd>eVTOL · SOLAR</dd>
-        <dt>COMPONENTS</dt>
-        <dd>{COMPONENTS.length}</dd>
-        <dt>INSPECTION</dt>
-        <dd className={inspection !== 'READY' ? 'accent' : ''}>{inspection}</dd>
-        <dt>CONFIG</dt>
-        <dd>{config}</dd>
-        <dt>MODEL</dt>
-        <dd>{modelSource === 'cad' ? 'CAD (SUPPLIED)' : 'VISUALIZATION'}</dd>
-        <dt>EDGE</dt>
-        <dd>{edge}</dd>
-      </dl>
+      <div className="k-config fade-on-idle" role="radiogroup" aria-labelledby="k-config-title">
+        <div className="k-config-title" id="k-config-title">
+          CONFIGURATION
+        </div>
+        {CONFIGS.map((c) => (
+          <button
+            key={c.id}
+            role="radio"
+            aria-checked={configuration === c.id}
+            className={configuration === c.id ? 'on' : ''}
+            onClick={() => {
+              useStore.setState({ configuration: c.id });
+              sound.tick();
+            }}
+          >
+            <i />
+            {c.label}
+          </button>
+        ))}
+      </div>
     </div>
   );
+}
+
+/** Manufacturer logo (bottom-right). */
+export function BrandLogo() {
+  return <img className="k-maker" src="/brand/kraus-hamdani-aerospace.png" alt="Kraus Hamdani Aerospace" width={601} height={161} />;
 }
