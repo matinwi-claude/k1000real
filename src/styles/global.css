@@ -1635,11 +1635,6 @@ input[type='range']::-moz-range-thumb {
   padding-left: 0.5em;
   color: var(--text-hi);
 }
-.k-loader-sub {
-  font-size: 8.5px;
-  letter-spacing: 0.34em;
-  color: var(--dim);
-}
 .k-loader-bar {
   width: 140px;
   height: 1px;
@@ -1653,36 +1648,6 @@ input[type='range']::-moz-range-thumb {
   background: var(--accent);
   transform-origin: left;
   transition: transform 0.6s var(--ease);
-}
-.k-intro-msg {
-  position: absolute;
-  left: 50%;
-  bottom: 15%;
-  transform: translate(-50%, 8px);
-  display: grid;
-  justify-items: center;
-  gap: 10px;
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 1.2s var(--ease), transform 1.2s var(--ease);
-  z-index: 10;
-}
-.k-intro-msg.show {
-  opacity: 1;
-  transform: translate(-50%, 0);
-}
-.k-intro-title {
-  font-size: 12px;
-  letter-spacing: 0.5em;
-  padding-left: 0.5em;
-  color: var(--text-hi);
-}
-.k-intro-lines {
-  display: flex;
-  gap: 22px;
-  font-size: 8.5px;
-  letter-spacing: 0.3em;
-  color: var(--dim);
 }
 
 /* ───────────────────────────────────────────────────────────── misc */
@@ -1924,14 +1889,6 @@ input[type='range']::-moz-range-thumb {
     top: 64px;
     transform: none;
     width: 190px;
-  }
-  .k-intro-msg {
-    bottom: 30%;
-  }
-  .k-intro-lines {
-    flex-direction: column;
-    align-items: center;
-    gap: 6px;
   }
   .k-eng {
     bottom: auto;

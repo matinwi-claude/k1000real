@@ -44,11 +44,13 @@ export function StatusPanel() {
 
   return (
     <div className="k-status">
-      <button className="k-brand" onClick={onLogo} aria-label="K1000 Digital Twin">
+      <button className="k-brand" onClick={onLogo} aria-label="K1000">
         <span className="k-brand-mark">K1000</span>
-        <span className="k-brand-sub">
-          ULE · DIGITAL TWIN{engineer && <em> · ENG</em>}
-        </span>
+        {engineer && (
+          <span className="k-brand-sub">
+            <em>ENG</em>
+          </span>
+        )}
       </button>
       <dl className="k-status-grid fade-on-idle">
         <dt>SYSTEM STATUS</dt>
