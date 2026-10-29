@@ -23,7 +23,6 @@ import {
   LIFT,
   LIFT_LAYOUT,
   MOTOR_BASE_Y,
-  TAIL,
   WING,
   pad,
   wingStation,
@@ -403,72 +402,6 @@ BUILDERS['wing-spar'] = (b) => {
   b.add('aluminum', rbox(0.12, 0.022, 0.04, 0.004, [0, wingY(0) + 0.011, zs]));
 };
 
-BUILDERS['tail-boom'] = (b) => {
-  // leaves the top of the aft fuselage at wing level and runs straight to the fin
-  const p0 = new THREE.Vector3(0, 0.07, -0.47);
-  const p1 = new THREE.Vector3(0, 0.077, FUSELAGE.tailEndZ + 0.005);
-  const L = p0.distanceTo(p1);
-  const g = lathe(
-    [
-      [0, 0],
-      [0.017, 0],
-      [0.0135, L],
-      [0.0095, L + 0.007],
-      [0, L + 0.01],
-    ],
-    32,
-  );
-  alignY(g, p1.clone().sub(p0).normalize(), p0);
-  b.add('shell', g);
-};
-
-const finStations = (): LoftStation[] => [
-  // long, thin dorsal fillet blending the fin into the tail boom
-  { s: TAIL.finBaseY - 0.012, t: 0, le: TAIL.finRootLE, chord: TAIL.finRootLE - TAIL.finRootTE, tc: 0.055 },
-  { s: TAIL.finBaseY + 0.03, t: 0, le: -1.07, chord: 0.268, tc: 0.08 },
-  { s: TAIL.finBaseY + 0.09, t: 0, le: -1.115, chord: 0.222, tc: 0.09 },
-  { s: TAIL.finTipY, t: 0, le: TAIL.finTipLE, chord: TAIL.finTipLE - TAIL.finTipTE, tc: 0.09 },
-];
-
-BUILDERS['vertical-fin'] = (b) => {
-  b.add('shell', wingLoft(finStations(), 0, 0.7, 22, 0, 'y'));
-};
-BUILDERS['rudder'] = (b) => {
-  b.add('shell', wingLoft(finStations(), 0.705, 1, 16, 0, 'y'));
-};
-
-function stabStations(side: 1 | -1): LoftStation[] {
-  // rectangular stabiliser with square tips (CAD top view)
-  const c = TAIL.stabLE - TAIL.stabTE;
-  return [0, 0.2, TAIL.stabHalfSpan].map((x) => ({ s: side * x, t: TAIL.finTipY + 0.006, le: TAIL.stabLE, chord: c, tc: 0.09 }));
-}
-
-BUILDERS['horizontal-stabilizer'] = (b) => {
-  for (const side of [1, -1] as const) b.add('shell', wingLoft(stabStations(side), 0, 0.68, 20, 0));
-};
-BUILDERS['elevator'] = (b) => {
-  for (const side of [1, -1] as const) b.add('shell', wingLoft(stabStations(side), 0.685, 1, 14, 0));
-};
-
-BUILDERS['solar-tail'] = (b) => {
-  const c0 = TAIL.stabLE - TAIL.stabTE;
-  for (const side of [1, -1] as const) {
-    for (const [xa, xb] of [
-      [0.03, 0.22],
-      [0.24, 0.43],
-    ]) {
-      const fn: SurfaceFn = (u, v, o) => {
-        const x = side > 0 ? u : v;
-        const xc = side > 0 ? v : u;
-        const [up] = airfoilAt(xc, 0.09, 0);
-        return o.set(side * x, TAIL.finTipY + 0.006 + up * c0, TAIL.stabLE - xc * c0);
-      };
-      const g = side > 0 ? surfaceSlab(fn, xa, xb, 0.1, 0.62, 6, 6, 0.001, 0.0014) : surfaceSlab(fn, 0.1, 0.62, xa, xb, 6, 6, 0.001, 0.0014);
-      b.addCustom(g, new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 }));
-    }
-  }
-};
-
 for (const side of [1, -1] as const) {
   BUILDERS[side > 0 ? 'boom-port' : 'boom-starboard'] = (b) => {
     const x = side * BOOM.x;
@@ -728,18 +661,6 @@ BUILDERS['cruise-prop'] = (b) => {
 // ───────────────────────────────────────────────────────── avionics
 
 
-BUILDERS['satcom'] = (b) => {
-  const z = 0.02;
-  const [up] = airfoilAt((wingStation(0).le - z) / wingStation(0).chord, 0.14);
-  const top = wingY(0) + up * wingStation(0).chord;
-  b.add('anodized', cyl(0.042, 0.044, 0.006, 40, [0, top + 0.001, z]));
-  const g = sphere(1, [0, 0, 0], 36, 18);
-  g.scale(0.036, 0.024, 0.036);
-  g.translate(0, top + 0.004, z);
-  b.add('radome', g);
-};
-
-
 BUILDERS['gnss'] = (b) => {
   const z = -0.66;
   const top = 0.071 + 0.0158;
@@ -766,11 +687,6 @@ for (const side of [1, -1] as const) {
 }
 
 // ───────────────────────────────────────────────────────── sensors
-BUILDERS['nav-lights'] = (b) => {
-  navLight(b, 'ledWhite', [0, TAIL.finTipY + 0.022, TAIL.stabTE + 0.012], '#ffffff');
-  b.add('shell', rbox(0.012, 0.012, 0.03, 0.004, [0, TAIL.finTipY + 0.014, TAIL.stabTE + 0.02]));
-};
-
 // ───────────────────────────────────────────────────────── camera
 BUILDERS['eo-ir'] = (b) => {
   const z = 0.62;

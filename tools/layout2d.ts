@@ -26,7 +26,6 @@ const stbd = (o: Vec3): Vec3 => [-o[0], o[1], o[2]];
 export const LAYOUT_2D: Record<string, Place> = {
   // wing
   'wing-center': { offset: [0, WING_UP, 0] },
-  satcom: { offset: [0, WING_UP + 0.1, 0] },
   'wing-port': { offset: port([wingOut, WING_UP, 0]) },
   'solar-port': { offset: port([wingOut, WING_UP, 0]) },
   'aileron-port': { offset: port([wingOut, WING_UP, -0.09]) },
@@ -54,7 +53,6 @@ export const LAYOUT_2D: Record<string, Place> = {
   'cruise-prop': { offset: [0, 0, 0.44] },
   'horizontal-stabilizer': { offset: [0, 0.14, -0.04] },
   elevator: { offset: [0, 0.14, -0.1] },
-  'solar-tail': { offset: [0, 0.2, -0.04] },
   rudder: { offset: [0, 0, -0.08] },
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 

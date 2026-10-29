@@ -56,7 +56,7 @@ Put a glTF binary at **`public/models/k1000ule.glb`**. If it's there, it replace
 
 ## Replacing individual parts with CAD (STL)
 
-Single parts can be swapped for real CAD while every other part keeps its generated geometry. The fuselage (with its four antenna masts and skids), canopy hatch, HD40 gimbal camera, cruise motor and cruise propeller already come from the STLs in `models-src/`.
+Single parts can be swapped for real CAD while every other part keeps its generated geometry. The fuselage (with its four antenna masts and skids), canopy hatch, HD40 gimbal camera, cruise motor and propeller, pitot, tail boom with fin, rudder, horizontal stabilizer and elevators already come from the STLs in `models-src/`.
 
 1. Put the STL in `models-src/`.
 2. Add it to `models-src/parts.json`:

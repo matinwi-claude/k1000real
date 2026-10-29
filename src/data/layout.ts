@@ -32,7 +32,7 @@ export const WING = {
 export const FUSELAGE = {
   noseZ: 0.8,
   podEndZ: -0.49,
-  tailEndZ: -1.345,
+  tailEndZ: -1.79,
   shellThickness: 0.0026,
 } as const;
 
@@ -59,17 +59,13 @@ export const CRUISE = {
   z: 0.822,
 } as const;
 
+/** T-tail extents, from the CAD tail and stabilizer (models-src/). */
 export const TAIL = {
-  /** fin root leading edge (start of the dorsal fillet) */
-  finRootLE: -0.98,
-  finRootTE: -1.335,
-  finTipLE: -1.17,
-  finTipTE: -1.34,
-  finBaseY: 0.085,
-  finTipY: 0.45,
-  stabHalfSpan: 0.465,
-  stabLE: -1.18,
-  stabTE: -1.338,
+  finTipY: 0.527,
+  stabY: 0.528,
+  stabHalfSpan: 0.628,
+  stabLE: -1.61,
+  stabTE: -1.82,
 } as const;
 
 /** Lowest point of the aircraft (EO/IR turret), used to place the floor. */
