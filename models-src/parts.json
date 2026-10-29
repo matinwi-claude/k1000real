@@ -1,16 +1,59 @@
 {
-  "$comment": "Source CAD parts → public/models/parts.glb. Run: python3 tools/import-parts.py (see README, "Replacing individual parts with CAD").",
+  "$comment": "Source CAD parts \u2192 public/models/parts.glb. Run: python3 tools/import-parts.py (see the README section on replacing parts with CAD).",
   "sources": [
     {
       "file": "fuselage-goldie-antenna-suite.stl",
       "units": "mm",
-      "axes": ["x", "z", "-y"],
-      "offset": [0, 0.119, 0.25],
-      "default": { "id": "fuselage", "material": "shell" },
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0.119,
+        0.25
+      ],
+      "default": {
+        "id": "fuselage",
+        "material": "shell"
+      },
       "pieces": [
-        { "id": "antenna-01", "material": "rubber", "where": { "min_z_gt": -20, "center_x_gt": 40 } },
-        { "id": "antenna-02", "material": "rubber", "where": { "min_z_gt": -20, "center_x_lt": -40 } }
+        {
+          "id": "antenna-01",
+          "material": "rubber",
+          "where": {
+            "min_z_gt": -20,
+            "center_x_gt": 40
+          }
+        },
+        {
+          "id": "antenna-02",
+          "material": "rubber",
+          "where": {
+            "min_z_gt": -20,
+            "center_x_lt": -40
+          }
+        }
       ]
+    },
+    {
+      "file": "fuselage-hatch.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0.119,
+        0.25
+      ],
+      "default": {
+        "id": "avionics-hatch",
+        "material": "shell"
+      }
     }
   ]
 }
