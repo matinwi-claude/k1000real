@@ -15,7 +15,6 @@
   --warn: #e6b04d;
   --standby: #8fa2b6;
   --orange: #e0662a;
-  --mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, monospace;
   --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   --inset: 24px;
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
@@ -35,6 +34,7 @@ body,
   background: var(--bg);
   color: var(--text);
   font-family: var(--sans);
+  font-variant-numeric: tabular-nums;
   -webkit-font-smoothing: antialiased;
   -webkit-tap-highlight-color: transparent;
   overscroll-behavior: none;
@@ -53,7 +53,7 @@ input:focus-visible {
   outline-offset: 2px;
 }
 kbd {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--dim);
   border: 1px solid var(--line);
@@ -61,9 +61,6 @@ kbd {
   padding: 0 4px;
   line-height: 14px;
   display: inline-block;
-}
-.mono {
-  font-family: var(--mono);
 }
 .dim {
   color: var(--dim);
@@ -108,7 +105,7 @@ kbd {
   inset: 0;
   pointer-events: none;
   overflow: visible;
-  font-family: var(--mono);
+  font-family: var(--sans);
 }
 
 /* HUD svg styling */
@@ -231,7 +228,7 @@ kbd {
 }
 .gz-label {
   stroke: none;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 8.5px;
 }
 
@@ -262,7 +259,7 @@ kbd {
 }
 .k-tooltip-sub {
   margin-top: 3px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--dim);
   letter-spacing: 0.06em;
@@ -394,7 +391,7 @@ kbd {
 }
 .k-brand-mark {
   font-size: 21px;
-  font-weight: 300;
+  font-weight: 700;
   letter-spacing: 0.34em;
   color: var(--text-hi);
   line-height: 1;
@@ -428,7 +425,7 @@ kbd {
   align-items: center;
   gap: 9px;
   padding: 4px 0;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   letter-spacing: 0.06em;
   color: var(--dim);
@@ -735,7 +732,7 @@ kbd {
   position: absolute;
   top: 4px;
   right: 7px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 7.5px;
   color: var(--dim2);
   opacity: 0;
@@ -851,13 +848,13 @@ kbd {
   justify-content: space-between;
   align-items: center;
   margin-right: 26px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--dim);
   letter-spacing: 0.08em;
 }
 .k-pn {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--dim);
   letter-spacing: 0.08em;
@@ -908,19 +905,19 @@ kbd {
 }
 .k-insp-facts dd.st-operational {
   color: var(--ok);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.08em;
 }
 .k-insp-facts dd.st-attention {
   color: var(--warn);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.08em;
 }
 .k-insp-facts dd.st-standby {
   color: var(--standby);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10px;
   letter-spacing: 0.08em;
 }
@@ -1022,7 +1019,7 @@ kbd {
   width: 42%;
 }
 .k-specs td {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 10.5px;
   color: var(--text-hi);
 }
@@ -1044,7 +1041,7 @@ kbd {
 }
 .k-loc-grid dd {
   margin: 3px 0 0;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11px;
   color: var(--text-hi);
 }
@@ -1057,7 +1054,7 @@ kbd {
     repeating-linear-gradient(90deg, transparent 0 15px, rgba(150, 180, 210, 0.04) 15px 16px);
 }
 .k-locator text {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 6.5px;
   fill: var(--dim);
   letter-spacing: 0.1em;
@@ -1093,7 +1090,7 @@ kbd {
 }
 .k-assembly-path {
   margin-top: 12px;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9.5px;
   color: var(--text);
 }
@@ -1122,7 +1119,7 @@ kbd {
   flex: 1;
 }
 .k-related button small {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--dim);
 }
@@ -1136,7 +1133,7 @@ kbd {
   background: rgba(224, 102, 42, 0.05);
 }
 .k-hidden-tag {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 8.5px;
   color: var(--orange);
   letter-spacing: 0.16em;
@@ -1192,7 +1189,7 @@ kbd {
   flex: 1;
 }
 .k-dock-title b {
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-weight: 400;
   color: var(--accent);
   letter-spacing: 0.04em;
@@ -1231,7 +1228,7 @@ kbd {
   text-align: right;
 }
 .k-slider-row small.mono {
-  font-family: var(--mono);
+  font-family: var(--sans);
   letter-spacing: 0.02em;
   white-space: pre;
 }
@@ -1300,7 +1297,7 @@ input[type='range']::-moz-range-thumb {
 }
 .k-measure-hint {
   margin: 10px 0 0;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9px;
   color: var(--accent);
   letter-spacing: 0.1em;
@@ -1412,7 +1409,7 @@ input[type='range']::-moz-range-thumb {
   padding: 8px 14px;
   background: rgba(9, 12, 15, 0.85);
   border: 1px solid var(--line);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 9.5px;
   letter-spacing: 0.14em;
   color: var(--text-hi);
@@ -1664,7 +1661,7 @@ input[type='range']::-moz-range-thumb {
   margin-left: 6px;
   padding: 0 4px;
   font-style: normal;
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 7px;
   letter-spacing: 0.12em;
   line-height: 12px;
@@ -1846,7 +1843,7 @@ input[type='range']::-moz-range-thumb {
   padding: 14px;
   background: #05070a;
   border: 1px solid var(--line);
-  font-family: var(--mono);
+  font-family: var(--sans);
   font-size: 11.5px;
   line-height: 1.6;
   color: #cfe3f7;
@@ -1875,7 +1872,7 @@ input[type='range']::-moz-range-thumb {
   background: #05070a;
   border: 1px solid var(--line-strong);
   color: var(--text-hi);
-  font: 11px var(--mono);
+  font: 11px var(--sans);
 }
 .k-modal-actions {
   display: flex;

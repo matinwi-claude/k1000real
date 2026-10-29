@@ -131,7 +131,7 @@ export function labelTexture(o: LabelOpts) {
   }
   for (const l of o.lines) {
     ctx.fillStyle = l.color ?? '#d8dee6';
-    ctx.font = `${l.weight ?? 500} ${l.size}px ${l.font ?? '"JetBrains Mono", ui-monospace, monospace'}`;
+    ctx.font = `${l.weight ?? 500} ${l.size}px ${l.font ?? 'Inter, sans-serif'}`;
     ctx.textAlign = l.align ?? 'left';
     ctx.textBaseline = 'middle';
     ctx.fillText(l.text, l.x ?? o.w * 0.05, l.y);

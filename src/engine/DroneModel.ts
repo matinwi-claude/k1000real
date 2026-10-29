@@ -796,13 +796,6 @@ BUILDERS['pitot'] = (b) => {
   b.add('blackMatte', cyl(0.0037, 0.0037, 0.006, 14, [x, yl - 0.026, st.le + 0.11], [Math.PI / 2, 0, 0]));
 };
 
-BUILDERS['lidar-down'] = (b) => {
-  const bot = fuselageBottom(-0.05);
-  b.add('blackMatte', rbox(0.022, 0.012, 0.03, 0.003, [0, bot + 0.002, -0.05]));
-  b.add('lens', cyl(0.005, 0.005, 0.002, 20, [0, bot - 0.0042, -0.043]));
-  b.add('glass', cyl(0.0055, 0.0055, 0.002, 20, [0, bot - 0.0042, -0.057]));
-};
-
 BUILDERS['nav-lights'] = (b) => {
   navLight(b, 'ledWhite', [0, TAIL.finTipY + 0.022, TAIL.stabTE + 0.012], '#ffffff');
   b.add('shell', rbox(0.012, 0.012, 0.03, 0.004, [0, TAIL.finTipY + 0.014, TAIL.stabTE + 0.02]));
@@ -840,16 +833,6 @@ BUILDERS['eo-ir'] = (b) => {
 };
 
 // ───────────────────────────────────────────────────────── payload
-BUILDERS['payload-bay'] = (b) => {
-  fusePatch(b, 'panel', 0.18, 0.44, 1.36 * Math.PI, 1.64 * Math.PI, 0.002, 0.0009);
-  for (const z of [0.2, 0.42])
-    for (const v of [1.4, 1.6]) {
-      const p = fuselageSurface(zToU(z), v * Math.PI, new THREE.Vector3());
-      b.bolt([p.x, p.y - 0.0028, p.z], [p.x * 2, -1, 0], 1.2);
-    }
-};
-
-
 // ───────────────────────────────────────────────────────── assemble
 export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D | null, parts?: PartModels): DroneModel {
   const root = new THREE.Group();

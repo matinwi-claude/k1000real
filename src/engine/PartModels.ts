@@ -33,8 +33,6 @@ export const CAD_FUSELAGE_FIT: Record<string, Fit> = {
   // belly parts: the CAD hull bottom sits at y ≈ −0.061 (the procedural pod reached −0.15)
   gimbal: shift(0, 0, 0.05),
   'eo-ir': shift(0, 0, 0.05),
-  'payload-bay': shift(0, 0.049, 0),
-  'lidar-down': shift(0, 0.008, 0),
 };
 
 export function fitMatrix(f: Fit) {

@@ -34,8 +34,7 @@ export type CategoryId =
   | 'power'
   | 'avionics'
   | 'sensors'
-  | 'camera'
-  | 'payload';
+  | 'camera';
 
 export type Status = 'operational' | 'attention' | 'standby';
 
@@ -90,7 +89,6 @@ export const CATEGORIES: Category[] = [
   { id: 'avionics', label: 'Avionics', code: 'AVN' },
   { id: 'sensors', label: 'Sensors', code: 'SNS' },
   { id: 'camera', label: 'Camera', code: 'CAM' },
-  { id: 'payload', label: 'Payload', code: 'PLD' },
 ];
 
 /** Aircraft-level facts from the public product page (shown in the status panel). */
@@ -272,7 +270,7 @@ export const COMPONENTS: DroneComponent[] = [
       'Slender streamlined pod beneath the wing that houses the battery, avionics and mission payload. Tapers aft into the tail boom for low drag — and a small acoustic, visual and radar signature.',
     position: [0, -0.02, 0.15],
     location: 'Centreline · beneath wing',
-    relatedComponents: ['nose-cone', 'tail-boom', 'avionics-hatch', 'payload-bay'],
+    relatedComponents: ['nose-cone', 'tail-boom', 'avionics-hatch'],
     status: 'operational',
     illustrativeSpecifications: [
       P('Signature', 'Minimal acoustic, visual and radar signature'),
@@ -649,24 +647,6 @@ export const COMPONENTS: DroneComponent[] = [
     explodeDelay: 0.2,
   },
   {
-    id: 'lidar-down',
-    name: 'Landing Rangefinder',
-    category: 'sensors',
-    system: 'Perception',
-    type: 'Downward Rangefinder',
-    partNumber: 'K1-SNS-L01',
-    description: 'Downward rangefinder for precise height above ground during vertical landing.',
-    position: [0, -0.11, -0.05],
-    location: 'Fuselage · belly',
-    relatedComponents: ['fuselage'],
-    status: 'standby',
-    statusNote: 'Illustrative: active during eVTOL phases only.',
-    illustrativeSpecifications: [P('Operations', 'Launch and land anywhere — runway independent'), { label: 'Type', value: 'Time-of-flight (illustrative)' }],
-    layer: 'structure',
-    explode: [0, -0.3, 0],
-    explodeDelay: 0.2,
-  },
-  {
     id: 'nav-lights',
     name: 'Navigation Lights',
     category: 'sensors',
@@ -725,26 +705,6 @@ export const COMPONENTS: DroneComponent[] = [
   },
 
   // ───────────────────────── PAYLOAD
-  {
-    id: 'payload-bay',
-    name: 'Payload Bay',
-    category: 'payload',
-    system: 'Mission Payload',
-    type: 'Modular Bay & Hatch',
-    partNumber: 'K1-PLD-B01',
-    description: 'Ventral bay and hatch built on an open architecture for rapid payload interchange in the field.',
-    position: [0, -0.125, 0.31],
-    location: 'Fuselage · belly, centre',
-    relatedComponents: ['fuselage'],
-    status: 'operational',
-    illustrativeSpecifications: [
-      P('Architecture', 'Open architecture for rapid payload interchangeability'),
-      P('Options', 'ISR sensors, comms relays and MOD payloads'),
-    ],
-    layer: 'exterior',
-    explode: [0, -0.24, 0],
-    explodeDelay: 0.2,
-  },
 
 ];
 
