@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K1000 Interactive — embed demo</title>
+    <style>
+      body { margin: 0; font: 15px/1.6 -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, sans-serif; color: #1d2329; background: #f4f5f7; }
+      main { max-width: 1080px; margin: 0 auto; padding: 48px 20px 96px; }
+      h1 { font-weight: 600; letter-spacing: -0.01em; margin: 0 0 8px; }
+      p { color: #4a5560; max-width: 640px; }
+      .row { display: flex; gap: 8px; flex-wrap: wrap; margin: 18px 0; }
+      button { font: inherit; font-size: 13px; padding: 8px 12px; border: 1px solid #c9d0d7; background: #fff; border-radius: 6px; cursor: pointer; }
+      button:hover { border-color: #7f8b97; }
+      pre { background: #0d1117; color: #c9d1d9; padding: 16px; border-radius: 8px; overflow: auto; font-size: 13px; }
+      #log, #alog { font-family: ui-monospace, Menlo, monospace; font-size: 12px; color: #4a5560; min-height: 18px; }
+      .spacer { height: 60vh; display: grid; place-items: center; color: #9aa4ae; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>K1000ULE on your page</h1>
+      <p>The viewer below is the same experience embedded with one line of HTML. It only takes over scrolling after you click into it, pauses rendering when it is off-screen, and can be driven from the host page.</p>
+
+      <div id="viewer" data-k1000 data-aspect="16/9"></div>
+
+      <div class="row">
+        <button onclick="v().view('reset')">Reset view</button>
+        <button onclick="v().view('top')">Top</button>
+        <button onclick="v().explode(1)">Explode</button>
+        <button onclick="v().explode(0)">Assemble</button>
+        <button onclick="v().select('battery')">Show battery</button>
+        <button onclick="v().select('lift-motor-03')">Lift motor 03</button>
+        <button onclick="v().send('xray', true)">X-ray</button>
+        <button onclick="v().send('xray', false)">Exterior</button>
+        <button onclick="v().send('lighting', 'night')">Night</button>
+        <button onclick="v().reset()">Reset all</button>
+      </div>
+      <div id="log"></div>
+
+      <h2>Embed code</h2>
+<pre>&lt;div data-k1000&gt;&lt;/div&gt;
+&lt;script src="https://YOUR-VIEWER-HOST/embed.js" async&gt;&lt;/script&gt;</pre>
+
+      <h2>2D parts atlas</h2>
+      <p>Every component laid out in an exploded line drawing. Click a part for its details, or drive it from the page. This one uses the light theme to sit on a light page.</p>
+      <div id="atlas" data-k1000="parts" data-theme="light"></div>
+      <div class="row">
+        <button onclick="a().select('battery')">Show battery</button>
+        <button onclick="a().select('eo-ir')">EO/IR turret</button>
+        <button onclick="a().category('propulsion')">Propulsion only</button>
+        <button onclick="a().category(null)">All systems</button>
+        <button onclick="a().reset()">Reset</button>
+      </div>
+      <div id="alog"></div>
+<pre>&lt;div data-k1000="parts" data-theme="light"&gt;&lt;/div&gt;
+&lt;script src="https://YOUR-VIEWER-HOST/embed.js" async&gt;&lt;/script&gt;</pre>
+
+      <div class="spacer">↓ scroll — the viewer pauses while off-screen</div>
+      <k1000-viewer data-height="460" data-view="exploded" data-autorotate="1"></k1000-viewer>
+    </main>
+    <script src="/embed.js"></script>
+    <script>
+      function v() { return K1000.get(document.getElementById('viewer')); }
+      function a() { return K1000.get(document.getElementById('atlas')); }
+      document.getElementById('atlas').addEventListener('k1000:select', function (e) {
+        document.getElementById('alog').textContent = e.detail.id ? 'Selected: ' + e.detail.name + ' (' + e.detail.id + ')' : 'Selection cleared';
+      });
+      document.getElementById('viewer').addEventListener('k1000:select', function (e) {
+        document.getElementById('log').textContent = e.detail.id ? 'Selected: ' + e.detail.name + ' (' + e.detail.id + ')' : 'Selection cleared';
+      });
+    </script>
+  </body>
+</html>

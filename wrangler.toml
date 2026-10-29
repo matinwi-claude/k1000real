@@ -1,0 +1,18 @@
+# Cloudflare Worker + Static Assets.
+# `wrangler deploy` runs the Vite build (see [build]) and uploads ./dist as static
+# assets. The Worker script only handles /api/* (e.g. /api/status).
+name = "k1000real"
+main = "worker/index.ts"
+compatibility_date = "2026-09-01"
+
+[build]
+command = "npm run build"
+
+[assets]
+directory = "./dist"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+run_worker_first = ["/api/*"]
+
+[observability]
+enabled = true
