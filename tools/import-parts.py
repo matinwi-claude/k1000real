@@ -9,7 +9,8 @@ split into components: every connected body goes to the first `pieces` entry who
 `default`. Meshes are written as "<component-id>__<material>[__spin]" and replace that
 component's procedural geometry at runtime (src/engine/PartModels.ts). `"spin": true`
 puts a source on its component's rotor group (propellers); `"keep": 0.3` decimates
-large meshes to that fraction of their triangles.
+large meshes to that fraction of their triangles; `"scale"` resizes a source (applied
+before `offset`).
 
 Requires: pip install trimesh scipy networkx rtree fast-simplification ; Node (npx) for meshopt compression.
 """
@@ -57,7 +58,7 @@ def convert(src):
         target = next((p for p in src.get('pieces', []) if matches(p['where'], lo, hi)), src['default'])
         groups.setdefault((target['id'], target['material']), []).append(faces)
 
-    rot = axis_matrix(src['axes']) * UNITS[src['units']]
+    rot = axis_matrix(src['axes']) * UNITS[src['units']] * src.get('scale', 1)
     out = {}
     for (cid, mat), parts in groups.items():
         part = mesh.submesh([np.concatenate(parts)], append=True)
