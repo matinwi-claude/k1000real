@@ -1060,12 +1060,18 @@ input[type='range']::-moz-range-thumb {
   justify-items: center;
   gap: 10px;
 }
-.k-loader-title {
-  font-size: 22px;
-  font-weight: 300;
-  letter-spacing: 0.5em;
-  padding-left: 0.5em;
-  color: var(--text-hi);
+.k-loader-logo {
+  width: min(260px, 60vw);
+  height: auto;
+}
+.k-loader-sub {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.32em;
+  padding-left: 0.32em;
+  text-transform: uppercase;
+  color: var(--dim);
 }
 .k-loader-bar {
   width: 140px;

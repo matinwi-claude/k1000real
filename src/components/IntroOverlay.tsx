@@ -29,7 +29,8 @@ export function IntroOverlay() {
   return (
     <div className={`k-loader ${phase !== 'dark' ? 'gone' : ''}`} aria-hidden={phase !== 'dark'}>
       <div className="k-loader-inner">
-        <div className="k-loader-title">K1000</div>
+        <img className="k-loader-logo" src="/brand/kraus-hamdani-aerospace.png" alt="Kraus Hamdani Aerospace" width={601} height={161} />
+        <div className="k-loader-sub">Interactive View</div>
         <div className="k-loader-bar">
           <i style={{ transform: `scaleX(${Math.max(0.04, progress)})` }} />
         </div>
