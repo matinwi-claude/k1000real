@@ -16,11 +16,12 @@ export const SPAN = 5.0;
 
 export const WING = {
   halfSpan: SPAN / 2,
-  rootChord: 0.293,
+  /** stretched to cover the CAD fuselage's wing saddle (330 mm opening) */
+  rootChord: 0.353,
   /** spanwise position where the rounded tip begins */
   tipStart: 1.9,
   /** trailing edge z (straight) */
-  teZ: -0.05,
+  teZ: -0.11,
   /** chord-line height at the root (wing sits on top of the fuselage pod) */
   y: 0.1,
   dihedralDeg: 2.5,
