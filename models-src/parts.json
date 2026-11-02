@@ -24,7 +24,17 @@
           "material": "grey",
           "where": {
             "min_z_gt": -20,
-            "center_x_gt": 40
+            "center_x_gt": 40,
+            "center_y_lt": 200
+          }
+        },
+        {
+          "id": "antenna-01",
+          "material": "grey",
+          "where": {
+            "min_z_gt": -20,
+            "center_x_lt": -40,
+            "center_y_lt": 200
           }
         },
         {
@@ -32,7 +42,17 @@
           "material": "grey",
           "where": {
             "min_z_gt": -20,
-            "center_x_lt": -40
+            "center_x_gt": 40,
+            "center_y_gt": 200
+          }
+        },
+        {
+          "id": "antenna-02",
+          "material": "grey",
+          "where": {
+            "min_z_gt": -20,
+            "center_x_lt": -40,
+            "center_y_gt": 200
           }
         }
       ]
@@ -79,8 +99,8 @@
       "units": "mm",
       "axes": [
         "-x",
-        "y",
-        "-z"
+        "-y",
+        "z"
       ],
       "offset": [
         0,
@@ -113,7 +133,7 @@
       "offset": [
         0,
         -0.012,
-        1.0189
+        1.0259
       ],
       "spin": true,
       "default": {

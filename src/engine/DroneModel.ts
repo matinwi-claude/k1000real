@@ -508,11 +508,8 @@ for (const side of [1, -1] as const) {
         'y',
       ),
     );
-    // spar stub the outer wing panel plugs onto (hidden inside the wing when assembled)
-    const stub = cyl(0.011, 0.011, 0.36, 20);
-    stub.rotateZ(Math.PI / 2);
-    stub.translate(x + side * 0.1, wingY(BOOM.x) + 0.012, 0.165);
-    b.add('blackMatte', stub);
+    // rectangular wooden spar stub the outer wing panel plugs onto (painted black)
+    b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, wingY(BOOM.x) + 0.012, 0.165]));
     // motor mount pads
     for (const z of [BOOM.rotorFrontZ, BOOM.rotorRearZ]) {
       b.add('anodized', cyl(0.026, 0.028, 0.006, 32, [x, MOTOR_BASE_Y - 0.003, z]));
@@ -714,13 +711,6 @@ BUILDERS['cruise-prop'] = (b) => {
 
 // ───────────────────────────────────────────────────────── avionics
 
-
-BUILDERS['gnss'] = (b) => {
-  const z = -0.66;
-  const top = 0.071 + 0.0158;
-  b.add('plasticLight', lathe([[0, 0], [0.017, 0], [0.017, 0.005], [0.012, 0.01], [0, 0.011]], 32, [0, top - 0.002, z]));
-  b.add('blackMatte', cyl(0.0175, 0.0175, 0.002, 32, [0, top - 0.001, z]));
-};
 
 for (const side of [1, -1] as const) {
   BUILDERS[side > 0 ? 'antenna-01' : 'antenna-02'] = (b) => {
