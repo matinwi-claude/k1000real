@@ -36,11 +36,12 @@ export const LABELS: AtlasLabel[] = [
     kind: 'group',
     text: 'Fuselage',
     sub: 'Canopy · masts',
-    ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02'],
+    ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'battery'],
     at: [962, 458],
   },
   { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },
   { kind: 'group', text: 'Camera', ids: ['eo-ir'], at: [412, 718], atPortrait: [183, 1252] },
 
   { kind: 'detail', text: 'HD40 Gimbal Camera', ids: ['eo-ir'] },
+  { kind: 'detail', text: 'Battery 6S16P', ids: ['battery'] },
 ];

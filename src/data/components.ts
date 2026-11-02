@@ -514,6 +514,23 @@ export const COMPONENTS: DroneComponent[] = [
 
   // ───────────────────────── AVIONICS
   {
+    id: 'battery',
+    name: 'Battery 6S16P',
+    category: 'power',
+    system: 'Electrical Power',
+    type: '6S16P Battery Pack',
+    partNumber: 'K1-PWR-B01',
+    description: 'Main 6S16P battery pack inside the fuselage, under the front antennas.',
+    position: [0, 0.026, 0.286],
+    location: 'Fuselage · under the front antennas',
+    relatedComponents: ['fuselage', 'avionics-hatch'],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'internal',
+    explode: [0, 0.3, 0.05],
+    explodeDelay: 0.2,
+  },
+  {
     id: 'solar-tail',
     name: 'Solar Array · Stabilizer',
     category: 'power',
@@ -640,6 +657,7 @@ const SPECS: Record<string, SpecSheet> = {
   'solar-port': { group: 'Feature', material: 'Solar cells' },
   'solar-starboard': { group: 'Feature', material: 'Solar cells' },
   'solar-tail': { group: 'Feature', material: 'Solar cells' },
+  battery: { group: 'Feature', material: 'Lithium-ion cells' },
   'antenna-01': { group: 'Feature', material: 'Plastic' },
   'antenna-02': { group: 'Feature', material: 'Plastic' },
   pitot: { group: 'Feature', material: 'Aluminum probe · 3D-printed cover' },

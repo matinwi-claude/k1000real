@@ -249,6 +249,25 @@
           }
         }
       ]
+    },
+    {
+      "file": "battery-6s16p.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "$comment": "X/Y as supplied (assembly frame); lowered 104.6 mm so the tray clears the hull floor by 1 mm",
+      "offset": [
+        0,
+        0.0144,
+        0.25
+      ],
+      "default": {
+        "id": "battery",
+        "material": "plastic"
+      }
     }
   ]
 }
