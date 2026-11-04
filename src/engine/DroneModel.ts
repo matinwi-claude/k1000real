@@ -488,22 +488,7 @@ for (const side of [1, -1] as const) {
         BOOM_Y,
       ),
     );
-    // faired pylon up into the wing
-    b.add(
-      'shell',
-      wingLoft(
-        [
-          { s: BOOM_Y, t: x, le: 0.21, chord: 0.31, tc: 0.13 },
-          { s: BOOM_Y + 0.03, t: x, le: 0.2, chord: 0.27, tc: 0.12 },
-          { s: WING.undersideY + 0.012, t: x, le: 0.19, chord: 0.22, tc: 0.12 },
-        ],
-        0,
-        1,
-        20,
-        0,
-        'y',
-      ),
-    );
+    // the pylon / mounting saddle and its wing segment come from the CAD wing (see parts.json)
     // rectangular wooden spar stub the outer wing panel plugs onto (painted black)
     b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
     // motor mount pads
@@ -813,7 +798,8 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
     const fn: BuildFn | undefined = external
       ? undefined
       : cad
-        ? (b) => {
+        ? (b, c) => {
+            if (cad.every((p) => p.add)) BUILDERS[data.id]?.(b, c);
             for (const p of cad) (p.spin ? b.addSpin : b.add).call(b, p.mat, p.geom);
           }
         : BUILDERS[data.id];

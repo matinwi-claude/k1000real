@@ -9,7 +9,8 @@ split into components: every connected body goes to the first `pieces` entry who
 `default`. Meshes are written as "<component-id>__<material>[__spin]" and replace that
 component's procedural geometry at runtime (src/engine/PartModels.ts). `"spin": true`
 puts a source on its component's rotor group (propellers); `"keep": 0.3` decimates
-large meshes to that fraction of their triangles; `"scale"` resizes a source (applied
+large meshes to that fraction of their triangles; a piece with `"add": true` is added to
+the component's procedural geometry instead of replacing it; `"scale"` resizes a source (applied
 before `offset`).
 
 Requires: pip install trimesh scipy networkx rtree fast-simplification ; Node (npx) for meshopt compression.
@@ -58,21 +59,22 @@ def convert(src):
         target = next((p for p in src.get('pieces', []) if matches(p['where'], lo, hi)), src['default'])
         if target.get('id') is None:
             continue  # `default: {"id": null}` takes only the bodies a piece matches
-        groups.setdefault((target['id'], target['material']), []).append(faces)
+        groups.setdefault((target['id'], target['material'], bool(target.get('add'))), []).append(faces)
 
     rot = axis_matrix(src['axes']) * UNITS[src['units']] * src.get('scale', 1)
     out = {}
-    for (cid, mat), parts in groups.items():
+    for (cid, mat, add), parts in groups.items():
         part = mesh.submesh([np.concatenate(parts)], append=True)
         part.vertices = part.vertices @ rot.T + np.array(src['offset'])
         part.merge_vertices()
         keep = src.get('keep')
         if keep and keep < 1 and len(part.faces) > 20000:
             # quadric decimation: keep this fraction of the triangles
-            part = part.simplify_quadric_decimation(percent=1 - keep)
+            # low aggression collapses edges more carefully (keeps thin rims and edges)
+            part = part.simplify_quadric_decimation(percent=1 - keep, aggression=src.get('aggression', 2))
         # split normals at creases so CAD edges stay crisp and curved panels stay smooth
         part = trimesh.graph.smooth_shade(part, angle=np.radians(35))
-        name = f'{cid}__{mat}' + ('__spin' if src.get('spin') else '')
+        name = f'{cid}__{mat}' + ('__spin' if src.get('spin') else '') + ('__add' if add else '')
         if name in out:
             part = trimesh.util.concatenate([out[name], part])
         out[name] = part

@@ -55,7 +55,8 @@
             "center_y_gt": 200
           }
         }
-      ]
+      ],
+      "keep": 0.45
     },
     {
       "file": "fuselage-hatch.stl",
@@ -73,7 +74,8 @@
       "default": {
         "id": "avionics-hatch",
         "material": "shell"
-      }
+      },
+      "keep": 0.6
     },
     {
       "file": "hd40-gimbal.stl",
@@ -174,7 +176,8 @@
       "default": {
         "id": "pitot",
         "material": "aluminum"
-      }
+      },
+      "keep": 0.5
     },
     {
       "file": "pitot-cover.stl",
@@ -193,7 +196,8 @@
         "id": "pitot",
         "material": "shell"
       },
-      "scale": 0.5
+      "scale": 0.5,
+      "keep": 0.5
     },
     {
       "file": "tail-boom-fin.stl",
@@ -267,7 +271,8 @@
       "default": {
         "id": "battery",
         "material": "plastic"
-      }
+      },
+      "keep": 0.4
     },
     {
       "file": "wing-6m.stl",
@@ -282,12 +287,38 @@
         0.119,
         0.25
       ],
-      "keep": 0.6,
+      "keep": 0.5,
       "$comment": "Whole-aircraft assembly: only the wing bodies are taken (everything else is skipped).",
       "default": {
         "id": null
       },
       "pieces": [
+        {
+          "id": "boom-port",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_gt": 890,
+            "max_x_lt": 965
+          },
+          "add": true
+        },
+        {
+          "id": "boom-starboard",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "max_x_lt": -890,
+            "min_x_gt": -965
+          },
+          "add": true
+        },
         {
           "id": "aileron-port",
           "material": "shell",
