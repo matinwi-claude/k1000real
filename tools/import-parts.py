@@ -85,13 +85,15 @@ def convert(src):
 
 def main():
     cfg = json.loads((SRC / 'parts.json').read_text())
-    scene = trimesh.Scene()
+    merged = {}
     for src in cfg['sources']:
         for name, part in convert(src).items():
-            if name in scene.geometry:
-                sys.exit(f'{name} comes from two sources; give one of them a different material')
-            part.visual = trimesh.visual.ColorVisuals(part)
-            scene.add_geometry(part, node_name=name, geom_name=name)
+            # the same component + material from several sources becomes one mesh
+            merged[name] = trimesh.util.concatenate([merged[name], part]) if name in merged else part
+    scene = trimesh.Scene()
+    for name, part in merged.items():
+        part.visual = trimesh.visual.ColorVisuals(part)
+        scene.add_geometry(part, node_name=name, geom_name=name)
     OUT.parent.mkdir(parents=True, exist_ok=True)
     with tempfile.TemporaryDirectory() as tmp:
         raw = Path(tmp) / 'raw.glb'

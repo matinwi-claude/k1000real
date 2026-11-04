@@ -454,8 +454,16 @@ BUILDERS['wing-spar'] = (b) => {
 };
 
 for (const side of [1, -1] as const) {
-  BUILDERS[side > 0 ? 'boom-port' : 'boom-starboard'] = (b) => {
+  BUILDERS[side > 0 ? 'boom-port' : 'boom-starboard'] = (b, ctx) => {
     const x = side * BOOM.x;
+    // rectangular wooden spar stub the outer wing panel plugs onto (painted black)
+    b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
+    // a CAD pod (models-src/vtol-pods.stl) replaces the procedural body, pads and plate
+    const cadPod = (ctx.parts?.get(ctx.data.id) ?? []).some((p) => {
+      p.geom.computeBoundingBox();
+      return p.geom.boundingBox!.max.z - p.geom.boundingBox!.min.z > 1;
+    });
+    if (cadPod) return;
     const r = BOOM.radius;
     const n = BOOM.nacelle;
     // spindle: thickest at the pylon, waisted, swelling again into the motor nacelles
@@ -488,9 +496,6 @@ for (const side of [1, -1] as const) {
         BOOM_Y,
       ),
     );
-    // the pylon / mounting saddle and its wing segment come from the CAD wing (see parts.json)
-    // rectangular wooden spar stub the outer wing panel plugs onto (painted black)
-    b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
     // motor mount pads
     for (const z of [BOOM.rotorFrontZ, BOOM.rotorRearZ]) {
       b.add('anodized', cyl(0.026, 0.028, 0.006, 32, [x, MOTOR_BASE_Y - 0.003, z]));

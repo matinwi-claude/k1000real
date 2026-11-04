@@ -294,8 +294,31 @@
       },
       "pieces": [
         {
+          "id": null,
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": -5,
+            "min_x_gt": 890,
+            "max_x_lt": 965
+          }
+        },
+        {
+          "id": null,
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": -5,
+            "max_x_lt": -890,
+            "min_x_gt": -965
+          }
+        },
+        {
           "id": "boom-port",
           "material": "shell",
+          "add": true,
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,
@@ -303,12 +326,12 @@
             "max_z_lt": 80,
             "min_x_gt": 890,
             "max_x_lt": 965
-          },
-          "add": true
+          }
         },
         {
           "id": "boom-starboard",
           "material": "shell",
+          "add": true,
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,
@@ -316,8 +339,7 @@
             "max_z_lt": 80,
             "max_x_lt": -890,
             "min_x_gt": -965
-          },
-          "add": true
+          }
         },
         {
           "id": "aileron-port",
@@ -397,6 +419,180 @@
             "max_z_lt": 80,
             "max_x_lt": -150,
             "min_x_gt": -890
+          }
+        }
+      ]
+    },
+    {
+      "file": "vtol-pods.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0.92,
+        0.119,
+        0.25
+      ],
+      "keep": 0.09,
+      "$comment": "boom-port: pod body, motors (procedural spar stub is kept)",
+      "default": {
+        "id": "boom-port",
+        "material": "shell",
+        "add": true
+      },
+      "pieces": [
+        {
+          "id": null,
+          "where": {
+            "min_y_lt": -700
+          }
+        },
+        {
+          "id": null,
+          "where": {
+            "max_y_gt": 1100
+          }
+        },
+        {
+          "id": "lift-motor-03",
+          "material": "motorBell",
+          "where": {
+            "min_y_gt": -545,
+            "max_y_lt": -465
+          }
+        },
+        {
+          "id": "lift-motor-02",
+          "material": "motorBell",
+          "where": {
+            "min_y_gt": 890,
+            "max_y_lt": 975
+          }
+        }
+      ]
+    },
+    {
+      "file": "vtol-pods.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0.92,
+        0.119,
+        0.25
+      ],
+      "keep": 0.06,
+      "$comment": "boom-port: lift propellers (spin about the motor axis)",
+      "spin": true,
+      "default": {
+        "id": null
+      },
+      "pieces": [
+        {
+          "id": "lift-prop-03",
+          "material": "plastic",
+          "where": {
+            "min_y_lt": -700
+          }
+        },
+        {
+          "id": "lift-prop-02",
+          "material": "plastic",
+          "where": {
+            "max_y_gt": 1100
+          }
+        }
+      ]
+    },
+    {
+      "file": "vtol-pods.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        -0.92,
+        0.119,
+        0.25
+      ],
+      "keep": 0.09,
+      "$comment": "boom-starboard: pod body, motors (procedural spar stub is kept)",
+      "default": {
+        "id": "boom-starboard",
+        "material": "shell",
+        "add": true
+      },
+      "pieces": [
+        {
+          "id": null,
+          "where": {
+            "min_y_lt": -700
+          }
+        },
+        {
+          "id": null,
+          "where": {
+            "max_y_gt": 1100
+          }
+        },
+        {
+          "id": "lift-motor-01",
+          "material": "motorBell",
+          "where": {
+            "min_y_gt": -545,
+            "max_y_lt": -465
+          }
+        },
+        {
+          "id": "lift-motor-04",
+          "material": "motorBell",
+          "where": {
+            "min_y_gt": 890,
+            "max_y_lt": 975
+          }
+        }
+      ]
+    },
+    {
+      "file": "vtol-pods.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        -0.92,
+        0.119,
+        0.25
+      ],
+      "keep": 0.06,
+      "$comment": "boom-starboard: lift propellers (spin about the motor axis)",
+      "spin": true,
+      "default": {
+        "id": null
+      },
+      "pieces": [
+        {
+          "id": "lift-prop-01",
+          "material": "plastic",
+          "where": {
+            "min_y_lt": -700
+          }
+        },
+        {
+          "id": "lift-prop-04",
+          "material": "plastic",
+          "where": {
+            "max_y_gt": 1100
           }
         }
       ]

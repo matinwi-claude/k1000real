@@ -48,8 +48,9 @@ export const BOOM = {
   radius: 0.031,
   /** radius of the motor nacelles at the rotor stations */
   nacelle: 0.025,
-  rotorFrontZ: 0.701,
-  rotorRearZ: -0.688,
+  /** CAD lift-motor centres */
+  rotorFrontZ: 0.75,
+  rotorRearZ: -0.68,
 } as const;
 
 export const LIFT = {
