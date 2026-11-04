@@ -4,7 +4,7 @@ An explorable digital-twin website for the **Kraus Hamdani Aerospace K1000ULE**,
 
 Built with React, TypeScript, Vite and Three.js, and deployed on Cloudflare Workers (static assets + a tiny `/api/status` Worker).
 
-> **About accuracy.** No official CAD is bundled. The 3D model is built in code. Its proportions were traced from CAD views of the K1000ULE (top, 3/4 and exploded views), cross-checked against the manufacturer's public renders. That covers the three-piece solar wing, slim keel fuselage with removable canopy and antenna masts, spindle booms carrying four lift rotors, nose tractor prop, and T-tail. The absolute scale (a 5 m wingspan is assumed) and the internal layout are illustrative. In the inspector, specs tagged **PUBLISHED** come from the public K1000ULE product page. Every other value is a labelled placeholder. To show the real geometry, drop in a model file (see below).
+> **About accuracy.** No official CAD is bundled. The 3D model is built in code. Most parts now come from CAD (see below); the rest were traced from CAD views of the K1000ULE (top, 3/4 and exploded views), cross-checked against the manufacturer's public renders. That covers the three-piece solar wing, slim keel fuselage with removable canopy and antenna masts, spindle booms carrying four lift rotors, nose tractor prop, and T-tail. The absolute scale (a 5 m wingspan is assumed) and the internal layout are illustrative. In the inspector, specs tagged **PUBLISHED** come from the public K1000ULE product page. Every other value is a labelled placeholder. To show the real geometry, drop in a model file (see below).
 
 ## Run locally
 

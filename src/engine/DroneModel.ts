@@ -31,7 +31,6 @@ import {
 } from '../data/layout';
 import {
   alignY,
-  airfoilAt,
   box,
   cyl,
   lathe,
@@ -258,23 +257,6 @@ function wingStations(xa: number, xb: number, side: 1 | -1, tcScale = 1): LoftSt
     });
 }
 
-/** Point on the wing upper surface at |x|, chord fraction xc. */
-function wingUpper(side: 1 | -1, x: number, xc: number, out: THREE.Vector3, lift = 0) {
-  const st = wingStation(x);
-  const tc = 0.14 - 0.03 * (x / WING.halfSpan);
-  const [up] = airfoilAt(xc, tc);
-  return out.set(side * x, wingY(x) + up * st.chord + lift, st.le - xc * st.chord);
-}
-
-/** Thin conformal panel on a wing upper surface, returned as a closed slab. */
-function solarPanel(side: 1 | -1, xa: number, xb: number, ca: number, cb: number) {
-  const fn: SurfaceFn =
-    side > 0
-      ? (u, v, o) => wingUpper(1, u, v, o)
-      : (u, v, o) => wingUpper(-1, v, u, o); // parameter order swapped so the normal still points up
-  return side > 0 ? surfaceSlab(fn, xa, xb, ca, cb, 10, 8, 0.0012, 0.0016) : surfaceSlab(fn, ca, cb, xa, xb, 8, 10, 0.0012, 0.0016);
-}
-
 function navLight(b: Builder, key: MatKey, pos: V3, color: string) {
   b.add(key, sphere(0.008, pos, 14, 10));
   const glow = new THREE.Sprite(
@@ -327,6 +309,22 @@ function drapedPanel(target: THREE.Mesh, x0: number, x1: number, z0: number, z1:
     g.computeVertexNormals();
   }
   return g;
+}
+
+/** Leading / trailing edge z of a CAD surface at span station x (downward ray march). */
+function chordAt(target: THREE.Mesh, x: number) {
+  const ray = new THREE.Raycaster();
+  const down = new THREE.Vector3(0, -1, 0);
+  let le = -Infinity;
+  let te = Infinity;
+  for (let z = 0.5; z > -0.4; z -= 0.004) {
+    ray.set(new THREE.Vector3(x, 5, z), down);
+    if (ray.intersectObject(target, false).length) {
+      le = Math.max(le, z);
+      te = Math.min(te, z);
+    }
+  }
+  return { le, te };
 }
 
 const BUILDERS: Record<string, BuildFn> = {};
@@ -423,36 +421,34 @@ for (const side of [1, -1] as const) {
     const mid = (A.inner + A.outer) / 2;
     void mid;
   };
-  BUILDERS[side > 0 ? 'solar-port' : 'solar-starboard'] = (b) => {
-    for (let i = 0; i < 8; i++) {
-      const xa = 0.06 + i * 0.285;
+  BUILDERS[side > 0 ? 'solar-port' : 'solar-starboard'] = (b, ctx) => {
+    const wing = ['wing-center', side > 0 ? 'wing-port' : 'wing-starboard'].flatMap((id) => ctx.parts?.get(id) ?? []);
+    if (!wing.length) return;
+    const target = new THREE.Mesh(merge(wing.map((p) => p.geom)));
+    const mat = new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 });
+    for (let i = 0; i < 9; i++) {
+      const xa = 0.12 + i * 0.285;
       const xb = xa + 0.27;
-      const ca = i >= 6 ? 0.16 : 0.05;
-      const g = solarPanel(side, xa, xb, ca, 0.9);
-      b.addCustom(g, new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 }));
+      // chord at the panel's narrower (outboard) end, from the CAD wing
+      const { le, te } = chordAt(target, side * xb);
+      const z1 = le - 0.012;
+      const z0 = te + 0.075; // stops ahead of the aileron hinge line
+      if (z1 - z0 < 0.04) continue;
+      b.addCustom(drapedPanel(target, side * xa, side * xb, z0, z1, 24, 20, 0.0015), mat);
     }
   };
+
 }
 
 BUILDERS['wing-spar'] = (b) => {
   const zs = 0.172;
   for (const side of [1, -1] as const) {
-    const p0 = new THREE.Vector3(0, wingY(0) + 0.011, zs);
-    const p1 = new THREE.Vector3(side * 2.25, wingY(2.25) + 0.008, zs - 0.01);
+    const p0 = new THREE.Vector3(0, 0.118, zs);
+    const p1 = new THREE.Vector3(side * 2.6, 0.16, zs - 0.01);
     const len = p0.distanceTo(p1);
     const g = cyl(0.0065, 0.012, len, 20);
     alignY(g, p1.clone().sub(p0).normalize(), p0.clone().lerp(p1, 0.5));
     b.add('blackMatte', g);
-    for (let k = 1; k <= 6; k++) {
-      const x = k * 0.35;
-      const st = wingStation(x);
-      const tc = (0.14 - 0.03 * (x / WING.halfSpan)) * 0.86;
-      const stations: LoftStation[] = [
-        { s: side * (x - 0.003), t: wingY(x) + 0.001, le: st.le - 0.01, chord: st.chord - 0.02, tc },
-        { s: side * (x + 0.003), t: wingY(x) + 0.001, le: st.le - 0.01, chord: st.chord - 0.02, tc },
-      ];
-      b.add('plastic', wingLoft(stations, 0.02, 0.95, 16));
-    }
   }
   b.add('aluminum', rbox(0.12, 0.022, 0.04, 0.004, [0, wingY(0) + 0.011, zs]));
 };
@@ -499,7 +495,7 @@ for (const side of [1, -1] as const) {
         [
           { s: BOOM_Y, t: x, le: 0.21, chord: 0.31, tc: 0.13 },
           { s: BOOM_Y + 0.03, t: x, le: 0.2, chord: 0.27, tc: 0.12 },
-          { s: wingY(BOOM.x) + 0.004, t: x, le: 0.19, chord: 0.22, tc: 0.12 },
+          { s: WING.undersideY + 0.012, t: x, le: 0.19, chord: 0.22, tc: 0.12 },
         ],
         0,
         1,
@@ -509,7 +505,7 @@ for (const side of [1, -1] as const) {
       ),
     );
     // rectangular wooden spar stub the outer wing panel plugs onto (painted black)
-    b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, wingY(BOOM.x) + 0.012, 0.165]));
+    b.add('blackMatte', rbox(0.36, 0.014, 0.03, 0.0015, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
     // motor mount pads
     for (const z of [BOOM.rotorFrontZ, BOOM.rotorRearZ]) {
       b.add('anodized', cyl(0.026, 0.028, 0.006, 32, [x, MOTOR_BASE_Y - 0.003, z]));
@@ -751,6 +747,8 @@ BUILDERS['eo-ir'] = (b) => {
 
 // ───────────────────────────────────────────────────────── payload
 // ───────────────────────────────────────────────────────── assemble
+const XRAY_IDS = new Set(['fuselage', 'avionics-hatch']);
+
 export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D | null, parts?: PartModels): DroneModel {
   const root = new THREE.Group();
   root.name = 'K1000';
@@ -764,7 +762,8 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
 
   // fasteners node first: other components parent their instances to themselves
   const makeNode = (data: DroneComponent): ComponentNode => {
-    const xrayW = data.layer === 'exterior' ? 1 : data.layer === 'structure' ? 0.55 : 0;
+    // X-ray only sees through the fuselage shell (and its hatch)
+    const xrayW = XRAY_IDS.has(data.id) ? 1 : 0;
     const ghostW = data.layer === 'exterior' ? 1 : 0;
     const group = new THREE.Group();
     group.name = data.id;

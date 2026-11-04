@@ -167,9 +167,9 @@
         "-y"
       ],
       "offset": [
-        0.8946,
-        0.1454,
-        0.313
+        1.0526,
+        0.1183,
+        0.32
       ],
       "default": {
         "id": "pitot",
@@ -185,9 +185,9 @@
         "y"
       ],
       "offset": [
-        0.8946,
-        0.1392,
-        0.0568
+        1.0526,
+        0.1121,
+        0.0638
       ],
       "default": {
         "id": "pitot",
@@ -268,6 +268,107 @@
         "id": "battery",
         "material": "plastic"
       }
+    },
+    {
+      "file": "wing-6m.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0.119,
+        0.25
+      ],
+      "keep": 0.6,
+      "$comment": "Whole-aircraft assembly: only the wing bodies are taken (everything else is skipped).",
+      "default": {
+        "id": null
+      },
+      "pieces": [
+        {
+          "id": "aileron-port",
+          "material": "shell",
+          "where": {
+            "min_y_gt": 290,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_gt": 1480
+          }
+        },
+        {
+          "id": "aileron-starboard",
+          "material": "shell",
+          "where": {
+            "min_y_gt": 290,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "max_x_lt": -1480
+          }
+        },
+        {
+          "id": "wing-port",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_gt": 890
+          }
+        },
+        {
+          "id": "wing-starboard",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "max_x_lt": -890
+          }
+        },
+        {
+          "id": "wing-center",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_lt": -800,
+            "max_x_gt": 800
+          }
+        },
+        {
+          "id": "wing-center",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_gt": 150,
+            "max_x_lt": 890
+          }
+        },
+        {
+          "id": "wing-center",
+          "material": "shell",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "max_x_lt": -150,
+            "min_x_gt": -890
+          }
+        }
+      ]
     }
   ]
 }

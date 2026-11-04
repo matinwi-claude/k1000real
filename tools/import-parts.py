@@ -56,6 +56,8 @@ def convert(src):
         pts = mesh.vertices[mesh.faces[faces].ravel()]
         lo, hi = pts.min(0), pts.max(0)
         target = next((p for p in src.get('pieces', []) if matches(p['where'], lo, hi)), src['default'])
+        if target.get('id') is None:
+            continue  # `default: {"id": null}` takes only the bodies a piece matches
         groups.setdefault((target['id'], target['material']), []).append(faces)
 
     rot = axis_matrix(src['axes']) * UNITS[src['units']] * src.get('scale', 1)

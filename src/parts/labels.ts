@@ -40,7 +40,7 @@ export const LABELS: AtlasLabel[] = [
     at: [962, 458],
   },
   { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },
-  { kind: 'group', text: 'Camera', ids: ['eo-ir'], at: [412, 718], atPortrait: [183, 1252] },
+  { kind: 'group', text: 'Camera', ids: ['eo-ir'], at: [470, 668], atPortrait: [183, 1252] },
 
   { kind: 'detail', text: 'HD40 Gimbal Camera', ids: ['eo-ir'] },
   { kind: 'detail', text: 'Battery 6S16P', ids: ['battery'] },

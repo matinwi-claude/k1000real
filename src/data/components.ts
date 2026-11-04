@@ -118,6 +118,8 @@ export const AIRCRAFT = {
 const P = (label: string, value: string): Spec => ({ label, value, published: true });
 
 const wingRootY = wingY(0);
+/** 4 in outboard of the port VTOL pod's outer side */
+const PITOT_X = BOOM.x + BOOM.radius + 0.1016;
 
 const liftMotors: DroneComponent[] = LIFT_LAYOUT.map((a) => ({
   id: `lift-motor-${pad(a.index)}`,
@@ -203,7 +205,7 @@ const wing = (side: 1 | -1): DroneComponent => ({
   partNumber: side > 0 ? 'K1-AFR-W01' : 'K1-AFR-W02',
   description:
     'Outer panel of the three-piece wing. Plugs onto the spar stub at the lift boom, carries the aileron and a rounded tip, and is almost entirely covered by solar cells that recharge the aircraft in flight.',
-  position: [side * 1.6, wingY(1.6), 0.1],
+  position: [side * 1.95, 0.14, 0.07],
   location: `${side > 0 ? 'Port' : 'Starboard'} side · shoulder-mounted`,
   relatedComponents: ['wing-center', side > 0 ? 'solar-port' : 'solar-starboard', side > 0 ? 'aileron-port' : 'aileron-starboard', side > 0 ? 'boom-port' : 'boom-starboard'],
   status: 'operational',
@@ -228,7 +230,7 @@ const wingCenter: DroneComponent = {
   partNumber: 'K1-AFR-W00',
   description:
     'Centre section of the three-piece wing. Sits on the fuselage pod, carries both lift booms on faired pylons, and receives the outer panels at its ends.',
-  position: [0, wingY(0) + 0.02, 0.1],
+  position: [0, 0.12, 0.07],
   location: 'Above fuselage · between the booms',
   relatedComponents: ['fuselage', 'wing-port', 'wing-starboard', 'boom-port', 'boom-starboard', 'wing-spar'],
   status: 'operational',
@@ -250,7 +252,7 @@ const aileron = (side: 1 | -1): DroneComponent => ({
   type: 'Control Surface',
   partNumber: side > 0 ? 'K1-AFR-C01' : 'K1-AFR-C02',
   description: 'Outboard trailing-edge control surface for roll control in fixed-wing flight, driven by a servo buried in the wing.',
-  position: [side * (WING.aileron.inner + WING.aileron.outer) / 2, wingY(1.8), WING.teZ + 0.03],
+  position: [side * (WING.aileron.inner + WING.aileron.outer) / 2, 0.145, WING.teZ + 0.035],
   location: `${side > 0 ? 'Port' : 'Starboard'} wing · outboard trailing edge`,
   relatedComponents: [side > 0 ? 'wing-port' : 'wing-starboard'],
   status: 'operational',
@@ -591,7 +593,7 @@ export const COMPONENTS: DroneComponent[] = [
     type: 'Airspeed Probe',
     partNumber: 'K1-SNS-P01',
     description: 'Forward-facing pitot probe in a fairing cover under the left wing, 4 in outboard of the left VTOL pod, measuring airspeed for fixed-wing flight and transitions.',
-    position: [0.8946, wingY(0.8946) - 0.02, 0.24],
+    position: [PITOT_X, WING.undersideY - 0.015, 0.2],
     location: 'Left wing · underside, 4 in outboard of the VTOL pod',
     relatedComponents: ['wing-port', 'boom-port'],
     status: 'operational',
@@ -664,6 +666,30 @@ const SPECS: Record<string, SpecSheet> = {
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
 };
 export const specSheet = (id: string): SpecSheet => SPECS[id] ?? { group: 'Airframe', material: CF };
+
+/** Explode view moves only these parts; lift motors and props ride with their pod. */
+const POD_EXPLODE: Vec3[] = [
+  [0.12, -0.3, 0],
+  [-0.12, -0.3, 0],
+];
+const EXPLODE: Record<string, Vec3> = {
+  'eo-ir': [0, -0.4, 0],
+  battery: [0, 0.32, 0.05],
+  'solar-port': [0, 0.22, 0],
+  'solar-starboard': [0, 0.22, 0],
+  'solar-tail': [0, 0.2, 0],
+  'boom-port': POD_EXPLODE[0],
+  'boom-starboard': POD_EXPLODE[1],
+};
+for (const a of LIFT_LAYOUT) {
+  const v = POD_EXPLODE[a.x > 0 ? 0 : 1];
+  EXPLODE[`lift-motor-${pad(a.index)}`] = v;
+  EXPLODE[`lift-prop-${pad(a.index)}`] = v;
+}
+for (const c of COMPONENTS) {
+  c.explode = EXPLODE[c.id] ?? [0, 0, 0];
+  if (EXPLODE[c.id]) c.explodeDelay = c.id.startsWith('boom') || c.id.startsWith('lift') ? 0.1 : c.explodeDelay;
+}
 
 export const COMPONENT_MAP: Record<string, DroneComponent> = Object.fromEntries(COMPONENTS.map((c) => [c.id, c]));
 

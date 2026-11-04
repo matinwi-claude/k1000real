@@ -11,42 +11,45 @@
 
 export type Vec3 = [number, number, number];
 
-/** Illustrative wingspan; other dimensions are ratios traced from the CAD top view. */
-export const SPAN = 5.0;
+/** Wingspan of the CAD wing (models-src/wing-6m.stl). */
+export const SPAN = 6.098;
 
 export const WING = {
   halfSpan: SPAN / 2,
-  /** stretched to cover the CAD fuselage's wing saddle (330 mm opening) */
-  rootChord: 0.353,
+  /** planform of the CAD wing: straight 364 mm chord, rounded tips */
+  rootChord: 0.364,
   /** spanwise position where the rounded tip begins */
-  tipStart: 1.9,
+  tipStart: 2.45,
   /** trailing edge z (straight) */
-  teZ: -0.11,
-  /** chord-line height at the root (wing sits on top of the fuselage pod) */
-  y: 0.1,
-  dihedralDeg: 2.5,
+  teZ: -0.114,
+  /** chord-line height at the root */
+  y: 0.124,
+  dihedralDeg: 0.9,
+  /** CAD wing underside between the fuselage and the VTOL pods */
+  undersideY: 0.106,
   /** three-piece wing: centre section spans the booms, outer panels plug in here */
   centreHalf: 0.8,
-  aileron: { inner: 1.36, outer: 2.2, hinge: 0.76 },
+  aileron: { inner: 1.487, outer: 2.747, hinge: 0.76 },
 } as const;
 
 export const FUSELAGE = {
-  noseZ: 0.8,
-  podEndZ: -0.49,
+  noseZ: 1.015,
+  podEndZ: -0.72,
   tailEndZ: -1.79,
   shellThickness: 0.0026,
 } as const;
 
+/** VTOL pods, placed where the CAD wing assembly carries them. */
 export const BOOM = {
-  x: 0.762,
-  frontZ: 0.843,
-  rearZ: -0.698,
+  x: 0.92,
+  frontZ: 0.811,
+  rearZ: -0.796,
   /** maximum radius, at the pylon */
   radius: 0.031,
   /** radius of the motor nacelles at the rotor stations */
   nacelle: 0.025,
-  rotorFrontZ: 0.733,
-  rotorRearZ: -0.59,
+  rotorFrontZ: 0.701,
+  rotorRearZ: -0.688,
 } as const;
 
 export const LIFT = {
@@ -99,7 +102,8 @@ export const LIFT_LAYOUT = [
   { index: 4, x: -BOOM.x, z: BOOM.rotorRearZ, side: 'Rear Right', boom: 'Starboard', spin: 'CW' },
 ] as const;
 
-export const BOOM_Y = wingY(BOOM.x) - 0.078;
+/** pod centreline height (CAD pod centre) */
+export const BOOM_Y = 0.0475;
 export const MOTOR_BASE_Y = BOOM_Y + BOOM.nacelle + 0.002;
 export const LIFT_PROP_Y = MOTOR_BASE_Y + LIFT.motorHeight + 0.016;
 
