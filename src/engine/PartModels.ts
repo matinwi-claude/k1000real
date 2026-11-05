@@ -18,13 +18,16 @@ export const PARTS_URL = '/models/parts.glb';
 export type PartGeometry = { mat: MatKey; geom: THREE.BufferGeometry; spin: boolean; add: boolean };
 export type PartModels = Map<string, PartGeometry[]>;
 
-export async function loadPartModels(url = PARTS_URL): Promise<PartModels> {
+/** `onProgress` gets the download fraction (0..1) when the server sends a length. */
+export async function loadPartModels(onProgress?: (f: number) => void, url = PARTS_URL): Promise<PartModels> {
   const parts: PartModels = new Map();
   try {
     const head = await fetch(url, { method: 'HEAD' });
     // SPA fallbacks answer unknown paths with index.html
     if (!head.ok || (head.headers.get('content-type') ?? '').includes('text/html')) return parts;
-    const gltf = await new GLTFLoader().setMeshoptDecoder(MeshoptDecoder).loadAsync(url);
+    const gltf = await new GLTFLoader()
+      .setMeshoptDecoder(MeshoptDecoder)
+      .loadAsync(url, (e) => e.total && onProgress?.(e.loaded / e.total));
     gltf.scene.updateMatrixWorld(true);
     gltf.scene.traverse((o) => {
       const mesh = o as THREE.Mesh;

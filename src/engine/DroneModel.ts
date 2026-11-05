@@ -78,6 +78,8 @@ export interface ComponentNode {
   hi: number;
   hov: number;
   fade: number;
+  /** 0 = solid, 1 = dissolved away (fixed-wing configuration) */
+  dissolve: number;
   transparent: boolean;
 }
 
@@ -281,6 +283,7 @@ const solarMat = () => {
  */
 function drapedPanel(target: THREE.Mesh, x0: number, x1: number, z0: number, z1: number, nu = 14, nv = 6, lift = 0.0007) {
   const ray = new THREE.Raycaster();
+  ray.firstHitOnly = true;
   const down = new THREE.Vector3(0, -1, 0);
   const pos: number[] = [];
   const uv: number[] = [];
@@ -311,9 +314,17 @@ function drapedPanel(target: THREE.Mesh, x0: number, x1: number, z0: number, z1:
   return g;
 }
 
+/** A raycast target for draping; uses three-mesh-bvh when the engine has installed it. */
+function bvhMesh(geoms: THREE.BufferGeometry[]) {
+  const g = merge(geoms);
+  (g as THREE.BufferGeometry & { computeBoundsTree?: () => void }).computeBoundsTree?.();
+  return new THREE.Mesh(g);
+}
+
 /** Leading / trailing edge z of a CAD surface at span station x (downward ray march). */
 function chordAt(target: THREE.Mesh, x: number) {
   const ray = new THREE.Raycaster();
+  ray.firstHitOnly = true;
   const down = new THREE.Vector3(0, -1, 0);
   let le = -Infinity;
   let te = Infinity;
@@ -333,7 +344,7 @@ const BUILDERS: Record<string, BuildFn> = {};
 BUILDERS['solar-tail'] = (b, ctx) => {
   const stab = ctx.parts?.get('horizontal-stabilizer');
   if (!stab) return;
-  const target = new THREE.Mesh(merge(stab.map((p) => p.geom)));
+  const target = bvhMesh(stab.map((p) => p.geom));
   const z0 = TAIL.stabTE + 0.062;
   const z1 = TAIL.stabLE - 0.012;
   for (const side of [1, -1] as const)
@@ -424,7 +435,7 @@ for (const side of [1, -1] as const) {
   BUILDERS[side > 0 ? 'solar-port' : 'solar-starboard'] = (b, ctx) => {
     const wing = ['wing-center', side > 0 ? 'wing-port' : 'wing-starboard'].flatMap((id) => ctx.parts?.get(id) ?? []);
     if (!wing.length) return;
-    const target = new THREE.Mesh(merge(wing.map((p) => p.geom)));
+    const target = bvhMesh(wing.map((p) => p.geom));
     const mat = new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 });
     for (let i = 0; i < 9; i++) {
       const xa = 0.12 + i * 0.285;
@@ -776,6 +787,7 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
       hi: 0,
       hov: 0,
       fade: 1,
+      dissolve: 0,
       transparent: false,
     };
   };

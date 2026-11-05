@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { carbonTexture } from './textures';
-import { MATERIAL_PATCH_FRAGMENT, MATERIAL_PATCH_UNIFORMS } from '../shaders/materialPatch';
+import { MATERIAL_PATCH_FRAGMENT, MATERIAL_PATCH_UNIFORMS, MATERIAL_PATCH_VERTEX, MATERIAL_PATCH_VERTEX_DECL } from '../shaders/materialPatch';
 
 /** Uniforms shared by every drone material. */
 export const globalUniforms = {
@@ -21,6 +21,7 @@ export interface ComponentUniforms {
   uFade: { value: number };
   uXrayW: { value: number };
   uGhostW: { value: number };
+  uDissolve: { value: number };
 }
 
 export function createComponentUniforms(xrayW: number, ghostW: number): ComponentUniforms {
@@ -31,17 +32,21 @@ export function createComponentUniforms(xrayW: number, ghostW: number): Componen
     uFade: { value: 1 },
     uXrayW: { value: xrayW },
     uGhostW: { value: ghostW },
+    uDissolve: { value: 0 },
   };
 }
 
 export function patchMaterial(mat: THREE.Material, cu: ComponentUniforms) {
   mat.onBeforeCompile = (shader) => {
     Object.assign(shader.uniforms, globalUniforms, cu);
+    shader.vertexShader = shader.vertexShader
+      .replace('#include <common>', `#include <common>\n${MATERIAL_PATCH_VERTEX_DECL}`)
+      .replace('#include <project_vertex>', `#include <project_vertex>\n${MATERIAL_PATCH_VERTEX}`);
     shader.fragmentShader = shader.fragmentShader
       .replace('#include <common>', `#include <common>\n${MATERIAL_PATCH_UNIFORMS}`)
       .replace('#include <opaque_fragment>', `#include <opaque_fragment>\n${MATERIAL_PATCH_FRAGMENT}`);
   };
-  mat.customProgramCacheKey = () => 'k1000-patch-v1';
+  mat.customProgramCacheKey = () => 'k1000-patch-v2';
 }
 
 export type MatKey =

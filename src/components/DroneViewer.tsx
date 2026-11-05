@@ -17,12 +17,17 @@ export function DroneViewer() {
   useEffect(() => {
     let cancelled = false;
     let engine: import('../engine/DroneEngine').DroneEngine | null = null;
-    useStore.setState({ loadProgress: 0.15 });
-    Promise.all([import('../engine/DroneEngine'), import('../engine/GltfModel'), import('../engine/PartModels')])
-      .then(async ([{ DroneEngine }, { loadExternalModel }, { loadPartModels }]) => {
+    useStore.setState({ loadProgress: 0.08 });
+    // start the CAD download straight away, alongside the engine code; the bar follows the download
+    const progress = (f: number) => {
+      if (!cancelled) useStore.setState({ loadProgress: Math.max(useStore.getState().loadProgress, 0.1 + 0.6 * f) });
+    };
+    const partsP = import('../engine/PartModels').then(({ loadPartModels }) => loadPartModels(progress));
+    const externalP = import('../engine/GltfModel').then(({ loadExternalModel }) => loadExternalModel());
+    import('../engine/DroneEngine')
+      .then(async ({ DroneEngine }) => {
         if (cancelled) return;
-        useStore.setState({ loadProgress: 0.45 });
-        const [external, parts] = await Promise.all([loadExternalModel(), loadPartModels()]);
+        const [external, parts] = await Promise.all([externalP, partsP]);
         if (cancelled) return;
         useStore.setState({ loadProgress: 0.7, modelSource: external ? 'cad' : 'procedural' });
         // let fonts settle so canvas-drawn labels use the right typeface

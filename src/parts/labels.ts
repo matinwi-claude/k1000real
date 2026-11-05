@@ -16,8 +16,8 @@ export interface AtlasLabel {
   kind: 'group' | 'detail';
 }
 
-const LIFT_PORT = ['boom-port', 'lift-motor-02', 'lift-motor-03', 'lift-prop-02', 'lift-prop-03'];
-const LIFT_STBD = ['boom-starboard', 'lift-motor-01', 'lift-motor-04', 'lift-prop-01', 'lift-prop-04'];
+const LIFT_PORT = ['boom-port', 'pod-segment-port', 'lift-motor-02', 'lift-motor-03', 'lift-prop-02', 'lift-prop-03'];
+const LIFT_STBD = ['boom-starboard', 'pod-segment-starboard', 'lift-motor-01', 'lift-motor-04', 'lift-prop-01', 'lift-prop-04'];
 
 export const LABELS: AtlasLabel[] = [
   { kind: 'group', text: 'Outer Wing', sub: 'Port · solar', ids: ['wing-port', 'solar-port', 'aileron-port', 'pitot'], at: [1330, 248] },

@@ -56,7 +56,7 @@
           }
         }
       ],
-      "keep": 0.45
+      "keep": 0.3
     },
     {
       "file": "fuselage-hatch.stl",
@@ -316,9 +316,8 @@
           }
         },
         {
-          "id": "boom-port",
+          "id": "pod-segment-port",
           "material": "shell",
-          "add": true,
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,
@@ -329,9 +328,8 @@
           }
         },
         {
-          "id": "boom-starboard",
+          "id": "pod-segment-starboard",
           "material": "shell",
-          "add": true,
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,

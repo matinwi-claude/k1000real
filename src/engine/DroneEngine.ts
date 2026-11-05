@@ -14,7 +14,7 @@ import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
 
 import { getState, useStore, type CameraView, type State } from '../store';
-import { COMPONENT_MAP } from '../data/components';
+import { COMPONENT_MAP, VTOL_ONLY } from '../data/components';
 
 /** Half-range of the cross-section cut slider per axis, in metres (illustrative scale). */
 export const SECTION_RANGE = { top: 0.15, side: 2.6, front: 1.3 } as const;
@@ -462,7 +462,10 @@ export class DroneEngine {
       }
       // disabling is finished in the loop once the cut animates out
     }
-    if (s.hidden !== p.hidden || s.view !== p.view) this.pickDirty = true;
+    if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration) this.pickDirty = true;
+    if (s.configuration !== p.configuration && s.configuration === 'fixed-wing' && s.selected && VTOL_ONLY.has(s.selected)) {
+      useStore.setState({ selected: null });
+    }
     if (s.explode >= 0.5 && p.explode < 0.5 && !s.cinematic) {
       // pull back so the separated assemblies stay in frame
       const want = this.fitDistance() * 1.35;
@@ -676,6 +679,7 @@ export class DroneEngine {
     this.pickTargets = [];
     for (const node of this.model.nodes.values()) {
       if (s.hidden[node.id]) continue;
+      if (s.configuration === 'fixed-wing' && VTOL_ONLY.has(node.id)) continue;
       if (xrayish && node.data.layer === 'exterior') continue;
       for (const m of node.meshes) {
         if (m.userData.componentId === 'fasteners') {
@@ -846,7 +850,7 @@ export class DroneEngine {
     }
 
     // ── components (explode positions, highlight uniforms, fades)
-    if (this.updateComponents(s, kf)) active = true;
+    if (this.updateComponents(s, kf, dt)) active = true;
 
     // ── hover
     if (this.pointerDirty && !this.downInfo && this.pointerInside && !s.cinematic) {
@@ -986,7 +990,7 @@ export class DroneEngine {
     return Math.abs(this.sectionAmt - (on ? 1 : 0)) > 0.001 || true;
   }
 
-  private updateComponents(s: State, k: number) {
+  private updateComponents(s: State, k: number, dt: number) {
     let changed = false;
     const sel = s.selected;
     const selData = sel ? COMPONENT_MAP[sel] : undefined;
@@ -1032,13 +1036,21 @@ export class DroneEngine {
         if (Math.abs(node.fade - fadeT) < 0.004) node.fade = fadeT;
         changed = true;
       }
+      // fixed-wing: the VTOL pods dissolve away (and rebuild when switching back)
+      const dissolveT = s.configuration === 'fixed-wing' && VTOL_ONLY.has(d.id) ? 1 : 0;
+      if (node.dissolve !== dissolveT) {
+        const step = Math.min(1, dt * 0.7);
+        node.dissolve = dissolveT > node.dissolve ? Math.min(dissolveT, node.dissolve + step) : Math.max(dissolveT, node.dissolve - step);
+        changed = true;
+      }
       const u = node.uniforms;
       u.uHov.value = node.hov;
       u.uHi.value = node.hi * (0.8 + 0.2 * Math.sin(this.time * 2.2));
       u.uDim.value = node.dim;
       u.uFade.value = node.fade;
-      // visibility after fade
-      const vis = node.fade > 0.003;
+      u.uDissolve.value = node.dissolve;
+      // visibility after fade / dissolve
+      const vis = node.fade > 0.003 && node.dissolve < 0.999;
       for (const m of node.meshes) {
         if (m.userData.componentId === 'fasteners' && node.id !== 'fasteners') continue;
         if (node.id === 'fasteners') {
@@ -1046,7 +1058,7 @@ export class DroneEngine {
           m.visible = vis && !s.hidden[host];
         } else m.visible = vis;
       }
-      for (const fm of node.fastenerMeshes) fm.visible = !hidden && !s.hidden.fasteners;
+      for (const fm of node.fastenerMeshes) fm.visible = !hidden && !s.hidden.fasteners && node.dissolve < 0.999;
       // transparency management
       const needT = node.fade < 0.999 || this.xrayCur * u.uXrayW.value > 0.001 || this.ghostCur * u.uGhostW.value > 0.001;
       if (needT !== node.transparent) {
