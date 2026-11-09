@@ -184,40 +184,80 @@ export function wearMark() {
 }
 
 /** Monocrystalline solar panel: grid of cells with thin busbars. `cols`×`rows` cells per panel. */
-export function solarTexture(cols = 8, rows = 4) {
-  const W = 512;
-  const H = 256;
+/**
+ * Solar panel (one texture per panel; u along the span, v along the chord), after the
+ * aircraft's array: glossy near-black cells, thin white row lines along the span, white
+ * ladder-style interconnects across the chord, and gold bus bars at the panel ends.
+ */
+export function solarTexture(cols = 9, rows = 4) {
+  const W = 1024;
+  const H = 512;
   const { c, ctx } = canvas(W, H);
-  ctx.fillStyle = '#c9cdd2';
+  const g = ctx.createLinearGradient(0, 0, W, H);
+  g.addColorStop(0, '#0b0d12');
+  g.addColorStop(0.5, '#11141b');
+  g.addColorStop(1, '#0a0c10');
+  ctx.fillStyle = g;
   ctx.fillRect(0, 0, W, H);
-  const m = 6;
-  const cw = (W - m * 2) / cols;
-  const ch = (H - m * 2) / rows;
-  for (let y = 0; y < rows; y++)
-    for (let x = 0; x < cols; x++) {
-      const x0 = m + x * cw + 1;
-      const y0 = m + y * ch + 1;
-      const g = ctx.createLinearGradient(x0, y0, x0 + cw, y0 + ch);
-      g.addColorStop(0, '#141b26');
-      g.addColorStop(0.5, '#1b2433');
-      g.addColorStop(1, '#121822');
-      ctx.fillStyle = g;
-      ctx.fillRect(x0, y0, cw - 2, ch - 2);
-      ctx.strokeStyle = 'rgba(170,185,205,0.35)';
-      ctx.lineWidth = 1;
-      for (let k = 1; k < 4; k++) {
-        ctx.beginPath();
-        ctx.moveTo(x0 + ((cw - 2) * k) / 4, y0);
-        ctx.lineTo(x0 + ((cw - 2) * k) / 4, y0 + ch - 2);
-        ctx.stroke();
-      }
-      ctx.strokeStyle = 'rgba(120,140,165,0.12)';
-      for (let k = 2; k < ch - 2; k += 4) {
-        ctx.beginPath();
-        ctx.moveTo(x0, y0 + k);
-        ctx.lineTo(x0 + cw - 2, y0 + k);
-        ctx.stroke();
-      }
+  // fine cell texture
+  ctx.strokeStyle = 'rgba(120,135,160,0.07)';
+  ctx.lineWidth = 1;
+  for (let y = 2; y < H; y += 3) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(W, y);
+    ctx.stroke();
+  }
+  const bus = 14; // gold bus bars at both span ends
+  // row lines along the span
+  ctx.strokeStyle = 'rgba(232,236,240,0.85)';
+  ctx.lineWidth = 2;
+  for (let r = 1; r < rows; r++) {
+    const y = (H * r) / rows;
+    ctx.beginPath();
+    ctx.moveTo(bus, y);
+    ctx.lineTo(W - bus, y);
+    ctx.stroke();
+  }
+  // ladder interconnects across the chord: a thin line with short ticks
+  for (let k = 0; k < cols; k++) {
+    const x = bus + ((W - 2 * bus) * (k + 0.5)) / cols;
+    ctx.strokeStyle = 'rgba(225,230,236,0.75)';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, H);
+    ctx.stroke();
+    ctx.lineWidth = 2;
+    for (let y = 9; y < H; y += 18) {
+      ctx.beginPath();
+      ctx.moveTo(x - 6, y);
+      ctx.lineTo(x + 6, y);
+      ctx.stroke();
     }
+  }
+  for (const x0 of [0, W - bus]) {
+    const gb = ctx.createLinearGradient(x0, 0, x0 + bus, 0);
+    gb.addColorStop(0, '#9a6a12');
+    gb.addColorStop(0.5, '#e6b23c');
+    gb.addColorStop(1, '#9a6a12');
+    ctx.fillStyle = gb;
+    ctx.fillRect(x0, 0, bus, H);
+  }
   return finish(c);
+}
+
+/** White company logo, twice around a band (transparent elsewhere); drawn once the image loads. */
+export function motorLogo() {
+  const { c, ctx } = canvas(1024, 128);
+  const t = finish(c);
+  const img = new Image();
+  img.onload = () => {
+    const h = 92;
+    const w = (img.width / img.height) * h;
+    for (const cx of [256, 768]) ctx.drawImage(img, cx - w / 2, (128 - h) / 2, w, h);
+    t.needsUpdate = true;
+  };
+  img.src = '/brand/kraus-hamdani-aerospace.png';
+  return t;
 }

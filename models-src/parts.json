@@ -20,6 +20,13 @@
       },
       "pieces": [
         {
+          "id": "fuselage",
+          "material": "nylon",
+          "where": {
+            "max_z_lt": -150
+          }
+        },
+        {
           "id": "antenna-01",
           "material": "grey",
           "where": {
@@ -92,7 +99,7 @@
       ],
       "default": {
         "id": "eo-ir",
-        "material": "grey"
+        "material": "cameraGrey"
       },
       "keep": 0.3
     },
@@ -111,12 +118,12 @@
       ],
       "default": {
         "id": "cruise-motor",
-        "material": "motorBell"
+        "material": "motorBlack"
       },
       "pieces": [
         {
           "id": "cruise-motor",
-          "material": "aluminum",
+          "material": "motorBlack",
           "where": {
             "max_x_lt": 4.5
           }
@@ -140,19 +147,19 @@
       "spin": true,
       "default": {
         "id": "cruise-prop",
-        "material": "aluminum"
+        "material": "carbon"
       },
       "pieces": [
         {
           "id": "cruise-prop",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "max_x_gt": 100
           }
         },
         {
           "id": "cruise-prop",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "min_x_lt": -100
           }
@@ -175,7 +182,7 @@
       ],
       "default": {
         "id": "pitot",
-        "material": "aluminum"
+        "material": "grey"
       },
       "keep": 0.5
     },
@@ -223,6 +230,15 @@
           "material": "shell",
           "where": {
             "min_y_gt": 1960
+          }
+        },
+        {
+          "id": "tail-boom",
+          "material": "nylon",
+          "where": {
+            "min_y_gt": 1850,
+            "max_y_lt": 1970,
+            "max_z_lt": -70
           }
         }
       ]
@@ -293,6 +309,28 @@
         "id": null
       },
       "pieces": [
+        {
+          "id": "wing-port",
+          "material": "nylon",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "min_x_gt": 2740
+          }
+        },
+        {
+          "id": "wing-starboard",
+          "material": "nylon",
+          "where": {
+            "min_y_gt": -30,
+            "max_y_lt": 410,
+            "min_z_gt": -40,
+            "max_z_lt": 80,
+            "max_x_lt": -2740
+          }
+        },
         {
           "id": null,
           "where": {
@@ -456,7 +494,7 @@
         },
         {
           "id": "lift-motor-03",
-          "material": "motorBell",
+          "material": "grey",
           "where": {
             "min_y_gt": -545,
             "max_y_lt": -465
@@ -464,7 +502,7 @@
         },
         {
           "id": "lift-motor-02",
-          "material": "motorBell",
+          "material": "grey",
           "where": {
             "min_y_gt": 890,
             "max_y_lt": 975
@@ -494,14 +532,14 @@
       "pieces": [
         {
           "id": "lift-prop-03",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "min_y_lt": -700
           }
         },
         {
           "id": "lift-prop-02",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "max_y_gt": 1100
           }
@@ -543,7 +581,7 @@
         },
         {
           "id": "lift-motor-01",
-          "material": "motorBell",
+          "material": "grey",
           "where": {
             "min_y_gt": -545,
             "max_y_lt": -465
@@ -551,7 +589,7 @@
         },
         {
           "id": "lift-motor-04",
-          "material": "motorBell",
+          "material": "grey",
           "where": {
             "min_y_gt": 890,
             "max_y_lt": 975
@@ -581,14 +619,14 @@
       "pieces": [
         {
           "id": "lift-prop-01",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "min_y_lt": -700
           }
         },
         {
           "id": "lift-prop-04",
-          "material": "plastic",
+          "material": "carbon",
           "where": {
             "max_y_gt": 1100
           }

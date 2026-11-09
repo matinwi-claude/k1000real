@@ -63,6 +63,9 @@ export type MatKey =
   | 'plastic'
   | 'plasticLight'
   | 'grey'
+  | 'cameraGrey'
+  | 'nylon'
+  | 'motorBlack'
   | 'glass'
   | 'lens'
   | 'pcb'
@@ -91,7 +94,8 @@ const phys = (p: THREE.MeshPhysicalMaterialParameters) => new THREE.MeshPhysical
 export function createMaterialLibrary(): MaterialLibrary {
   const carbon = carbonTexture();
   return {
-    shell: phys({ color: '#e6e9ec', roughness: 0.42, metalness: 0.04, clearcoat: 0.55, clearcoatRoughness: 0.3 }),
+    // airframe colour (#7F8583)
+    shell: phys({ color: '#7f8583', roughness: 0.42, metalness: 0.04, clearcoat: 0.55, clearcoatRoughness: 0.3 }),
     panel: phys({ color: '#dde1e5', roughness: 0.38, metalness: 0.04, clearcoat: 0.7, clearcoatRoughness: 0.25 }),
     radome: phys({ color: '#2b3036', roughness: 0.32, metalness: 0.1, clearcoat: 0.8, clearcoatRoughness: 0.2 }),
     seam: std({ color: '#4a5058', roughness: 0.8, metalness: 0 }),
@@ -102,7 +106,11 @@ export function createMaterialLibrary(): MaterialLibrary {
     blackMatte: std({ color: '#0b0c0e', roughness: 0.85, metalness: 0.05 }),
     rubber: std({ color: '#131416', roughness: 0.95, metalness: 0 }),
     plastic: std({ color: '#23272c', roughness: 0.62, metalness: 0.05 }),
-    grey: std({ color: '#7c8289', roughness: 0.55, metalness: 0.1 }),
+    grey: std({ color: '#7f8583', roughness: 0.55, metalness: 0.1 }),
+    cameraGrey: std({ color: '#7c8289', roughness: 0.55, metalness: 0.1 }),
+    // white SLS nylon: matte, sand-blasted
+    nylon: phys({ color: '#efede8', roughness: 0.96, metalness: 0, sheen: 0.35, sheenRoughness: 0.9, sheenColor: '#ffffff' }),
+    motorBlack: phys({ color: '#0e0f11', roughness: 0.32, metalness: 0.55, clearcoat: 0.5, clearcoatRoughness: 0.25 }),
     plasticLight: phys({ color: '#b9bec4', roughness: 0.42, metalness: 0.1, clearcoat: 0.5, clearcoatRoughness: 0.3 }),
     glass: phys({ color: '#05080c', roughness: 0.04, metalness: 0.1, clearcoat: 1, clearcoatRoughness: 0.02 }),
     lens: phys({

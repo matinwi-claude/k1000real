@@ -57,7 +57,7 @@ import {
   type MatKey,
   type MaterialLibrary,
 } from './materials';
-import { glowTexture, serialPlate, solarTexture, wearMark } from './textures';
+import { glowTexture, motorLogo, serialPlate, solarTexture, wearMark } from './textures';
 import type { PartModels } from './PartModels';
 
 export interface ComponentNode {
@@ -339,6 +339,35 @@ function chordAt(target: THREE.Mesh, x: number) {
 }
 
 const BUILDERS: Record<string, BuildFn> = {};
+
+/** UVs projected onto the plane across the thinnest bounding-box axis; `tile` metres per texture repeat. */
+function planarUV(g: THREE.BufferGeometry, tile: number) {
+  g.computeBoundingBox();
+  const size = g.boundingBox!.getSize(new THREE.Vector3());
+  const thin = size.x <= size.y && size.x <= size.z ? 0 : size.y <= size.z ? 1 : 2;
+  const [a, c] = [0, 1, 2].filter((k) => k !== thin);
+  const pos = g.attributes.position;
+  const uv = new Float32Array(pos.count * 2);
+  for (let i = 0; i < pos.count; i++) {
+    uv[i * 2] = pos.getComponent(i, a) / tile;
+    uv[i * 2 + 1] = pos.getComponent(i, c) / tile;
+  }
+  g.setAttribute('uv', new THREE.BufferAttribute(uv, 2));
+}
+
+/** Additions drawn on top of a CAD part. */
+const CAD_EXTRAS: Record<string, BuildFn> = {
+  // company logo in white around the main motor's bell (T-Motor CAD: bell z 0.989–1.013, r 30 mm)
+  'cruise-motor': (b) => {
+    const g = new THREE.CylinderGeometry(0.0303, 0.0303, 0.022, 96, 1, true);
+    g.rotateX(Math.PI / 2);
+    g.translate(0, -0.012, 1.0006);
+    b.addCustom(
+      g,
+      new THREE.MeshStandardMaterial({ map: motorLogo(), transparent: true, depthWrite: false, roughness: 0.4, polygonOffset: true, polygonOffsetFactor: -2 }),
+    );
+  },
+};
 
 // solar cells on the CAD horizontal stabilizer (two panels per side, clear of the fin)
 BUILDERS['solar-tail'] = (b, ctx) => {
@@ -817,7 +846,12 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
       : cad
         ? (b, c) => {
             if (cad.every((p) => p.add)) BUILDERS[data.id]?.(b, c);
-            for (const p of cad) (p.spin ? b.addSpin : b.add).call(b, p.mat, p.geom);
+            for (const p of cad) {
+              // STL has no UVs: textured materials get a planar projection
+              if (p.mat === 'carbon' && !p.geom.attributes.uv) planarUV(p.geom, 0.03);
+              (p.spin ? b.addSpin : b.add).call(b, p.mat, p.geom);
+            }
+            CAD_EXTRAS[data.id]?.(b, c);
           }
         : BUILDERS[data.id];
     if (!fn) {
