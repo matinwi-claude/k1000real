@@ -3,8 +3,8 @@
   --pa-bg: #090b0e;
   --pa-ink: #9db6cf;
   --pa-hi: var(--accent);
-  --pa-text: #dfe8f1;
-  --pa-dim: #6b7b8b;
+  --pa-text: #fefefe;
+  --pa-dim: #fefefe;
   --pa-chip: rgba(14, 18, 23, 0.82);
   --pa-line: rgba(150, 180, 210, 0.16);
   position: fixed;

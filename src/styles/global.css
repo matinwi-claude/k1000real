@@ -5,10 +5,14 @@
   --panel-solid: #0b0e12;
   --line: rgba(150, 180, 210, 0.14);
   --line-strong: rgba(150, 185, 220, 0.3);
-  --text: #c8d2dc;
-  --text-hi: #eef3f8;
-  --dim: #6b7b8b;
-  --dim2: #4a5866;
+  /* brand off-white (#fefefe) for all interface text */
+  --text: #fefefe;
+  --text-hi: #fefefe;
+  --dim: #fefefe;
+  --dim2: #fefefe;
+  /* brand palette */
+  --brand-electric: #407bfa;
+  --brand-light: #dfeaf6;
   --accent: #7fc0ff;
   --accent-dim: rgba(127, 192, 255, 0.16);
   --ok: #5ed39a;
@@ -372,9 +376,17 @@ kbd {
   transition: background 0.2s, border-color 0.2s, box-shadow 0.2s;
 }
 .k-config button.on i {
-  background: var(--accent);
-  border-color: var(--accent);
-  box-shadow: 0 0 6px rgba(127, 192, 255, 0.5);
+  background: var(--brand-electric);
+  border-color: var(--brand-electric);
+  box-shadow: 0 0 6px rgba(64, 123, 250, 0.6);
+}
+/* tool rail and camera views keep their own muted greys */
+.k-rail,
+.k-views {
+  --text: #c8d2dc;
+  --text-hi: #eef3f8;
+  --dim: #6b7b8b;
+  --dim2: #4a5866;
 }
 .k-maker {
   position: absolute;
@@ -401,15 +413,13 @@ kbd {
   font-weight: 600;
   letter-spacing: 0.12em;
   text-transform: uppercase;
-  color: var(--text-hi);
+  color: var(--brand-light);
   text-decoration: none;
   opacity: 0.85;
   transition: opacity 0.2s, color 0.2s;
 }
 .app.is-sky .k-ui {
   /* keep the light interface legible over a bright sky */
-  --dim: #e4ecf5;
-  --dim2: #d3dfeb;
   text-shadow: 0 1px 2px rgba(10, 30, 55, 0.55), 0 0 10px rgba(10, 30, 55, 0.35);
 }
 .app.is-sky .k-maker {
