@@ -3,7 +3,7 @@ import { create } from 'zustand';
 export type InteractionMode = 'explore' | 'inspect';
 export type ViewMode = 'exterior' | 'xray';
 export type SectionAxis = 'top' | 'side' | 'front';
-export type LightingMode = 'studio' | 'technical' | 'night' | 'inspection';
+export type LightingMode = 'studio' | 'sky' | 'night' | 'inspection';
 export type Configuration = 'fixed-wing' | 'evtol';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
 

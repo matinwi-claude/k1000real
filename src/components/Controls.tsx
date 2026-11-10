@@ -83,7 +83,7 @@ export function ViewButtons() {
 
 const LIGHTS: { id: LightingMode; label: string; desc: string }[] = [
   { id: 'studio', label: 'STUDIO', desc: 'Product photography' },
-  { id: 'technical', label: 'TECHNICAL', desc: 'Flat, component clarity' },
+  { id: 'sky', label: 'SKY', desc: 'Daylight, open sky' },
   { id: 'night', label: 'NIGHT', desc: 'Low-light cinematic' },
   { id: 'inspection', label: 'INSPECTION', desc: 'Bright directional' },
 ];

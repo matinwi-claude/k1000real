@@ -90,7 +90,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
   - **X-ray:** fresnel-style see-through rendering.
   - **Cross-section:** cut from the top, side or front with a slider, showing hatched cut faces.
 - **Tools:**
-  - Lighting presets: Studio, Technical, Night and Inspection.
+  - Lighting presets: Studio, Sky, Night and Inspection.
   - Free cam (WASD + Q/E) and presentation mode.
 - **Shareable URL state:**
   - `?mode=inspection&component=lift-motor-04`

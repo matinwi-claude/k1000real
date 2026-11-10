@@ -36,7 +36,7 @@ Set these as attributes on the placeholder. Each one maps to a URL parameter on 
 | `data-radius` | number (px) | Corner radius. Default `12`. |
 | `data-component` | component id | Opens with that part selected, e.g. `eo-ir`, `wing-port`, `lift-motor-03`. |
 | `data-view` | `exploded`, `xray` | Starting view. Combine with commas. |
-| `data-light` | `studio`, `technical`, `night`, `inspection` | Lighting preset. |
+| `data-light` | `studio`, `sky`, `night`, `inspection` | Lighting preset. |
 | `data-mode` | `inspection` | Starting tool. |
 | `data-autorotate` | `0` / `1` | Turns the idle rotation off or on. |
 
@@ -57,7 +57,7 @@ You can also use `<k1000-parts></k1000-parts>`, or an iframe pointing at `https:
 | --- | --- | --- |
 | `data-height`, `data-aspect`, `data-radius` | as above | Size. The default aspect ratio is `16/10`. |
 | `data-component` | component id | Opens with that part selected. |
-| `data-category` | `airframe`, `propulsion`, `power`, `avionics`, `sensors`, `camera`, `payload`, `landing-gear` | Highlights one system. |
+| `data-category` | `airframe`, `propulsion`, `power`, `sensors`, `camera` | Highlights one system. |
 | `data-theme` | `light` | Dark lines on a light background, for light pages. |
 | `data-accent` | hex without `#`, e.g. `e5322d` | Highlight colour, to match your brand. |
 | `data-ink` | hex without `#` | Line colour. |

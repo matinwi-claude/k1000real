@@ -31,7 +31,6 @@ export type CategoryId =
   | 'airframe'
   | 'propulsion'
   | 'power'
-  | 'avionics'
   | 'sensors'
   | 'camera';
 
@@ -92,7 +91,6 @@ export const CATEGORIES: Category[] = [
   { id: 'airframe', label: 'Airframe', code: 'AFR' },
   { id: 'propulsion', label: 'Propulsion', code: 'PRP' },
   { id: 'power', label: 'Power', code: 'PWR' },
-  { id: 'avionics', label: 'Avionics', code: 'AVN' },
   { id: 'sensors', label: 'Sensors', code: 'SNS' },
   { id: 'camera', label: 'Camera', code: 'CAM' },
 ];
@@ -573,7 +571,7 @@ export const COMPONENTS: DroneComponent[] = [
   {
     id: 'antenna-01',
     name: 'Antennas - Front',
-    category: 'avionics',
+    category: 'sensors',
     system: 'Communications',
     type: 'Antenna Pair',
     partNumber: 'K1-AVN-N01',
@@ -590,7 +588,7 @@ export const COMPONENTS: DroneComponent[] = [
   {
     id: 'antenna-02',
     name: 'Antennas - Aft',
-    category: 'avionics',
+    category: 'sensors',
     system: 'Communications',
     type: 'Antenna Pair',
     partNumber: 'K1-AVN-N02',

@@ -28,6 +28,7 @@ export default function App() {
   const explode = useStore((s) => s.explode);
   const section = useStore((s) => s.section);
   const embed = useStore((s) => s.embed);
+  const lighting = useStore((s) => s.lighting);
 
   const cls = [
     'app',
@@ -40,6 +41,7 @@ export default function App() {
     selected && 'has-selection',
     (explode > 0.001 || section) && 'has-dock',
     embed && 'is-embed',
+    lighting === 'sky' && 'is-sky',
   ]
     .filter(Boolean)
     .join(' ');

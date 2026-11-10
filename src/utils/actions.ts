@@ -4,7 +4,7 @@ import { COMPONENTS, getComponent } from '../data/components';
 import { sound } from './sound';
 
 const set = useStore.setState;
-const LIGHTS: LightingMode[] = ['studio', 'technical', 'night', 'inspection'];
+const LIGHTS: LightingMode[] = ['studio', 'sky', 'night', 'inspection'];
 
 /** UI + keyboard actions shared across controls. */
 export const actions = {

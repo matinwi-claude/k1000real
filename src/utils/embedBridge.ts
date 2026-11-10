@@ -15,7 +15,7 @@ import { actions } from './actions';
 type Msg = { k1000?: string; value?: unknown };
 
 const VIEWS: CameraView[] = ['reset', 'front', 'side', 'top', 'bottom', 'rear'];
-const LIGHTS: LightingMode[] = ['studio', 'technical', 'night', 'inspection'];
+const LIGHTS: LightingMode[] = ['studio', 'sky', 'night', 'inspection'];
 
 function post(data: Record<string, unknown>) {
   if (window.parent === window) return;

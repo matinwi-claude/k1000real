@@ -19,6 +19,8 @@ export interface LightPreset {
   shadow: number;
   led: number;
   vignette: number;
+  /** 0 = studio backdrop, 1 = open sky with clouds */
+  sky: number;
 }
 
 const c = (h: string) => new THREE.Color(h);
@@ -43,25 +45,28 @@ export const LIGHT_PRESETS: Record<LightingMode, LightPreset> = {
     shadow: 0.7,
     led: 1,
     vignette: 0.75,
+    sky: 0,
   },
-  technical: {
-    background: c('#0b0f14'),
-    exposure: 1.02,
-    env: 0.35,
-    hemi: 1.9,
-    hemiSky: c('#e6eef7'),
-    hemiGround: c('#2a3038'),
-    key: 0.9,
-    keyColor: c('#ffffff'),
-    keyPos: v(1.5, 5, 3),
-    fill: 0.9,
-    fillColor: c('#ffffff'),
-    rim: 0.5,
+  sky: {
+    // daylight in the open sky: bright sun, blue skylight, no floor
+    background: c('#6f9fd2'),
+    exposure: 1.05,
+    env: 0.9,
+    hemi: 1.1,
+    hemiSky: c('#bcd7f5'),
+    hemiGround: c('#5d6b7a'),
+    key: 3.0,
+    keyColor: c('#fff6e6'),
+    keyPos: v(2.2, 5.0, 1.6),
+    fill: 0.8,
+    fillColor: c('#a8c8ee'),
+    rim: 1.2,
     rimColor: c('#ffffff'),
-    grid: 0.8,
-    shadow: 0.35,
-    led: 0.6,
-    vignette: 0.35,
+    grid: 0,
+    shadow: 0,
+    led: 0.5,
+    vignette: 0.15,
+    sky: 1,
   },
   night: {
     background: c('#020305'),
@@ -81,6 +86,7 @@ export const LIGHT_PRESETS: Record<LightingMode, LightPreset> = {
     shadow: 0.5,
     led: 5,
     vignette: 0.95,
+    sky: 0,
   },
   inspection: {
     background: c('#0d1014'),
@@ -100,6 +106,7 @@ export const LIGHT_PRESETS: Record<LightingMode, LightPreset> = {
     shadow: 0.85,
     led: 0.8,
     vignette: 0.5,
+    sky: 0,
   },
 };
 
@@ -118,7 +125,7 @@ export function clonePreset(p: LightPreset): LightPreset {
 
 /** Exponential approach of `cur` toward `target` (in place). */
 export function lerpPreset(cur: LightPreset, target: LightPreset, k: number) {
-  const nums: (keyof LightPreset)[] = ['exposure', 'env', 'hemi', 'key', 'fill', 'rim', 'grid', 'shadow', 'led', 'vignette'];
+  const nums: (keyof LightPreset)[] = ['exposure', 'env', 'hemi', 'key', 'fill', 'rim', 'grid', 'shadow', 'led', 'vignette', 'sky'];
   let delta = 0;
   for (const n of nums) {
     const a = cur[n] as number;

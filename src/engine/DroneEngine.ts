@@ -248,15 +248,35 @@ export class DroneEngine {
       new THREE.ShaderMaterial({
         depthTest: false,
         depthWrite: false,
-        uniforms: { uCenter: { value: new THREE.Color('#151b22') }, uEdge: { value: new THREE.Color('#050608') }, uAspect: { value: 1 } },
+        uniforms: {
+          uCenter: { value: new THREE.Color('#151b22') },
+          uEdge: { value: new THREE.Color('#050608') },
+          uAspect: { value: 1 },
+          uSky: { value: 0 },
+          uView: { value: new THREE.Vector2() },
+        },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.9999, 1.0); }',
         fragmentShader: `
-          uniform vec3 uCenter; uniform vec3 uEdge; uniform float uAspect; varying vec2 vUv;
+          uniform vec3 uCenter; uniform vec3 uEdge; uniform float uAspect; uniform float uSky; uniform vec2 uView; varying vec2 vUv;
+          float h(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+          float vn(vec2 p){ vec2 i = floor(p); vec2 f = fract(p); f = f * f * (3.0 - 2.0 * f);
+            return mix(mix(h(i), h(i + vec2(1, 0)), f.x), mix(h(i + vec2(0, 1)), h(i + vec2(1, 1)), f.x), f.y); }
+          float fbm(vec2 p){ float a = 0.5, s = 0.0; for (int i = 0; i < 5; i++) { s += a * vn(p); p *= 2.03; a *= 0.5; } return s; }
           void main(){
             vec2 p = (vUv - vec2(0.5, 0.56)) * vec2(uAspect, 1.0);
             float d = length(p);
             float t = smoothstep(0.0, 0.95, d);
             vec3 c = mix(uCenter, uEdge, t);
+            if (uSky > 0.001) {
+              // sky: deep blue overhead to pale haze low down; clouds pan with the camera
+              float y = vUv.y + uView.y;
+              vec3 sky = mix(vec3(0.80, 0.88, 0.95), vec3(0.24, 0.48, 0.80), smoothstep(-0.1, 1.1, y));
+              vec2 q = vec2((vUv.x - 0.5) * uAspect + uView.x, y) * vec2(1.6, 3.2);
+              float cl = fbm(q + vec2(0.0, fbm(q * 0.5) * 0.8));
+              cl = smoothstep(0.52, 0.78, cl) * (0.55 + 0.45 * smoothstep(0.0, 0.6, y));
+              vec3 cloud = mix(vec3(0.78, 0.82, 0.88), vec3(1.0), smoothstep(0.55, 0.9, fbm(q * 2.0 + 3.1)));
+              c = mix(c, mix(sky, cloud, cl), uSky);
+            }
             // fine dither to avoid banding
             float n = fract(sin(dot(gl_FragCoord.xy, vec2(12.9898, 78.233))) * 43758.5453);
             gl_FragColor = vec4(c + (n - 0.5) / 255.0, 1.0);
@@ -910,6 +930,9 @@ export class DroneEngine {
     const bu = this.backdrop.material.uniforms;
     bu.uEdge.value.copy(L.background).multiplyScalar(0.7);
     bu.uCenter.value.copy(L.background).lerp(L.rimColor, 0.035).multiplyScalar(2.1);
+    bu.uSky.value = L.sky;
+    // clouds pan as the camera orbits (azimuth) and tilts (polar)
+    bu.uView.value.set(this.controls.azimuthAngle * 0.6, (Math.PI / 2 - this.controls.polarAngle) * 0.5);
     this.renderer.toneMappingExposure = L.exposure;
     this.scene.environmentIntensity = L.env;
     this.hemi.intensity = L.hemi;

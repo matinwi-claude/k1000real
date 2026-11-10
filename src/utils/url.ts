@@ -5,7 +5,7 @@ import { COMPONENT_MAP } from '../data/components';
  * Shareable URL state. Supported params:
  *   mode=inspection             component=motor-04
  *   view=exploded,xray          explode=0..1
- *   light=studio|technical|night|inspection
+ *   light=studio|sky|night|inspection
  *   section=top|side|front      cut=-1..1
  *   present=1  cam=px,py,pz,tx,ty,tz
  */
@@ -22,7 +22,7 @@ export function readUrlState(search = window.location.search): Partial<State> {
   const ex = q.get('explode');
   if (ex !== null && Number.isFinite(Number(ex))) out.explode = Math.min(1, Math.max(0, Number(ex)));
   const light = q.get('light') as LightingMode | null;
-  if (light && ['studio', 'technical', 'night', 'inspection'].includes(light)) out.lighting = light;
+  if (light && ['studio', 'sky', 'night', 'inspection'].includes(light)) out.lighting = light;
   const section = q.get('section') as SectionAxis | null;
   if (section && ['top', 'side', 'front'].includes(section)) out.section = section;
   const cut = q.get('cut');
