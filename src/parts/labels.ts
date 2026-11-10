@@ -26,12 +26,12 @@ export const LABELS: AtlasLabel[] = [
   { kind: 'group', text: 'Outer Wing', sub: 'Starboard · solar', ids: ['wing-starboard', 'solar-starboard', 'aileron-starboard'], at: [70, 690] },
   { kind: 'group', text: 'Center Wing', ids: ['wing-center'], at: [668, 296] },
   { kind: 'group', text: 'VTOL Pod', sub: 'Port', ids: LIFT_PORT, at: [1238, 478] },
-  { kind: 'group', text: 'VTOL Pod', sub: 'Starboard', ids: LIFT_STBD, at: [700, 700] },
+  { kind: 'group', text: 'VTOL Pod', sub: 'Starboard', ids: LIFT_STBD, at: [640, 700] },
   {
     kind: 'group',
     text: 'Tail',
     ids: ['tail-boom', 'rudder', 'horizontal-stabilizer', 'elevator', 'solar-tail'],
-    at: [706, 178],
+    at: [646, 178],
   },
   {
     kind: 'group',

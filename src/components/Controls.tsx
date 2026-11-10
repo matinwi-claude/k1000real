@@ -78,11 +78,11 @@ export function ViewButtons() {
   );
 }
 
-const LIGHTS: { id: LightingMode; label: string; desc: string }[] = [
-  { id: 'studio', label: 'STUDIO', desc: 'Product photography' },
-  { id: 'sky', label: 'SKY', desc: 'Daylight, open sky' },
-  { id: 'night', label: 'NIGHT', desc: 'Low-light cinematic' },
-  { id: 'inspection', label: 'INSPECTION', desc: 'Bright directional' },
+const LIGHTS: { id: LightingMode; label: string }[] = [
+  { id: 'studio', label: 'STUDIO' },
+  { id: 'sky', label: 'SKY' },
+  { id: 'night', label: 'NIGHT' },
+  { id: 'inspection', label: 'INSPECTION' },
 ];
 
 function Toggle({ on, onClick, icon, label, kbd }: { on: boolean; onClick: () => void; icon: ReactNode; label: string; kbd?: string }) {
@@ -118,7 +118,6 @@ export function SettingsMenu() {
                 <button key={l.id} className={lighting === l.id ? 'on' : ''} onClick={() => actions.setLighting(l.id)}>
                   <span className={`k-light-swatch ${l.id}`} />
                   <span>{l.label}</span>
-                  <small>{l.desc}</small>
                 </button>
               ))}
             </div>
