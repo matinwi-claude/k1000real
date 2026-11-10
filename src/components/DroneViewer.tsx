@@ -10,7 +10,6 @@ import { getComponent } from '../data/components';
 export function DroneViewer() {
   const hostRef = useRef<HTMLDivElement>(null);
   const hudRef = useRef<SVGSVGElement>(null);
-  const gizmoRef = useRef<SVGSVGElement>(null);
   const tipRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -43,7 +42,6 @@ export function DroneViewer() {
             parts,
             host: hostRef.current!,
             hud: hudRef.current!,
-            gizmo: gizmoRef.current!,
             tooltip: tipRef.current!,
           });
         } catch (e) {
@@ -70,9 +68,6 @@ export function DroneViewer() {
       <div className="k-host" ref={hostRef} />
       <div className="k-vignette" />
       <svg className="k-hud" ref={hudRef} />
-      <div className="k-gizmo-wrap fade-on-idle">
-        <svg className="k-gizmo" ref={gizmoRef} />
-      </div>
       <Tooltip innerRef={tipRef} />
       {error && (
         <div className="k-error">

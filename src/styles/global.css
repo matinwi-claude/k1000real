@@ -162,44 +162,6 @@ kbd {
   fill: var(--dim);
 }
 
-/* gizmo */
-.k-gizmo-wrap {
-  position: absolute;
-  right: calc(var(--inset) + 2px);
-  bottom: calc(var(--inset) + 50px);
-  width: 64px;
-  height: 64px;
-  pointer-events: none;
-}
-.k-gizmo {
-  width: 100%;
-  height: 100%;
-}
-.gz-ring {
-  fill: none;
-  stroke: var(--line);
-}
-.gz-axis {
-  stroke-width: 1.3;
-}
-.gz-x {
-  stroke: #d26a5c;
-  fill: #d26a5c;
-}
-.gz-y {
-  stroke: #7cc48a;
-  fill: #7cc48a;
-}
-.gz-z {
-  stroke: #5d9ae0;
-  fill: #5d9ae0;
-}
-.gz-label {
-  stroke: none;
-  font-family: var(--sans);
-  font-size: 8.5px;
-}
-
 /* tooltip */
 .k-tooltip {
   position: fixed;
@@ -280,8 +242,6 @@ kbd {
 .app.is-cinematic .k-ui * {
   pointer-events: none !important;
 }
-.app.is-presentation .k-gizmo-wrap,
-.app.is-cinematic .k-gizmo-wrap,
 .app.is-presentation .k-hud,
 .app.is-cinematic .k-hud {
   opacity: 0;
@@ -1305,14 +1265,6 @@ input[type='range']::-moz-range-thumb {
     padding: 8px 0;
     font-size: 7.5px;
     letter-spacing: 0.14em;
-  }
-  .k-gizmo-wrap {
-    right: auto;
-    left: 8px;
-    bottom: auto;
-    top: 132px;
-    width: 46px;
-    height: 46px;
   }
   .k-settings-panel {
     width: min(300px, calc(100vw - 32px));

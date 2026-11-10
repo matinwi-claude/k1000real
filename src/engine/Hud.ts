@@ -1,6 +1,6 @@
 /**
  * Screen-space technical HUD drawn in a single SVG layer above the canvas:
- * inspection brackets, callout leaders and the axis gizmo. Updated imperatively by the engine each rendered frame — no React
+ * inspection brackets and callout leaders. Updated imperatively by the engine each rendered frame — no React
  * re-renders on the hot path.
  */
 const NS = 'http://www.w3.org/2000/svg';
@@ -94,36 +94,6 @@ export class Hud {
       this.coord.setAttribute('y', String(y1 + 15));
       this.coord2.setAttribute('x', String(x0));
       this.coord2.setAttribute('y', String(y1 + 28));
-    }
-  }
-}
-
-/** Small XYZ triad driven by the camera orientation. */
-export class AxisGizmo {
-  private lines: SVGLineElement[] = [];
-  private labels: SVGTextElement[] = [];
-  constructor(svg: SVGSVGElement) {
-    svg.innerHTML = '';
-    svg.setAttribute('viewBox', '-40 -40 80 80');
-    el('circle', { class: 'gz-ring', r: 30, cx: 0, cy: 0 }, svg);
-    const names = ['X', 'Y', 'Z'];
-    for (let i = 0; i < 3; i++) {
-      this.lines.push(el('line', { class: `gz-axis gz-${names[i].toLowerCase()}`, x1: 0, y1: 0 }, svg));
-      const t = el('text', { class: `gz-label gz-${names[i].toLowerCase()}`, 'text-anchor': 'middle', 'dominant-baseline': 'central' }, svg);
-      t.textContent = names[i];
-      this.labels.push(t);
-    }
-  }
-  /** `axes` = camera-space projections of world X,Y,Z unit vectors: [x, y, depth]. */
-  update(axes: [number, number, number][]) {
-    for (let i = 0; i < 3; i++) {
-      const [x, y, z] = axes[i];
-      const L = 22;
-      this.lines[i].setAttribute('x2', String(x * L));
-      this.lines[i].setAttribute('y2', String(-y * L));
-      this.lines[i].style.opacity = String(z > 0 ? 0.45 : 1);
-      this.labels[i].setAttribute('x', String(x * (L + 9)));
-      this.labels[i].setAttribute('y', String(-y * (L + 9)));
     }
   }
 }

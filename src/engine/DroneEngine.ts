@@ -25,7 +25,7 @@ import { createMaterialLibrary, globalUniforms } from './materials';
 import { LIGHT_PRESETS, clonePreset, lerpPreset, type LightPreset } from './lighting';
 import { createGridMaterial } from '../shaders/grid';
 import { planformShadowTexture, SHADOW_PLANE } from './shadow';
-import { AxisGizmo, Hud, type Pt } from './Hud';
+import { Hud, type Pt } from './Hud';
 import { sound } from '../utils/sound';
 
 CameraControls.install({ THREE });
@@ -49,7 +49,6 @@ export interface EngineDom {
   parts?: PartModels;
   host: HTMLElement;
   hud: SVGSVGElement;
-  gizmo: SVGSVGElement;
   tooltip: HTMLElement;
 }
 
@@ -72,7 +71,6 @@ export class DroneEngine {
   outline: OutlinePass;
   model!: DroneModel;
   hud: Hud;
-  gizmo: AxisGizmo;
 
   private dom: EngineDom;
   private timer = new THREE.Timer();
@@ -187,7 +185,6 @@ export class DroneEngine {
     this.composer.addPass(new OutputPass());
 
     this.hud = new Hud(dom.hud);
-    this.gizmo = new AxisGizmo(dom.gizmo);
 
     this.setupEnvironment();
     this.setupModel();
@@ -1085,14 +1082,6 @@ export class DroneEngine {
 
   // ─────────────────────────────────────────────────────────── HUD
   private updateHud(s: State) {
-    // gizmo
-    const q = this.camera.quaternion.clone().invert();
-    const axes = [new THREE.Vector3(1, 0, 0), new THREE.Vector3(0, 1, 0), new THREE.Vector3(0, 0, 1)].map((a) => {
-      a.applyQuaternion(q);
-      return [a.x, a.y, a.z] as [number, number, number];
-    });
-    this.gizmo.update(axes);
-
     // selection callout + brackets
     const node = this.selectionNode;
     const uiHidden = s.presentation || s.cinematic;
