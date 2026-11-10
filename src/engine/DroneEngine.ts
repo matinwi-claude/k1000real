@@ -42,6 +42,9 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t 
 const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 const approach = (cur: number, target: number, k: number) => cur + (target - cur) * k;
 
+/** Parts that show a dashed guide line back to where they belong when exploded. */
+const GUIDE_IDS = new Set(['battery', 'eo-ir']);
+
 export interface EngineDom {
   /** optional real model (glTF scene) that replaces the procedural geometry */
   external?: THREE.Object3D | null;
@@ -322,7 +325,7 @@ export class DroneEngine {
         m.geometry.computeBoundsTree();
       }
     }
-    // explode guide lines
+    // explode guide lines (only for the parts that drop out of the fuselage)
     const n = this.model.nodes.size;
     const gg = new THREE.BufferGeometry();
     gg.setAttribute('position', new THREE.Float32BufferAttribute(new Float32Array(n * 6), 3));
@@ -1037,7 +1040,7 @@ export class DroneEngine {
       } else if (d.id === 'cruise-prop') {
         node.spin.rotation.z = this.spinAngle * 0.8 + local * 0.6;
       }
-      if (local > 0.001 && (ex[0] || ex[1] || ex[2])) {
+      if (local > 0.001 && GUIDE_IDS.has(d.id) && (ex[0] || ex[1] || ex[2])) {
         guidePos.setXYZ(gi * 2, node.basePosition.x, node.basePosition.y, node.basePosition.z);
         guidePos.setXYZ(gi * 2 + 1, px, py, pz);
         gi++;

@@ -498,8 +498,8 @@ BUILDERS['wing-spar'] = (b) => {
 for (const side of [1, -1] as const) {
   BUILDERS[side > 0 ? 'boom-port' : 'boom-starboard'] = (b, ctx) => {
     const x = side * BOOM.x;
-    // square-section (14 × 14 mm) wooden spar stub the outer wing panel plugs onto (painted black)
-    b.add('blackMatte', rbox(0.36, 0.014, 0.014, 0.0015, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
+    // square-section (22 × 22 mm) wooden spar stub the outer wing panel plugs onto (painted black)
+    b.add('blackMatte', rbox(0.36, 0.022, 0.022, 0.002, [x + side * 0.1, WING.undersideY + 0.018, 0.165]));
     // a CAD pod (models-src/vtol-pods.stl) replaces the procedural body, pads and plate
     const cadPod = (ctx.parts?.get(ctx.data.id) ?? []).some((p) => {
       p.geom.computeBoundingBox();
