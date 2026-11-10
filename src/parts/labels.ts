@@ -44,4 +44,6 @@ export const LABELS: AtlasLabel[] = [
 
   { kind: 'detail', text: 'HD40 Gimbal Camera', ids: ['eo-ir'] },
   { kind: 'detail', text: 'Battery 6S16P', ids: ['battery'] },
+  { kind: 'detail', text: 'ATNE', ids: ['atne'] },
+  { kind: 'detail', text: 'Silvus', ids: ['silvus'] },
 ];

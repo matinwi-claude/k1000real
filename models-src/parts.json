@@ -632,6 +632,48 @@
           }
         }
       ]
+    },
+    {
+      "file": "atne-wale.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "keep": 0.08,
+      "$comment": "ATNE (W.A.L.E. assembly): drawn in the 2D atlas only",
+      "default": {
+        "id": "atne",
+        "material": "grey"
+      }
+    },
+    {
+      "file": "silvus-oem.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "keep": 0.4,
+      "$comment": "Silvus OEM radio: drawn in the 2D atlas only",
+      "default": {
+        "id": "silvus",
+        "material": "grey"
+      }
     }
   ]
 }

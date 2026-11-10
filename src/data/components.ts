@@ -32,7 +32,9 @@ export type CategoryId =
   | 'propulsion'
   | 'power'
   | 'sensors'
-  | 'camera';
+  | 'camera'
+  | 'payload'
+  | 'communications';
 
 export type Status = 'operational' | 'attention' | 'standby';
 
@@ -72,6 +74,8 @@ export interface DroneComponent {
   explodeDelay: number;
   /** Revealed only to people who look closely (see Easter eggs). */
   hiddenNote?: string;
+  /** Shown in the 2D parts atlas only, never in the 3D viewer (geometry in tools/atlas-parts.glb). */
+  atlasOnly?: boolean;
 }
 
 /** Shown in the Specifications panel. */
@@ -93,6 +97,8 @@ export const CATEGORIES: Category[] = [
   { id: 'power', label: 'Power', code: 'PWR' },
   { id: 'sensors', label: 'Sensors', code: 'SNS' },
   { id: 'camera', label: 'Camera', code: 'CAM' },
+  { id: 'payload', label: 'Payload', code: 'PLD' },
+  { id: 'communications', label: 'Communications', code: 'COM' },
 ];
 
 /** Aircraft-level facts from the public product page (shown in the status panel). */
@@ -644,7 +650,45 @@ export const COMPONENTS: DroneComponent[] = [
     explodeDelay: 0.3,
   },
 
-  // ───────────────────────── PAYLOAD
+  // ───────────────────────── PAYLOAD (2D atlas only)
+  {
+    id: 'atne',
+    name: 'ATNE',
+    category: 'payload',
+    system: 'Mission Payload',
+    type: 'Mission Payload',
+    partNumber: 'K1-PLD-A01',
+    description: 'ATNE mission payload.',
+    position: [0, -0.02, -0.19],
+    location: 'Payload',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
+
+  // ───────────────────────── COMMUNICATIONS (2D atlas only)
+  {
+    id: 'silvus',
+    name: 'Silvus',
+    category: 'communications',
+    system: 'Communications',
+    type: 'Silvus OEM Radio',
+    partNumber: 'K1-COM-S01',
+    description: 'Silvus OEM radio module.',
+    position: [0, -0.025, -0.039],
+    location: 'Communications',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'internal',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
 
 ];
 
@@ -685,6 +729,8 @@ const SPECS: Record<string, SpecSheet> = {
   'antenna-02': { group: 'Feature', material: 'Plastic' },
   pitot: { group: 'Feature', material: 'Aluminum probe · 3D-printed cover' },
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
+  atne: { group: 'Payload', material: 'Aluminum' },
+  silvus: { group: 'Feature', material: 'Aluminum' },
 };
 export const specSheet = (id: string): SpecSheet => SPECS[id] ?? { group: 'Airframe', material: CF };
 

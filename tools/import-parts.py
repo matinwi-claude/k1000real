@@ -11,7 +11,7 @@ component's procedural geometry at runtime (src/engine/PartModels.ts). `"spin": 
 puts a source on its component's rotor group (propellers); `"keep": 0.3` decimates
 large meshes to that fraction of their triangles; a piece with `"add": true` is added to
 the component's procedural geometry instead of replacing it; `"scale"` resizes a source (applied
-before `offset`).
+before `offset`); `"atlasOnly": true` sends a source to tools/atlas-parts.glb (2D atlas only).
 
 Requires: pip install trimesh scipy networkx rtree fast-simplification ; Node (npx) for meshopt compression.
 """
@@ -24,6 +24,8 @@ import trimesh
 ROOT = Path(__file__).resolve().parent.parent
 SRC = ROOT / 'models-src'
 OUT = ROOT / 'public' / 'models' / 'parts.glb'
+# parts drawn only in the 2D atlas: served to the line-art tool, never shipped to the 3D viewer
+ATLAS_OUT = ROOT / 'tools' / 'atlas-parts.glb'
 UNITS = {'mm': 0.001, 'cm': 0.01, 'm': 1.0, 'in': 0.0254}
 GLTF_TRANSFORM = '@gltf-transform/cli@4.5.1'
 
@@ -85,21 +87,25 @@ def convert(src):
 
 def main():
     cfg = json.loads((SRC / 'parts.json').read_text())
-    merged = {}
+    merged = {OUT: {}, ATLAS_OUT: {}}
     for src in cfg['sources']:
+        dest = merged[ATLAS_OUT if src.get('atlasOnly') else OUT]
         for name, part in convert(src).items():
             # the same component + material from several sources becomes one mesh
-            merged[name] = trimesh.util.concatenate([merged[name], part]) if name in merged else part
-    scene = trimesh.Scene()
-    for name, part in merged.items():
-        part.visual = trimesh.visual.ColorVisuals(part)
-        scene.add_geometry(part, node_name=name, geom_name=name)
-    OUT.parent.mkdir(parents=True, exist_ok=True)
-    with tempfile.TemporaryDirectory() as tmp:
-        raw = Path(tmp) / 'raw.glb'
-        scene.export(raw)
-        subprocess.run(['npx', '--yes', GLTF_TRANSFORM, 'meshopt', str(raw), str(OUT)], check=True)
-    print(f'wrote {OUT.relative_to(ROOT)} ({OUT.stat().st_size / 1e6:.2f} MB)')
+            dest[name] = trimesh.util.concatenate([dest[name], part]) if name in dest else part
+    for out, parts in merged.items():
+        if not parts:
+            continue
+        scene = trimesh.Scene()
+        for name, part in parts.items():
+            part.visual = trimesh.visual.ColorVisuals(part)
+            scene.add_geometry(part, node_name=name, geom_name=name)
+        out.parent.mkdir(parents=True, exist_ok=True)
+        with tempfile.TemporaryDirectory() as tmp:
+            raw = Path(tmp) / 'raw.glb'
+            scene.export(raw)
+            subprocess.run(['npx', '--yes', GLTF_TRANSFORM, 'meshopt', str(raw), str(out)], check=True)
+        print(f'wrote {out.relative_to(ROOT)} ({out.stat().st_size / 1e6:.2f} MB)')
 
 
 if __name__ == '__main__':

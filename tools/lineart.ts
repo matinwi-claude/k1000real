@@ -443,8 +443,8 @@ function rdpOpen(pts: [number, number][], eps: number): [number, number][] {
   return pts.filter((_, i) => keepIdx[i]);
 }
 
-loadPartModels()
-  .then(run)
+Promise.all([loadPartModels(), loadPartModels(undefined, '/tools/atlas-parts.glb')])
+  .then(([cad, atlas]) => run(new Map([...cad, ...atlas])))
   .catch((e) => {
     log(String((e as Error).stack ?? e));
     (window as unknown as Record<string, unknown>).__lineartError = String(e);

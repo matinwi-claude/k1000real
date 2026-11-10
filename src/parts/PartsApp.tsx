@@ -505,9 +505,13 @@ function InfoPanel({ c, onClose, onStep }: { c: DroneComponent; onClose: () => v
         <button onClick={() => onStep(-1)} aria-label="Previous part">
           ←
         </button>
-        <a href={`/?component=${c.id}&mode=inspection`} target={EMBED ? '_blank' : undefined} rel="noopener">
-          VIEW IN 3D ↗
-        </a>
+        {c.atlasOnly ? (
+          <span />
+        ) : (
+          <a href={`/?component=${c.id}&mode=inspection`} target={EMBED ? '_blank' : undefined} rel="noopener">
+            VIEW IN 3D ↗
+          </a>
+        )}
         <button onClick={() => onStep(1)} aria-label="Next part">
           →
         </button>

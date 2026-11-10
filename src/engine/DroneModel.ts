@@ -855,7 +855,7 @@ export function buildDroneModel(lib: MaterialLibrary, external?: THREE.Object3D 
           }
         : BUILDERS[data.id];
     if (!fn) {
-      if (!external) console.warn('No builder for component', data.id);
+      if (!external && !data.atlasOnly) console.warn('No builder for component', data.id);
       continue;
     }
     const b = new Builder();

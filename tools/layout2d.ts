@@ -62,10 +62,14 @@ export const LAYOUT_2D: Record<string, Place> = {
   // enlarged detail parts (screen = metres right / up of the model origin on the drawing)
   'eo-ir': { screen: [-1.2, -1.25], scale: 2.6 },
   battery: { screen: [0.95, -1.1], scale: 1.7 },
+  atne: { screen: [2.75, -0.95], scale: 0.85 },
+  silvus: { screen: [1.95, -1.15], scale: 3.2 },
 };
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
   'eo-ir': { screen: [-1.85, -3.75], scale: 5.4 },
   battery: { screen: [0.6, -3.75], scale: 3.2 },
+  atne: { screen: [-1.5, -5.4], scale: 1.6 },
+  silvus: { screen: [1.0, -5.3], scale: 6 },
 };

@@ -15,7 +15,7 @@ export function readUrlState(search = window.location.search): Partial<State> {
   const mode = q.get('mode');
   if (mode === 'inspection' || mode === 'inspect') out.mode = 'inspect';
   const comp = q.get('component');
-  if (comp && COMPONENT_MAP[comp]) out.selected = comp;
+  if (comp && COMPONENT_MAP[comp] && !COMPONENT_MAP[comp].atlasOnly) out.selected = comp;
   const views = (q.get('view') ?? '').split(',').map((v) => v.trim().toLowerCase());
   if (views.includes('exploded')) out.explode = 1;
   if (views.includes('xray') || views.includes('x-ray')) out.view = 'xray';
