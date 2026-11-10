@@ -1,6 +1,6 @@
 /**
  * Hangar reveal: a short cinematic of the K1000ULE in a dark hangar while rows of
- * ceiling light strips switch on from front to back, then floor lights and glints.
+ * ceiling light strips switch on from front to back, then floor-standing LED panels.
  *
  * Rendered offline, one deterministic frame at a time: tools/render-hangar.mjs opens
  * this page with Playwright, calls window.__render(t) for every frame and encodes
@@ -62,45 +62,119 @@ function flickerOn(t: number, t0: number, seed: number) {
   return pattern[i] * (0.75 + 0.25 * hash(seed + i));
 }
 
-function starTexture() {
-  const s = 256;
+/** Tileable polished-concrete albedo: soft mottling, fine speckle and saw-cut joints at the tile edges. */
+function concreteCanvas() {
+  const S = 1024;
   const c = document.createElement('canvas');
-  c.width = c.height = s;
+  c.width = c.height = S;
   const g = c.getContext('2d')!;
-  const m = s / 2;
-  const core = g.createRadialGradient(m, m, 0, m, m, m * 0.35);
-  core.addColorStop(0, 'rgba(255,255,255,1)');
-  core.addColorStop(0.2, 'rgba(255,255,255,0.45)');
-  core.addColorStop(1, 'rgba(255,255,255,0)');
-  g.fillStyle = core;
-  g.fillRect(0, 0, s, s);
-  g.globalCompositeOperation = 'lighter';
-  const ray = (angle: number, len: number, width: number, alpha: number) => {
-    g.save();
-    g.translate(m, m);
-    g.rotate(angle);
-    const gr = g.createLinearGradient(-len, 0, len, 0);
-    gr.addColorStop(0, 'rgba(255,255,255,0)');
-    gr.addColorStop(0.5, `rgba(255,255,255,${alpha})`);
-    gr.addColorStop(1, 'rgba(255,255,255,0)');
-    g.fillStyle = gr;
-    g.beginPath();
-    g.moveTo(-len, 0);
-    g.lineTo(0, -width);
-    g.lineTo(len, 0);
-    g.lineTo(0, width);
-    g.closePath();
-    g.fill();
-    g.restore();
+  const img = g.createImageData(S, S);
+  const lat = (x: number, y: number, p: number, seed: number) => hash(((x % p) + p) % p * 157 + (((y % p) + p) % p) * 311 + seed * 7919);
+  const noise = (x: number, y: number, p: number, seed: number) => {
+    const fx = (x / S) * p;
+    const fy = (y / S) * p;
+    const ix = Math.floor(fx);
+    const iy = Math.floor(fy);
+    let tx = fx - ix;
+    let ty = fy - iy;
+    tx = tx * tx * (3 - 2 * tx);
+    ty = ty * ty * (3 - 2 * ty);
+    const a = lat(ix, iy, p, seed);
+    const b = lat(ix + 1, iy, p, seed);
+    const c2 = lat(ix, iy + 1, p, seed);
+    const d = lat(ix + 1, iy + 1, p, seed);
+    return a + (b - a) * tx + (c2 - a) * ty + (a - b - c2 + d) * tx * ty;
   };
-  ray(0, m, 2.2, 1);
-  ray(Math.PI / 2, m * 0.85, 2, 0.9);
-  ray(Math.PI / 4, m * 0.45, 1.2, 0.45);
-  ray(-Math.PI / 4, m * 0.45, 1.2, 0.45);
-  const tex = new THREE.CanvasTexture(c);
-  tex.colorSpace = THREE.SRGBColorSpace;
-  return tex;
+  for (let y = 0; y < S; y++) {
+    for (let x = 0; x < S; x++) {
+      let n = 0;
+      let amp = 0.5;
+      let tot = 0;
+      for (const p of [3, 7, 16, 37, 90]) {
+        n += noise(x, y, p, p) * amp;
+        tot += amp;
+        amp *= 0.55;
+      }
+      n /= tot;
+      let v = 0.72 + (n - 0.5) * 0.5 + (hash(x * 1.31 + y * 977.7) - 0.5) * 0.06;
+      // saw-cut joints along two tile edges (they wrap, so every tile gets a full border)
+      const jx = Math.min(x, S - 1 - x);
+      const jy = Math.min(y, S - 1 - y);
+      if (jx < 2 || jy < 2) v *= 0.45;
+      const k = Math.max(0, Math.min(255, Math.round(v * 255)));
+      const i = (y * S + x) * 4;
+      img.data[i] = img.data[i + 1] = img.data[i + 2] = k;
+      img.data[i + 3] = 255;
+    }
+  }
+  g.putImageData(img, 0, 0);
+  return c;
 }
+
+function radialShadowTexture() {
+  const c = document.createElement('canvas');
+  c.width = c.height = 128;
+  const g = c.getContext('2d')!;
+  const gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+  gr.addColorStop(0, 'rgba(0,0,0,1)');
+  gr.addColorStop(0.55, 'rgba(0,0,0,0.75)');
+  gr.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = gr;
+  g.fillRect(0, 0, 128, 128);
+  return new THREE.CanvasTexture(c);
+}
+
+/** Polished-concrete reflection, added over the lit floor: blurred and smeared along the view
+ *  direction (vertical on screen), modulated by the concrete and a Fresnel term. */
+const FloorReflectShader = {
+  name: 'FloorReflect',
+  uniforms: {
+    color: { value: null as THREE.Color | null },
+    tDiffuse: { value: null as THREE.Texture | null },
+    textureMatrix: { value: null as THREE.Matrix4 | null },
+    tConcrete: { value: null as THREE.Texture | null },
+    uRepeat: { value: 15 },
+    uStrength: { value: 0.75 },
+    uTexel: { value: new THREE.Vector2(2 / W, 2 / H) },
+  },
+  vertexShader: /* glsl */ `
+    uniform mat4 textureMatrix;
+    varying vec4 vUv; varying vec2 vFloorUv; varying vec3 vWorld;
+    void main() {
+      vUv = textureMatrix * vec4(position, 1.0);
+      vFloorUv = uv;
+      vWorld = (modelMatrix * vec4(position, 1.0)).xyz;
+      gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+    }`,
+  fragmentShader: /* glsl */ `
+    uniform vec3 color; uniform sampler2D tDiffuse; uniform sampler2D tConcrete;
+    uniform float uRepeat; uniform float uStrength; uniform vec2 uTexel;
+    varying vec4 vUv; varying vec2 vFloorUv; varying vec3 vWorld;
+    float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233))) * 43758.5453); }
+    void main() {
+      vec2 uv = vUv.xy / vUv.w;
+      float conc = texture2D(tConcrete, vFloorUv * uRepeat + 0.5).r;
+      float dist = length(cameraPosition.xz - vWorld.xz);
+      // farther floor = blurrier reflection
+      float spread = mix(7.0, 12.0, clamp((dist - 3.0) / 10.0, 0.0, 1.0));
+      float jit = (h(gl_FragCoord.xy) - 0.5) * 0.25;
+      vec3 acc = vec3(0.0); float wsum = 0.0;
+      for (int i = -9; i <= 9; i++) {
+        for (int j = -3; j <= 3; j++) {
+          float fi = float(i) + jit; float fj = float(j) + jit * 0.7;
+          float w = exp(-fi * fi / 30.0 - fj * fj / 5.0);
+          acc += texture2D(tDiffuse, uv + vec2(fj * uTexel.x * 3.5, fi * uTexel.y * spread), 2.5).rgb * w;
+          wsum += w;
+        }
+      }
+      vec3 refl = acc / wsum;
+      vec3 V = normalize(cameraPosition - vWorld);
+      float F = 0.04 + 0.96 * pow(1.0 - clamp(V.y, 0.0, 1.0), 5.0);
+      // worn, less polished patches reflect less
+      float k = uStrength * F * mix(0.55, 1.0, smoothstep(0.3, 0.85, conc));
+      gl_FragColor = vec4(refl * color * k, 1.0);
+    }`,
+};
 
 const GradeShader = {
   uniforms: {
@@ -166,12 +240,15 @@ async function main() {
   console.log('aircraft bounds', abox.min.toArray(), abox.max.toArray());
 
   // ── display stand: one slim post with a saddle and a round foot
-  const standMat = new THREE.MeshPhysicalMaterial({ color: '#0d0e10', roughness: 0.25, metalness: 0.8, clearcoat: 1, clearcoatRoughness: 0.1 });
+  // satin black powder coat
+  const standMat = new THREE.MeshStandardMaterial({ color: '#08090a', roughness: 0.62, metalness: 0.2 });
   const stand = new THREE.Group();
   const post = new THREE.Mesh(new THREE.CylinderGeometry(0.028, 0.034, STAND_TOP - 0.02, 32), standMat);
   post.position.y = (STAND_TOP - 0.02) / 2;
-  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.36, 0.025, 64), standMat);
-  foot.position.y = 0.0125;
+  const footMat = standMat.clone();
+  footMat.userData.envIntensity = 0.35;
+  const foot = new THREE.Mesh(new THREE.CylinderGeometry(0.24, 0.26, 0.03, 64), footMat);
+  foot.position.y = 0.015;
   const saddle = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.025, 0.32), standMat);
   saddle.position.y = STAND_TOP - 0.012;
   stand.add(post, foot, saddle);
@@ -179,23 +256,77 @@ async function main() {
   stand.position.set(0, 0, 0.25);
   scene.add(stand);
 
-  // ── floor: dark polished concrete over a mirror
+  // ── floor: lit polished concrete, a soft shadow pass, then a blurred reflection added on top
   const floorSize = 60;
+  const REPEAT = floorSize / 4; // 4 m concrete slabs
+  const concreteImg = concreteCanvas();
+  const concreteAlbedo = new THREE.CanvasTexture(concreteImg);
+  concreteAlbedo.colorSpace = THREE.SRGBColorSpace;
+  const concreteRough = new THREE.CanvasTexture(concreteImg);
+  for (const tx of [concreteAlbedo, concreteRough]) {
+    tx.wrapS = tx.wrapT = THREE.RepeatWrapping;
+    tx.repeat.set(REPEAT, REPEAT);
+    tx.offset.set(0.5, 0.5);
+    tx.anisotropy = 8;
+  }
+  const floorMat = new THREE.MeshStandardMaterial({
+    color: '#3a3a3a',
+    map: concreteAlbedo,
+    roughness: 0.95,
+    roughnessMap: concreteRough,
+    metalness: 0,
+  });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(floorSize, floorSize), floorMat);
+  floor.rotation.x = -Math.PI / 2;
+  scene.add(floor);
+
+  // soft overhead shadow of the aircraft and stand (the ceiling is one big soft light)
+  renderer.shadowMap.enabled = true;
+  renderer.shadowMap.type = THREE.VSMShadowMap;
+  const shadowSun = new THREE.DirectionalLight('#ffffff', 0.0001);
+  shadowSun.position.set(0, 10, -0.6);
+  shadowSun.castShadow = true;
+  shadowSun.shadow.mapSize.set(512, 512);
+  Object.assign(shadowSun.shadow.camera, { left: -4.5, right: 4.5, top: 4.5, bottom: -4.5, near: 6, far: 12 });
+  shadowSun.shadow.radius = 22;
+  shadowSun.shadow.blurSamples = 25;
+  scene.add(shadowSun, shadowSun.target);
+  for (const root of [model.root, stand]) root.traverse((o) => ((o as THREE.Mesh).isMesh ? (o.castShadow = true) : null));
+  const shadowMat = new THREE.ShadowMaterial({ opacity: 0, transparent: true, depthWrite: false });
+  const shadowPlane = new THREE.Mesh(new THREE.PlaneGeometry(9, 9), shadowMat);
+  shadowPlane.rotation.x = -Math.PI / 2;
+  shadowPlane.position.y = 0.0005;
+  shadowPlane.receiveShadow = true;
+  shadowPlane.renderOrder = 1;
+  scene.add(shadowPlane);
+  // contact darkening where the stand's foot meets the floor
+  const contactMat = new THREE.MeshBasicMaterial({ map: radialShadowTexture(), transparent: true, depthWrite: false, opacity: 0 });
+  const contact = new THREE.Mesh(new THREE.PlaneGeometry(0.7, 0.7), contactMat);
+  contact.rotation.x = -Math.PI / 2;
+  contact.position.set(0, 0.0007, 0.25);
+  contact.renderOrder = 1;
+  scene.add(contact);
+
   const mirror = new Reflector(new THREE.PlaneGeometry(floorSize, floorSize), {
     textureWidth: W / 2,
     textureHeight: H / 2,
-    color: new THREE.Color('#5a5a5a'),
+    color: new THREE.Color('#ffffff'),
     clipBias: 0.003,
+    shader: FloorReflectShader,
   });
+  // mipmapped, so every blur tap reads an already-smoothed texel (no banding between taps)
+  const reflTex = mirror.getRenderTarget().texture;
+  reflTex.generateMipmaps = true;
+  reflTex.minFilter = THREE.LinearMipmapLinearFilter;
+  const mirrorMat = mirror.material as THREE.ShaderMaterial;
+  mirrorMat.uniforms.tConcrete.value = concreteRough;
+  mirrorMat.transparent = true;
+  mirrorMat.blending = THREE.AdditiveBlending;
+  mirrorMat.depthWrite = false;
   mirror.rotation.x = -Math.PI / 2;
-  mirror.position.y = -0.002;
+  mirror.position.y = 0.001;
+  mirror.renderOrder = 2;
   scene.add(mirror);
-  const floor = new THREE.Mesh(
-    new THREE.PlaneGeometry(floorSize, floorSize),
-    new THREE.MeshStandardMaterial({ color: '#000000', roughness: 0.32, metalness: 0, transparent: true, opacity: 0.84 }),
-  );
-  floor.rotation.x = -Math.PI / 2;
-  scene.add(floor);
 
   // ── hangar shell
   const wallMat = new THREE.MeshStandardMaterial({ color: '#030304', roughness: 0.95 });
@@ -247,53 +378,51 @@ async function main() {
   }
 
   // ── floor LED panels: three bars each, two pairs either side of the aircraft
-  const panels: { mats: THREE.MeshBasicMaterial[]; light: THREE.RectAreaLight; t0: number; base: THREE.Vector3 }[] = [];
+  const panels: { mats: THREE.MeshBasicMaterial[]; light: THREE.RectAreaLight; t0: number }[] = [];
   const panelSpots: [number, number, number][] = [
     [-4.0, 0, -1.8],
     [4.0, 0, -1.8],
     [-2.5, 0, -4.4],
     [2.5, 0, -4.4],
   ];
+  const standGrey = new THREE.MeshStandardMaterial({ color: '#3b3d41', roughness: 0.42, metalness: 0.7 });
+  const housingMat = new THREE.MeshStandardMaterial({ color: '#0e0f11', roughness: 0.55, metalness: 0.2 });
   panelSpots.forEach(([x, , z], idx) => {
     const g = new THREE.Group();
     g.position.set(x, 0, z);
-    const legMat = new THREE.MeshStandardMaterial({ color: '#111214', roughness: 0.5, metalness: 0.6 });
-    const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.55, 12), legMat);
-    leg.position.y = 0.275;
-    const frame = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.3, 0.05), legMat);
-    frame.position.y = 0.7;
-    g.add(leg, frame);
+    g.rotation.y = -x * 0.04; // toe in slightly toward the aircraft
+    // tripod light stand
+    const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.014, 0.62, 12), standGrey);
+    pole.position.y = 0.31 + 0.05;
+    g.add(pole);
+    for (let l = 0; l < 3; l++) {
+      const a = (l / 3) * Math.PI * 2 + 0.5;
+      const leg = new THREE.Mesh(new THREE.CylinderGeometry(0.008, 0.008, 0.36, 8), standGrey);
+      leg.position.set(Math.cos(a) * 0.13, 0.13, Math.sin(a) * 0.13);
+      leg.rotation.set(Math.sin(a) * -0.85, 0, Math.cos(a) * 0.85);
+      g.add(leg);
+    }
+    const yoke = new THREE.Mesh(new THREE.BoxGeometry(0.58, 0.02, 0.02), standGrey);
+    yoke.position.y = 0.68;
+    g.add(yoke);
+    // LED panel housing with three diffused bars
+    const housing = new THREE.Mesh(new THREE.BoxGeometry(0.52, 0.32, 0.07), housingMat);
+    housing.position.y = 0.86;
+    g.add(housing);
     const mats: THREE.MeshBasicMaterial[] = [];
     for (let r = 0; r < 3; r++) {
       const mat = new THREE.MeshBasicMaterial({ color: '#000', toneMapped: false });
-      const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.42, 0.045), mat);
-      bar.position.set(0, 0.79 - r * 0.085, 0.027);
+      const bar = new THREE.Mesh(new THREE.PlaneGeometry(0.44, 0.06), mat);
+      bar.position.set(0, 0.95 - r * 0.09, 0.036);
       g.add(bar);
       mats.push(mat);
     }
-    const light = new THREE.RectAreaLight('#ffffff', 0, 0.42, 0.25);
-    light.position.set(x, 0.7, z + 0.03);
-    light.lookAt(x * 0.2, 0.6, z + 6);
+    const light = new THREE.RectAreaLight('#ffffff', 0, 0.44, 0.26);
+    light.position.set(x, 0.86, z + 0.05);
+    light.lookAt(x * 0.3, 0.5, z + 6);
     scene.add(g, light);
-    panels.push({ mats, light, t0: 3.0 + (idx < 2 ? 0.15 : 0) + hash(idx + 40) * 0.05, base: new THREE.Vector3(x, 0.01, z + 0.25) });
+    panels.push({ mats, light, t0: 3.0 + (idx < 2 ? 0.15 : 0) + hash(idx + 40) * 0.05 });
   });
-
-  // ── floor glints: under the stand and in front of the panels
-  const starTex = starTexture();
-  const glints: { sprite: THREE.Sprite; t0: number; size: number; seed: number }[] = [];
-  const addGlint = (p: THREE.Vector3, t0: number, size: number, seed: number) => {
-    const sprite = new THREE.Sprite(
-      new THREE.SpriteMaterial({ map: starTex, color: '#ffffff', blending: THREE.AdditiveBlending, depthWrite: false, transparent: true, toneMapped: false }),
-    );
-    sprite.position.copy(p);
-    sprite.scale.setScalar(0.001);
-    scene.add(sprite);
-    glints.push({ sprite, t0, size, seed });
-  };
-  addGlint(new THREE.Vector3(0, 0.03, 0.62), 3.25, 0.75, 1);
-  addGlint(new THREE.Vector3(-0.3, 0.02, 0.32), 3.4, 0.35, 2);
-  addGlint(new THREE.Vector3(0.3, 0.02, 0.32), 3.45, 0.35, 3);
-  panels.forEach((p, i) => addGlint(p.base, p.t0 + 0.15, i < 2 ? 0.55 : 0.4, 10 + i));
 
   // ── camera + post
   const camera = new THREE.PerspectiveCamera(34, W / H, 0.05, 80);
@@ -308,7 +437,7 @@ async function main() {
 
   // ── reflections: an environment map of the hangar (without the aircraft), rebuilt as lights change
   const pmrem = new THREE.PMREMGenerator(renderer);
-  const reflective = new Set<THREE.MeshStandardMaterial>();
+  const reflective = new Set<THREE.MeshStandardMaterial>([standGrey, housingMat]);
   for (const root of [model.root, stand]) {
     root.traverse((o) => {
       const mesh = o as THREE.Mesh;
@@ -327,18 +456,16 @@ async function main() {
     model.root.visible = false;
     stand.visible = false;
     mirror.visible = false;
-    for (const g of glints) g.sprite.visible = false;
     const prev = envRT;
     envRT = pmrem.fromScene(scene, 0, 0.1, 60, { size: 256, position: envCenter });
     prev?.dispose();
     model.root.visible = true;
     stand.visible = true;
     mirror.visible = true;
-    for (const g of glints) g.sprite.visible = true;
     // only the aircraft and stand reflect the hangar; the floor and walls stay dark
     for (const m of reflective) {
       m.envMap = envRT.texture;
-      m.envMapIntensity = 1.6;
+      m.envMapIntensity = m.userData.envIntensity ?? 1.6;
     }
   };
 
@@ -361,17 +488,14 @@ async function main() {
     let panelSum = 0;
     panels.forEach((p, i) => {
       const k = flickerOn(t, p.t0, 90 + i * 5);
-      for (const m of p.mats) m.color.setScalar(4 * k);
+      for (const m of p.mats) m.color.setScalar(2.4 * k);
       p.light.intensity = 3 * k;
       panelSum += Math.round(k * 10);
     });
-    glints.forEach((g) => {
-      const k = smooth(g.t0, g.t0 + 0.35, t);
-      const tw = 0.82 + 0.18 * Math.sin(t * 5.3 + g.seed * 1.7) * Math.sin(t * 2.1 + g.seed);
-      g.sprite.scale.setScalar(Math.max(0.001, g.size * k * tw));
-      g.sprite.material.color.setScalar(1.8 * k);
-      g.sprite.material.rotation = Math.sin(t * 0.6 + g.seed) * 0.05;
-    });
+    // overhead shadow and contact darkening follow the ceiling brightness
+    const ceiling = litSum / (N_STRIPS * 10);
+    shadowMat.opacity = 0.55 * ceiling;
+    contactMat.opacity = 0.7 * Math.max(ceiling, 0.15 * (panelSum / 40));
     updateEnv(`${litSum}|${panelSum}|${Math.round(wall * 10)}`);
 
     // slow push-in
