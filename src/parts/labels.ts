@@ -10,6 +10,8 @@ export interface AtlasLabel {
   at?: [number, number];
   /** position in the portrait (phone) drawing; aircraft labels share coordinates in both */
   atPortrait?: [number, number];
+  /** a loose part laid out in a row: its label shares a baseline with the row's other labels */
+  row?: boolean;
   /** in portrait, ignore `at` and sit under the part */
   portraitAuto?: boolean;
   align?: 'start' | 'middle' | 'end';
@@ -40,10 +42,10 @@ export const LABELS: AtlasLabel[] = [
     at: [962, 458],
   },
   { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },
-  { kind: 'group', text: 'Camera', ids: ['eo-ir'], at: [470, 668], atPortrait: [183, 1252] },
 
-  { kind: 'detail', text: 'HD40 Gimbal Camera', ids: ['eo-ir'] },
-  { kind: 'detail', text: 'Battery 6S16P', ids: ['battery'] },
-  { kind: 'detail', text: 'ATNE', ids: ['atne'] },
-  { kind: 'detail', text: 'Silvus', ids: ['silvus'] },
+  { kind: 'detail', text: 'HD40', ids: ['eo-ir'], row: true },
+  { kind: 'detail', text: 'Battery 6S16P', ids: ['battery'], row: true },
+  { kind: 'detail', text: 'ATNE', ids: ['atne'], row: true },
+  { kind: 'detail', text: 'Silvus Tx', ids: ['silvus'], row: true },
+  { kind: 'detail', text: 'Silvus 4400', ids: ['silvus-4400'], row: true },
 ];

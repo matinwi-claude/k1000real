@@ -359,7 +359,7 @@ export function PartsApp({ art }: { art: LineArt }) {
           <div className={`pa-tip ${tip.x > size.w - 240 ? 'flip' : ''}`} style={{ left: tip.x, top: tip.y }}>
             <b>{tipC.name}</b>
             <span>
-              {tipC.partNumber} · {CATEGORIES.find((c) => c.id === tipC.category)!.label}
+              {CATEGORIES.find((c) => c.id === tipC.category)!.label}
             </span>
           </div>
         )}
@@ -440,7 +440,15 @@ function labelAt(l: AtlasLabel, PART_MAP: Record<string, Part>, portrait: boolea
   if (l.at && !(portrait && l.portraitAuto)) return l.at;
   const p = PART_MAP[l.ids[0]];
   if (!p?.box) return [0, 0];
-  return [(p.box[0] + p.box[2]) / 2, p.box[3] + 14];
+  let bottom = p.box[3];
+  if (l.row) {
+    // loose parts laid out side by side share one baseline: the lowest part bottom of the row
+    for (const o of LABELS) {
+      const q = o.row ? PART_MAP[o.ids[0]]?.box : undefined;
+      if (q && q[1] < p.box[3] && q[3] > p.box[1]) bottom = Math.max(bottom, q[3]);
+    }
+  }
+  return [(p.box[0] + p.box[2]) / 2, bottom + 14];
 }
 
 function Label({

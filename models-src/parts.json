@@ -674,6 +674,27 @@
         "id": "silvus",
         "material": "grey"
       }
+    },
+    {
+      "file": "silvus-sc4400.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "keep": 0.12,
+      "$comment": "Silvus SC4400 dual-band OEM radio: drawn in the 2D atlas only",
+      "default": {
+        "id": "silvus-4400",
+        "material": "grey"
+      }
     }
   ]
 }

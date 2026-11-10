@@ -1,4 +1,4 @@
-import { useRef } from 'react';
+import { useRef, type MouseEvent } from 'react';
 import { useStore, type Configuration } from '../store';
 import { sound } from '../utils/sound';
 
@@ -7,13 +7,15 @@ const CONFIGS: { id: Configuration; label: string }[] = [
   { id: 'evtol', label: 'eVTOL' },
 ];
 
-/** Brand mark + configuration picker (top-left). Logo ×5 → Engineer Mode. */
+/** Brand mark (links to khaero.com) + configuration picker (top-left). Shift-click the mark ×5 → Engineer Mode. */
 export function StatusPanel() {
   const engineer = useStore((s) => s.engineer);
   const configuration = useStore((s) => s.configuration);
   const clicks = useRef<number[]>([]);
 
-  const onLogo = () => {
+  const onLogo = (e: MouseEvent) => {
+    if (!e.shiftKey) return; // a plain click follows the link
+    e.preventDefault();
     const now = performance.now();
     clicks.current = [...clicks.current.filter((t) => now - t < 1800), now];
     if (clicks.current.length >= 5) {
@@ -27,14 +29,14 @@ export function StatusPanel() {
 
   return (
     <div className="k-status">
-      <button className="k-brand" onClick={onLogo} aria-label="K1000ULE">
+      <a className="k-brand" href="https://www.khaero.com/" target="_blank" rel="noopener" onClick={onLogo} aria-label="K1000ULE · khaero.com">
         <span className="k-brand-mark">K1000ULE</span>
         {engineer && (
           <span className="k-brand-sub">
             <em>ENG</em>
           </span>
         )}
-      </button>
+      </a>
       <div className="k-config fade-on-idle" role="radiogroup" aria-labelledby="k-config-title">
         <div className="k-config-title" id="k-config-title">
           CONFIGURATION

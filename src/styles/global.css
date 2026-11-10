@@ -316,6 +316,8 @@ kbd {
   top: var(--inset);
 }
 .k-brand {
+  color: inherit;
+  text-decoration: none;
   display: flex;
   flex-direction: column;
   align-items: flex-start;

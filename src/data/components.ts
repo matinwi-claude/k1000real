@@ -631,7 +631,7 @@ export const COMPONENTS: DroneComponent[] = [
   // ───────────────────────── CAMERA
   {
     id: 'eo-ir',
-    name: 'HD40 Gimbal Camera',
+    name: 'HD40',
     category: 'camera',
     system: 'ISR Imaging',
     type: 'Stabilised EO/IR Gimbal',
@@ -672,8 +672,26 @@ export const COMPONENTS: DroneComponent[] = [
 
   // ───────────────────────── COMMUNICATIONS (2D atlas only)
   {
+    id: 'silvus-4400',
+    name: 'Silvus 4400',
+    category: 'communications',
+    system: 'Communications',
+    type: 'Silvus SC4400 OEM Radio',
+    partNumber: 'K1-COM-S02',
+    description: 'Silvus SC4400 dual-band OEM radio module.',
+    position: [0, 0.01, 0],
+    location: 'Communications',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'internal',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
+  {
     id: 'silvus',
-    name: 'Silvus',
+    name: 'Silvus Tx',
     category: 'communications',
     system: 'Communications',
     type: 'Silvus OEM Radio',
@@ -731,6 +749,7 @@ const SPECS: Record<string, SpecSheet> = {
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },
   silvus: { group: 'Feature', material: 'Aluminum' },
+  'silvus-4400': { group: 'Feature', material: 'Aluminum' },
 };
 export const specSheet = (id: string): SpecSheet => SPECS[id] ?? { group: 'Airframe', material: CF };
 
