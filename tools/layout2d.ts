@@ -48,7 +48,6 @@ export const LAYOUT_2D: Record<string, Place> = {
   'lift-prop-04': { offset: stbd([boomOut, 0.13, 0]) },
 
   // fuselage group
-  'avionics-hatch': { offset: [0, 0.2, 0.02] },
   'antenna-01': { offset: [0, 0.1, 0] },
   'antenna-02': { offset: [0, 0.1, 0] },
   'cruise-motor': { offset: [0, 0, 0.28] },
