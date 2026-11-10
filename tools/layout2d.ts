@@ -60,10 +60,11 @@ export const LAYOUT_2D: Record<string, Place> = {
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
   // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
-  'eo-ir': { screen: [0.55, -1.15], scale: 1.75 },
-  battery: { screen: [1.15, -1.15], scale: 1.0 },
-  atne: { screen: [1.75, -1.1], scale: 0.85 },
-  silvus: { screen: [2.3, -1.15], scale: 3.0 },
+  'eo-ir': { screen: [0.25, -1.15], scale: 1.75 },
+  battery: { screen: [0.77, -1.15], scale: 1.0 },
+  atne: { screen: [1.29, -1.1], scale: 0.85 },
+  starlink: { screen: [1.81, -1.15], scale: 0.95 },
+  silvus: { screen: [2.33, -1.15], scale: 3.0 },
   'silvus-4400': { screen: [2.85, -1.15], scale: 2.8 },
 };
 
@@ -72,6 +73,7 @@ export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
   'eo-ir': { screen: [-1.6, -3.7], scale: 3.6 },
   battery: { screen: [0.05, -3.7], scale: 2.2 },
   atne: { screen: [1.7, -3.85], scale: 1.6 },
-  silvus: { screen: [-0.9, -5.3], scale: 6 },
-  'silvus-4400': { screen: [1.0, -5.3], scale: 5.5 },
+  starlink: { screen: [-1.6, -5.3], scale: 2.1 },
+  silvus: { screen: [0.05, -5.3], scale: 6 },
+  'silvus-4400': { screen: [1.7, -5.3], scale: 5.5 },
 };

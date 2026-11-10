@@ -142,7 +142,7 @@
       "offset": [
         0,
         -0.012,
-        1.0389
+        1.0434
       ],
       "spin": true,
       "default": {
@@ -165,7 +165,8 @@
           }
         }
       ],
-      "keep": 0.3
+      "keep": 0.3,
+      "scale": 1.2
     },
     {
       "file": "pitot.stl",
@@ -693,6 +694,27 @@
       "$comment": "Silvus SC4400 dual-band OEM radio: drawn in the 2D atlas only",
       "default": {
         "id": "silvus-4400",
+        "material": "grey"
+      }
+    },
+    {
+      "file": "starlink.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "keep": 0.1,
+      "$comment": "Starlink terminal: drawn in the 2D atlas only",
+      "default": {
+        "id": "starlink",
         "material": "grey"
       }
     }

@@ -668,6 +668,25 @@ export const COMPONENTS: DroneComponent[] = [
     atlasOnly: true,
   },
 
+  {
+    id: 'starlink',
+    name: 'Starlink',
+    category: 'payload',
+    system: 'Mission Payload',
+    type: 'Starlink Terminal',
+    partNumber: 'K1-PLD-S01',
+    description: 'Starlink satellite terminal payload.',
+    position: [0, 0, -0.33],
+    location: 'Payload',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
+
   // ───────────────────────── COMMUNICATIONS (2D atlas only)
   {
     id: 'silvus-4400',
@@ -746,6 +765,7 @@ const SPECS: Record<string, SpecSheet> = {
   pitot: { group: 'Feature', material: 'Aluminum probe · 3D-printed cover' },
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },
+  starlink: { group: 'Payload', material: 'Aluminum' },
   silvus: { group: 'Feature', material: 'Aluminum' },
   'silvus-4400': { group: 'Feature', material: 'Aluminum' },
 };
