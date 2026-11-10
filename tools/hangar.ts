@@ -31,7 +31,9 @@ declare global {
 const Q = new URLSearchParams(location.search);
 const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
-const DURATION = 6;
+const SHOT1 = 6; // head-on reveal
+const SHOT2 = 2.6; // elevated three-quarter view from the front port side
+const DURATION = SHOT1 + SHOT2;
 
 // ── hangar layout (metres; aircraft nose toward +Z, camera in front of it)
 const N_STRIPS = 22;
@@ -43,6 +45,11 @@ const STAND_TOP = 1.05; // fuselage belly height on the display stand
 const CAM_START = new THREE.Vector3(0, 0.82, 7.3);
 const CAM_END = new THREE.Vector3(0, 0.8, 6.8);
 const CAM_LOOK = new THREE.Vector3(0, 1.6, 0);
+// shot 2: orbit slowly around the aircraft from above and to the side
+const ORBIT_LOOK = [new THREE.Vector3(-0.6, 0.75, -0.1), new THREE.Vector3(0.15, 0.72, 0.15)];
+const ORBIT_HEIGHT = [2.95, 2.85];
+const ORBIT_RADIUS = [6.4, 6.25];
+const ORBIT_AZIMUTH = [(-58 * Math.PI) / 180, (-46 * Math.PI) / 180]; // 0 = straight ahead of the nose, negative = port side
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -429,7 +436,9 @@ async function main() {
   const rt = new THREE.WebGLRenderTarget(W, H, { type: THREE.HalfFloatType, samples: 4 });
   const composer = new EffectComposer(renderer, rt);
   composer.addPass(new RenderPass(scene, camera));
-  const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.2, 0.0, 1.6);
+  const bloom = new UnrealBloomPass(new THREE.Vector2(W, H), 0.45, 0.0, 1.6);
+  // keep only the tight inner glow: drop the wide, low-resolution mip levels that read as haze
+  (bloom as unknown as { compositeMaterial: THREE.ShaderMaterial }).compositeMaterial.uniforms.bloomFactors.value = [1.0, 0.35, 0.06, 0.0, 0.0];
   composer.addPass(bloom);
   const grade = new ShaderPass(GradeShader);
   composer.addPass(grade);
@@ -499,9 +508,20 @@ async function main() {
     updateEnv(`${litSum}|${panelSum}|${Math.round(wall * 10)}`);
 
     // slow push-in
-    const u = smooth(0, DURATION, t);
-    camera.position.lerpVectors(CAM_START, CAM_END, u);
-    camera.lookAt(CAM_LOOK);
+    if (t < SHOT1) {
+      // slow push-in
+      const u = smooth(0, SHOT1, t);
+      camera.position.lerpVectors(CAM_START, CAM_END, u);
+      camera.lookAt(CAM_LOOK);
+    } else {
+      const u = (t - SHOT1) / SHOT2; // linear drift, so the cut lands on a moving camera
+      const lerp = (r: number[]) => r[0] + (r[1] - r[0]) * u;
+      const az = lerp(ORBIT_AZIMUTH);
+      const rad = lerp(ORBIT_RADIUS);
+      // port side is +x, the nose points to +z
+      camera.position.set(Math.sin(-az) * rad, lerp(ORBIT_HEIGHT), Math.cos(az) * rad);
+      camera.lookAt(new THREE.Vector3().lerpVectors(ORBIT_LOOK[0], ORBIT_LOOK[1], u));
+    }
     grade.uniforms.uTime.value = t;
     composer.render();
     return renderer.domElement.toDataURL('image/png');

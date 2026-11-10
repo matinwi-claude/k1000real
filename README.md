@@ -78,7 +78,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 
 ## Hangar reveal video (`tools/hangar.html`)
 
-A short black-and-white cinematic: the K1000ULE on a display stand in a dark hangar while rows of ceiling light strips switch on front to back, then floor lights and glints come on. It uses the same model as the viewer and renders offline, one frame at a time.
+A short black-and-white cinematic: the K1000ULE on a display stand in a dark hangar while rows of ceiling light strips switch on front to back and floor-standing LED panels come on, then a cut to an elevated three-quarter view. It uses the same model as the viewer and renders offline, one frame at a time.
 
 With `npm run dev` running: `npm run hangar -- k1000-hangar-reveal.mp4` (needs Playwright with a Chromium, and ffmpeg). Use `--only 1.2,5.5` to render single frames as PNGs while tweaking, and `--w`/`--h`/`--fps` to change the output. Open `/tools/hangar.html?t=4` to preview one moment in the browser. Timing, camera and light levels are constants at the top of `tools/hangar.ts`.
 
