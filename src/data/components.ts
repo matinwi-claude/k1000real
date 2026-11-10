@@ -779,6 +779,7 @@ const POD_EXPLODE: Vec3[] = [
 const EXPLODE: Record<string, Vec3> = {
   'eo-ir': [0, -0.4, 0],
   battery: [0, -0.32, 0],
+  'avionics-hatch': [0, 0.3, 0],
   'solar-port': [0, 0.22, 0],
   'solar-starboard': [0, 0.22, 0],
   'solar-tail': [0, 0.2, 0],
