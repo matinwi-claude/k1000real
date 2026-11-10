@@ -634,13 +634,6 @@ kbd {
 .k-kbd-grid kbd {
   margin-right: 4px;
 }
-.k-disclaimer {
-  margin: 0;
-  padding: 12px 16px 8px;
-  font-size: 9.5px;
-  line-height: 1.55;
-  color: var(--dim);
-}
 
 /* ───────────────────────────────────────────────────────────── tool rail */
 .k-rail {

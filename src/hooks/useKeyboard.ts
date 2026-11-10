@@ -37,8 +37,6 @@ export function useKeyboard() {
         case 's': return actions.toggleSection();
         case 'l': return actions.cycleLighting();
         case 'r': return actions.toggleAutoRotate();
-        case 'c': return actions.toggleFreeCam();
-        case 'p': return actions.togglePresentation();
         case 'f': return actions.focusSelected();
         case 'h': return actions.hideSelected();
         case '?': return useStore.setState({ settingsOpen: !s.settingsOpen });

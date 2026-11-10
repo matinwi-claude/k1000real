@@ -2,17 +2,14 @@ import type { ReactNode } from 'react';
 import { useStore, type CameraView, type LightingMode } from '../store';
 import { actions } from '../utils/actions';
 import {
-  IconCamera,
   IconClose,
   IconExplode,
   IconEmbed,
   IconLayers,
   IconLink,
-  IconPresent,
   IconRotate,
   IconSection,
   IconSettings,
-  IconSound,
   IconXray,
 } from './Icons';
 import { engineRef } from '../engine/engineRef';
@@ -103,9 +100,6 @@ export function SettingsMenu() {
   const open = useStore((s) => s.settingsOpen);
   const lighting = useStore((s) => s.lighting);
   const autoRotate = useStore((s) => s.autoRotate);
-  const freeCam = useStore((s) => s.freeCam);
-  const presentation = useStore((s) => s.presentation);
-  const snd = useStore((s) => s.sound);
   const engineer = useStore((s) => s.engineer);
   const spinTest = useStore((s) => s.spinTest);
   const toggle = () => useStore.setState({ settingsOpen: !open });
@@ -132,12 +126,9 @@ export function SettingsMenu() {
           <section>
             <h4>CAMERA</h4>
             <Toggle on={autoRotate} onClick={actions.toggleAutoRotate} icon={<IconRotate size={15} />} label="AUTO ROTATE" kbd="R" />
-            <Toggle on={freeCam} onClick={actions.toggleFreeCam} icon={<IconCamera size={15} />} label="FREE CAM" kbd="C" />
-            <Toggle on={presentation} onClick={actions.togglePresentation} icon={<IconPresent size={15} />} label="PRESENTATION" kbd="P" />
           </section>
           <section>
             <h4>INTERFACE</h4>
-            <Toggle on={snd} onClick={actions.toggleSound} icon={<IconSound size={15} off={!snd} />} label="INTERFACE SOUND" />
             <button className="k-set-action" onClick={() => void actions.copyLink()}>
               <IconLink size={15} /> COPY LINK TO THIS VIEW
             </button>
@@ -166,11 +157,6 @@ export function SettingsMenu() {
               <span><kbd>ESC</kbd> back</span>
             </div>
           </section>
-          <p className="k-disclaimer">
-            Interactive visualization of the Kraus Hamdani Aerospace K1000ULE. Geometry is procedurally modelled from public
-            product imagery; absolute scale and internal layout are illustrative. Specs tagged PUBLISHED come from the public
-            product page — everything else is a placeholder, not official engineering data.
-          </p>
         </div>
       )}
     </div>

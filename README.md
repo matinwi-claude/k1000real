@@ -91,7 +91,6 @@ An exploded, isometric line drawing of every part, styled like a technical broch
   - **Cross-section:** cut from the top, side or front with a slider, showing hatched cut faces.
 - **Tools:**
   - Lighting presets: Studio, Sky, Night and Inspection.
-  - Free cam (WASD + Q/E) and presentation mode.
 - **Shareable URL state:**
   - `?mode=inspection&component=lift-motor-04`
   - `?view=exploded` · `?view=xray` · `?section=side&cut=0.2`
@@ -102,11 +101,10 @@ An exploded, isometric line drawing of every part, styled like a technical broch
   - Click a part number three times to reveal a note.
   - Look for the tiny serial plate under the starboard boom.
   - Type `k1000` for a cinematic flyaround.
-- **Sound:** optional synthesized interface sounds, off by default.
 
 ### Keyboard
 
-`1–5` views · `E` explode · `I` inspect · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `C` free cam · `P` presentation · `F` focus · `H` hide part · `Esc` back
+`1–5` views · `E` explode · `I` inspect · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `F` focus · `H` hide part · `Esc` back
 
 ## Performance
 

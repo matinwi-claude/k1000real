@@ -88,26 +88,6 @@ export const IconRotate = ({ size, ...p }: P) => (
   </svg>
 );
 
-export const IconCamera = ({ size, ...p }: P) => (
-  <svg {...base(size)} {...p}>
-    <path d="M3.5 8.5h11v8h-11z" />
-    <path d="M14.5 11 20.5 8v9l-6-3" />
-  </svg>
-);
-
-export const IconPresent = ({ size, ...p }: P) => (
-  <svg {...base(size)} {...p}>
-    <path d="M4 8V4h4M16 4h4v4M20 16v4h-4M8 20H4v-4" />
-  </svg>
-);
-
-export const IconSound = ({ size, off, ...p }: P & { off?: boolean }) => (
-  <svg {...base(size)} {...p}>
-    <path d="M4 9.5h3.5L12 6v12l-4.5-3.5H4z" />
-    {off ? <path d="M16 9.5l5 5M21 9.5l-5 5" /> : <path d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11" />}
-  </svg>
-);
-
 export const IconLink = ({ size, ...p }: P) => (
   <svg {...base(size)} {...p}>
     <path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1" />
