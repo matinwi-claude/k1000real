@@ -420,7 +420,6 @@ export function PartsApp({ art }: { art: LineArt }) {
         </div>
       </footer>
 
-      {!compact && !sel && <p className="pa-note">Line art traced from the K1000ULE digital twin · loose parts shown enlarged · click any part</p>}
 
       {sel && <InfoPanel c={sel} onClose={() => select(null)} onStep={step} />}
 

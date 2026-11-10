@@ -32,7 +32,6 @@ export type CategoryId =
   | 'propulsion'
   | 'power'
   | 'sensors'
-  | 'camera'
   | 'payload'
   | 'communications';
 
@@ -96,7 +95,6 @@ export const CATEGORIES: Category[] = [
   { id: 'propulsion', label: 'Propulsion', code: 'PRP' },
   { id: 'power', label: 'Power', code: 'PWR' },
   { id: 'sensors', label: 'Sensors', code: 'SNS' },
-  { id: 'camera', label: 'Camera', code: 'CAM' },
   { id: 'payload', label: 'Payload', code: 'PLD' },
   { id: 'communications', label: 'Communications', code: 'COM' },
 ];
@@ -208,7 +206,7 @@ const podSegment = (side: 1 | -1): DroneComponent => ({
   system: 'Airframe Structure',
   type: 'Wing Section',
   partNumber: side > 0 ? 'K1-AFR-P01' : 'K1-AFR-P02',
-  description: 'Short wing section between the centre wing and the outer panel, where the VTOL pod mounts.',
+  description: 'Short wing section between the center wing and the outer panel, where the VTOL pod mounts.',
   position: [side * 0.92, 0.125, 0.07],
   location: `${side > 0 ? 'Port' : 'Starboard'} wing · VTOL pod station`,
   relatedComponents: [side > 0 ? 'boom-port' : 'boom-starboard', 'wing-center'],
@@ -246,13 +244,13 @@ const wing = (side: 1 | -1): DroneComponent => ({
 
 const wingCenter: DroneComponent = {
   id: 'wing-center',
-  name: 'Centre Wing Section',
+  name: 'Center Wing Section',
   category: 'airframe',
   system: 'Airframe Structure',
-  type: 'Wing Centre Section',
+  type: 'Wing Center Section',
   partNumber: 'K1-AFR-W00',
   description:
-    'Centre section of the three-piece wing. Sits on the fuselage pod, carries both lift booms on faired pylons, and receives the outer panels at its ends.',
+    'Center section of the three-piece wing. Sits on the fuselage pod, carries both lift booms on faired pylons, and receives the outer panels at its ends.',
   position: [0, 0.12, 0.07],
   location: 'Above fuselage · between the booms',
   relatedComponents: ['fuselage', 'wing-port', 'wing-starboard', 'boom-port', 'boom-starboard', 'wing-spar'],
@@ -343,7 +341,7 @@ export const COMPONENTS: DroneComponent[] = [
   },
   {
     id: 'tail-boom',
-    name: 'Tail Boom & Vertical Fin',
+    name: 'Tail',
     category: 'airframe',
     system: 'Empennage',
     type: 'Tail Boom with Integrated Fin',
@@ -542,7 +540,7 @@ export const COMPONENTS: DroneComponent[] = [
   // ───────────────────────── AVIONICS
   {
     id: 'battery',
-    name: 'Battery 6S16P',
+    name: 'Battery',
     category: 'power',
     system: 'Electrical Power',
     type: '6S16P Battery Pack',
@@ -632,7 +630,7 @@ export const COMPONENTS: DroneComponent[] = [
   {
     id: 'eo-ir',
     name: 'HD40',
-    category: 'camera',
+    category: 'payload',
     system: 'ISR Imaging',
     type: 'Stabilised EO/IR Gimbal',
     partNumber: 'K1-CAM-E01',

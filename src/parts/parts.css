@@ -352,16 +352,6 @@
   border-left: 0;
   border-right: 0;
 }
-.pa-note {
-  position: absolute;
-  left: var(--inset);
-  bottom: 62px;
-  margin: 0;
-  font: 9.5px var(--sans);
-  letter-spacing: 0.06em;
-  color: var(--pa-dim);
-  pointer-events: none;
-}
 
 /* info panel */
 .pa-panel {

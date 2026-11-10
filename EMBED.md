@@ -57,7 +57,7 @@ You can also use `<k1000-parts></k1000-parts>`, or an iframe pointing at `https:
 | --- | --- | --- |
 | `data-height`, `data-aspect`, `data-radius` | as above | Size. The default aspect ratio is `16/10`. |
 | `data-component` | component id | Opens with that part selected. |
-| `data-category` | `airframe`, `propulsion`, `power`, `sensors`, `camera` | Highlights one system. |
+| `data-category` | `airframe`, `propulsion`, `power`, `sensors`, `payload`, `communications` | Highlights one system. |
 | `data-theme` | `light` | Dark lines on a light background, for light pages. |
 | `data-accent` | hex without `#`, e.g. `e5322d` | Highlight colour, to match your brand. |
 | `data-ink` | hex without `#` | Line colour. |
