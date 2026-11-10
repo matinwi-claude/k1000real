@@ -462,7 +462,9 @@ for (const side of [1, -1] as const) {
     void mid;
   };
   BUILDERS[side > 0 ? 'solar-port' : 'solar-starboard'] = (b, ctx) => {
-    const wing = ['wing-center', side > 0 ? 'wing-port' : 'wing-starboard'].flatMap((id) => ctx.parts?.get(id) ?? []);
+    const wing = ['wing-center', side > 0 ? 'pod-segment-port' : 'pod-segment-starboard', side > 0 ? 'wing-port' : 'wing-starboard'].flatMap(
+      (id) => ctx.parts?.get(id) ?? [],
+    );
     if (!wing.length) return;
     const target = bvhMesh(wing.map((p) => p.geom));
     const mat = new THREE.MeshPhysicalMaterial({ map: solarMat(), roughness: 0.16, metalness: 0.35, clearcoat: 1, clearcoatRoughness: 0.05 });

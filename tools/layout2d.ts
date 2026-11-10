@@ -60,7 +60,7 @@ export const LAYOUT_2D: Record<string, Place> = {
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
   // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
-  'eo-ir': { screen: [0.55, -1.15], scale: 2.4 },
+  'eo-ir': { screen: [0.55, -1.15], scale: 1.75 },
   battery: { screen: [1.15, -1.15], scale: 1.0 },
   atne: { screen: [1.75, -1.1], scale: 0.85 },
   silvus: { screen: [2.3, -1.15], scale: 3.0 },
@@ -69,7 +69,7 @@ export const LAYOUT_2D: Record<string, Place> = {
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
-  'eo-ir': { screen: [-1.6, -3.7], scale: 5.0 },
+  'eo-ir': { screen: [-1.6, -3.7], scale: 3.6 },
   battery: { screen: [0.05, -3.7], scale: 2.2 },
   atne: { screen: [1.7, -3.85], scale: 1.6 },
   silvus: { screen: [-0.9, -5.3], scale: 6 },

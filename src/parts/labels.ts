@@ -39,7 +39,6 @@ export const LABELS: AtlasLabel[] = [
     ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'battery'],
     at: [962, 458],
   },
-  { kind: 'group', text: 'Cruise', sub: 'Electric tractor', ids: ['cruise-motor', 'cruise-prop'], at: [1112, 640] },
 
   { kind: 'detail', text: 'HD40', ids: ['eo-ir'], row: true },
   { kind: 'detail', text: 'Battery', ids: ['battery'], row: true },

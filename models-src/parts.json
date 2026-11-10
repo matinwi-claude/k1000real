@@ -136,13 +136,13 @@
       "units": "mm",
       "axes": [
         "-x",
-        "z",
-        "y"
+        "-z",
+        "-y"
       ],
       "offset": [
         0,
         -0.012,
-        1.0259
+        1.0389
       ],
       "spin": true,
       "default": {
@@ -311,7 +311,7 @@
       "pieces": [
         {
           "id": "wing-port",
-          "material": "nylon",
+          "material": "shell",
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,
@@ -322,7 +322,7 @@
         },
         {
           "id": "wing-starboard",
-          "material": "nylon",
+          "material": "shell",
           "where": {
             "min_y_gt": -30,
             "max_y_lt": 410,

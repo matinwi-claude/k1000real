@@ -198,7 +198,7 @@ const boom = (side: 1 | -1): DroneComponent => ({
     side < 0 ? 'Serial plate on the underside of the boom, just aft of the pylon. Zoom in closely — the etching is a few millimetres tall.' : undefined,
 });
 
-/** 50 mm wing section the VTOL pod mounts to: explodes with the pod, stays for fixed-wing. */
+/** 50 mm wing section the VTOL pod mounts to: part of the pod (explodes and dissolves with it). */
 const podSegment = (side: 1 | -1): DroneComponent => ({
   id: side > 0 ? 'pod-segment-port' : 'pod-segment-starboard',
   name: side > 0 ? 'Pod Wing Section · Port' : 'Pod Wing Section · Starboard',
@@ -778,7 +778,7 @@ for (const c of COMPONENTS) {
 }
 
 /** Parts that dissolve away in the fixed-wing configuration. */
-export const VTOL_ONLY = new Set(['boom-port', 'boom-starboard', ...LIFT_LAYOUT.flatMap((a) => [`lift-motor-${pad(a.index)}`, `lift-prop-${pad(a.index)}`])]);
+export const VTOL_ONLY = new Set(['boom-port', 'boom-starboard', 'pod-segment-port', 'pod-segment-starboard', ...LIFT_LAYOUT.flatMap((a) => [`lift-motor-${pad(a.index)}`, `lift-prop-${pad(a.index)}`])]);
 
 export const COMPONENT_MAP: Record<string, DroneComponent> = Object.fromEntries(COMPONENTS.map((c) => [c.id, c]));
 
