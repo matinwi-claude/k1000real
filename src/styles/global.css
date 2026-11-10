@@ -290,6 +290,7 @@ kbd {
 .app.is-free .k-views,
 .app.is-free .k-config,
 .app.is-free .k-maker,
+.app.is-free .k-explore,
 .app.is-free .k-inspector,
 .app.is-free .k-dock,
 .app.is-free .k-frame {
@@ -424,6 +425,30 @@ kbd {
   opacity: 0.85;
   pointer-events: none;
   user-select: none;
+}
+.k-explore {
+  position: absolute;
+  left: var(--inset);
+  bottom: var(--inset);
+  width: 132px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-top: 1px solid var(--line-strong);
+  border-bottom: 1px solid var(--line-strong);
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-hi);
+  text-decoration: none;
+  opacity: 0.85;
+  transition: opacity 0.2s, color 0.2s;
+}
+.k-explore:hover {
+  opacity: 1;
+  color: var(--accent);
 }
 .k-dot {
   width: 5px;
@@ -1208,6 +1233,15 @@ input[type='range']::-moz-range-thumb {
     top: 64px;
     bottom: auto;
     width: 92px;
+  }
+  .k-explore {
+    top: 98px;
+    bottom: auto;
+    left: auto;
+    right: var(--inset);
+    width: 92px;
+    padding: 5px 0;
+    font-size: 9px;
   }
   .k-frame {
     display: none;

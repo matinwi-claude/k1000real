@@ -1,6 +1,6 @@
 import { useStore } from './store';
 import { DroneViewer } from './components/DroneViewer';
-import { BrandLogo, StatusPanel } from './components/StatusPanel';
+import { BrandLogo, ExploreMore, StatusPanel } from './components/StatusPanel';
 import { SettingsMenu, ToolRail, ViewButtons } from './components/Controls';
 import { ComponentInspector } from './components/ComponentInspector';
 import { ExplodedView } from './components/ExplodedView';
@@ -54,6 +54,7 @@ export default function App() {
         <ToolRail />
         <ViewButtons />
         <BrandLogo />
+        <ExploreMore />
         <EngineerPanel />
         <ComponentInspector />
         <div className="k-dock">

@@ -28,7 +28,7 @@
         },
         {
           "id": "antenna-01",
-          "material": "grey",
+          "material": "nylon",
           "where": {
             "min_z_gt": -20,
             "center_x_gt": 40,
@@ -37,7 +37,7 @@
         },
         {
           "id": "antenna-01",
-          "material": "grey",
+          "material": "nylon",
           "where": {
             "min_z_gt": -20,
             "center_x_lt": -40,
@@ -46,7 +46,7 @@
         },
         {
           "id": "antenna-02",
-          "material": "grey",
+          "material": "nylon",
           "where": {
             "min_z_gt": -20,
             "center_x_gt": 40,
@@ -55,7 +55,7 @@
         },
         {
           "id": "antenna-02",
-          "material": "grey",
+          "material": "nylon",
           "where": {
             "min_z_gt": -20,
             "center_x_lt": -40,

@@ -59,6 +59,15 @@ export function StatusPanel() {
   );
 }
 
+/** Link to the aircraft's product page (bottom-left, sized to match the logo). */
+export function ExploreMore() {
+  return (
+    <a className="k-explore" href="https://www.khaero.com/k1000ule" target="_blank" rel="noopener">
+      Explore More <span aria-hidden>↗</span>
+    </a>
+  );
+}
+
 /** Manufacturer logo (bottom-right). */
 export function BrandLogo() {
   return <img className="k-maker" src="/brand/kraus-hamdani-aerospace.png" alt="Kraus Hamdani Aerospace" width={601} height={161} />;
