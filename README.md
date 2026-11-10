@@ -76,6 +76,12 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 - **The drawing is generated from the 3D model, not drawn by hand.** `tools/lineart.ts` builds the same model, spreads the parts out, renders an isometric depth buffer and keeps only the visible edges. The result is `src/parts/lineart.json` (plus a portrait variant for phones). The page itself loads no Three.js.
 - **To change the layout:** edit `tools/layout2d.ts`. Then, with `npm run dev` running, regenerate the drawing with `node tools/run-lineart.mjs` and `node tools/run-lineart.mjs "http://localhost:5173/tools/lineart.html?variant=portrait" src/parts/lineart-portrait.json`. This needs `playwright-core` and a Chromium.
 
+## Hangar reveal video (`tools/hangar.html`)
+
+A short black-and-white cinematic: the K1000ULE on a display stand in a dark hangar while rows of ceiling light strips switch on front to back, then floor lights and glints come on. It uses the same model as the viewer and renders offline, one frame at a time.
+
+With `npm run dev` running: `npm run hangar -- k1000-hangar-reveal.mp4` (needs Playwright with a Chromium, and ffmpeg). Use `--only 1.2,5.5` to render single frames as PNGs while tweaking, and `--w`/`--h`/`--fps` to change the output. Open `/tools/hangar.html?t=4` to preview one moment in the browser. Timing, camera and light levels are constants at the top of `tools/hangar.ts`.
+
 ## Features
 
 - **Camera:** smooth damped orbit, pan and zoom. Zoom follows the cursor and goes from the whole aircraft down to millimetre-scale parts. Presets: Reset, Front, Side, Top and Bottom. Inertia and auto-rotate are included. Touch: one finger rotates, two fingers pan, pinch zooms.
