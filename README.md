@@ -82,6 +82,18 @@ A short black-and-white cinematic: the K1000ULE on a display stand in a dark han
 
 With `npm run dev` running: `npm run hangar -- k1000-hangar-reveal.mp4` (needs Playwright with a Chromium, and ffmpeg). Use `--only 1.2,5.5` to render single frames as PNGs while tweaking, and `--w`/`--h`/`--fps` to change the output. Open `/tools/hangar.html?t=4` to preview one moment in the browser. Timing, camera and light levels are constants at the top of `tools/hangar.ts`.
 
+## Sunrise lift-off video (`tools/sunrise.html`)
+
+A 12.6 s colour piece with the same renderer:
+
+- The aircraft sits on a desert landing pad as a silhouette against the pre-dawn glow.
+- The sun clears a distant ridge and lights the airframe from the top down, starting with the solar cells. The light then floods across the plain.
+- The four lift rotors spin up, with motion-blurred blades, and kick backlit dust off the pad.
+- An elevated three-quarter shot follows the aircraft as it lifts off.
+- It ends on a title card.
+
+To render it, run `npm run sunrise` while `npm run dev` is running; it takes the same flags as the hangar render. The sun's path, sky colours and timing are defined near the top of `tools/sunrise.ts`.
+
 ## Features
 
 - **Camera:** smooth damped orbit, pan and zoom. Zoom follows the cursor and goes from the whole aircraft down to millimetre-scale parts. Presets: Reset, Front, Side, Top and Bottom. Inertia and auto-rotate are included. Touch: one finger rotates, two fingers pan, pinch zooms.
