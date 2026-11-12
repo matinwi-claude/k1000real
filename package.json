@@ -12,7 +12,8 @@
     "deploy": "wrangler deploy",
     "preview:worker": "npm run build && wrangler dev",
     "hangar": "node tools/render-hangar.mjs",
-    "sunrise": "node tools/render-hangar.mjs k1000-sunrise.mp4 --url http://localhost:5173/tools/sunrise.html"
+    "sunrise": "node tools/render-hangar.mjs k1000-sunrise.mp4 --url http://localhost:5173/tools/sunrise.html",
+    "hangar-real": "node tools/render-hangar.mjs k1000-hangar-doors.mp4 --url http://localhost:5173/tools/hangar-real.html"
   },
   "dependencies": {
     "camera-controls": "^3.1.2",
