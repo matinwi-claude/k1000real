@@ -1,11 +1,12 @@
 /**
- * Hangar doors: a single-shot, colour, photoreal reveal of the K1000ULE.
+ * Hangar doors: a two-angle, colour, photoreal reveal of the K1000ULE.
  *
- * One locked angle (a slow dolly push from the front-port three-quarter). The hangar is dark
+ * Two angles. First a slow dolly push from the front-port three-quarter: the hangar is dark
  * apart from an exit sign and a hairline of daylight at the door seam. The big sliding doors
  * behind the aircraft roll apart; low sun pours in through the haze, sweeps across the airframe
- * and throws its shadow toward the lens. Then the high-bay lights come on row by row and the
- * aircraft is revealed in full, with a small title at the end.
+ * and throws its shadow toward the lens. Then the
+ * high-bay lights flicker on row by row. Then a cut to a high port-quarter angle that cranes down
+ * and round, revealing the whole aircraft, with a small title at the end.
  *
  * Rendered offline one deterministic frame at a time (tools/render-hangar.mjs). Open
  * /tools/hangar-real.html?t=7 in the dev server to preview one moment.
@@ -37,11 +38,12 @@ const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
 
 // ── timeline (seconds)
-const DURATION = 12.5;
+const DURATION = 18;
 const DOOR_START = 1.0;
 const DOOR_END = 9.6;
 const ROW_ON = [8.5, 8.75, 9.0, 9.25]; // high-bay rows, back to front
-const TITLE_IN = 10.4;
+const CUT = 10.0; // cut to the second angle once every high bay has flickered on
+const TITLE_IN = 14.6;
 
 // ── hangar (metres; aircraft nose toward +Z, port = +X; the doors are in the starboard wall, x = HX0)
 const HX0 = -14;
@@ -63,6 +65,13 @@ const CAM_TO = new THREE.Vector3(2.35, 1.55, 6.35);
 const LOOK_FROM = new THREE.Vector3(-0.05, 0.45, -0.45);
 const LOOK_TO = new THREE.Vector3(0.1, 0.5, -0.3);
 const FOV = 30;
+// ── second angle, after the lights come on: high over the port quarter, a slow crane that comes down and round
+// toward the side, showing the whole aircraft — the solar wing in plan, booms, rotors and T-tail
+const CAM2_FROM = new THREE.Vector3(4.2, 4.6, -6.2);
+const CAM2_TO = new THREE.Vector3(5.4, 3.9, -4.4);
+const LOOK2_FROM = new THREE.Vector3(0.1, 0.35, -0.55);
+const LOOK2_TO = new THREE.Vector3(0.0, 0.4, -0.35);
+const FOV2 = 34;
 
 const clamp01 = (x: number) => Math.min(1, Math.max(0, x));
 const smooth = (a: number, b: number, x: number) => {
@@ -79,14 +88,16 @@ function doorOpen(t: number) {
   const e = u < 0.35 ? (u / 0.35) ** 2 * 0.25 : u < 0.8 ? 0.25 + ((u - 0.35) / 0.45) * 0.6 : 0.85 + 0.15 * (1 - (1 - (u - 0.8) / 0.2) ** 2);
   return DOOR_TRAVEL * e;
 }
-/** LED high-bay switch-on: a quick stutter, then full. */
+/** High-bay strike: a few stuttering flickers (each lamp its own rhythm), then a steady full on. */
+const FLICKER = 0.5;
 function flickerOn(t: number, t0: number, seed: number) {
   const d = t - t0;
   if (d < 0) return 0;
-  if (d > 0.16) return 1;
-  const pattern = [0.7, 0.1, 1, 0.35, 1];
-  const i = Math.min(pattern.length - 1, Math.floor((d / 0.16) * pattern.length));
-  return pattern[i] * (0.8 + 0.2 * hash(seed + i));
+  if (d > FLICKER) return 1;
+  const pattern = [0.85, 0, 0.15, 1, 0.05, 0, 0.6, 1, 0.3, 1, 1, 0.75];
+  const i = Math.min(pattern.length - 1, Math.floor((d / FLICKER) * pattern.length));
+  const jitter = hash(seed * 1.7 + i) < 0.25 ? 0.4 : 1; // some lamps drop out on a different beat
+  return pattern[i] * jitter * (0.8 + 0.2 * hash(seed + i));
 }
 
 function valueNoise(S: number) {
@@ -1133,12 +1144,21 @@ async function main() {
     updateEnv(`${Math.round(open * 4)}|${Math.round(bays * N_BAYS)}`);
     dustMat.uniforms.uAmb.value = 0;
 
-    // camera: one continuous move, eased, with a hint of dolly float
-    const u = smooth(-2.5, DURATION + 1.5, t);
-    camera.position.lerpVectors(CAM_FROM, CAM_TO, u);
+    // camera: shot 1 is one continuous eased push; at CUT a hard cut to the high side angle
+    if (t < CUT) {
+      const u = smooth(-2.5, 12.5 + 1.5, t);
+      camera.position.lerpVectors(CAM_FROM, CAM_TO, u);
+      tmp.lerpVectors(LOOK_FROM, LOOK_TO, u);
+      if (camera.fov !== FOV) { camera.fov = FOV; camera.updateProjectionMatrix(); }
+    } else {
+      const u = smooth(CUT - 1.5, DURATION + 1.0, t);
+      camera.position.lerpVectors(CAM2_FROM, CAM2_TO, u);
+      tmp.lerpVectors(LOOK2_FROM, LOOK2_TO, u);
+      if (camera.fov !== FOV2) { camera.fov = FOV2; camera.updateProjectionMatrix(); }
+    }
     camera.position.x += 0.004 * Math.sin(t * 1.3) + 0.002 * Math.sin(t * 2.9 + 1);
     camera.position.y += 0.003 * Math.sin(t * 1.1 + 2) + 0.0015 * Math.sin(t * 3.3);
-    camera.lookAt(tmp.lerpVectors(LOOK_FROM, LOOK_TO, u));
+    camera.lookAt(tmp);
     camera.updateMatrixWorld();
     sky.position.copy(camera.position);
 

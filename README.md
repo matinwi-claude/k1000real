@@ -96,15 +96,17 @@ To render it, run `npm run sunrise` while `npm run dev` is running; it takes the
 
 ## Hangar doors video (`tools/hangar-real.html`)
 
-A 12.5 s photoreal take on the hangar reveal, filmed as one continuous shot: a slow push in from the front-port three-quarter view.
+An 18 s photoreal take on the hangar reveal in two angles. It opens on a slow push in from the front-port three-quarter view:
 
 - The hangar starts dark, apart from an exit sign.
 - The big sliding doors in the side wall roll open.
 - Low sun pours in through hazy air. The light shafts and dust motes are ray-marched against a depth map from the sun, so the door edges and the airframe cut them.
 - The light sweeps across the aircraft from tail to nose and throws its shadow across the polished floor.
-- It ends on a small title.
+- The high-bay lights flicker on, row by row.
 
-Render it with `npm run hangar-real` (dev server running). It takes the same flags as the other renders. The timing, door travel, sun direction and camera move are constants at the top of `tools/hangar-real.ts`.
+Then it cuts to a high port-quarter angle that cranes down and round, showing the whole aircraft, and ends on a small title.
+
+Render it with `npm run hangar-real` (dev server running). It takes the same flags as the other renders. The timing, door travel, sun direction and both camera moves are constants at the top of `tools/hangar-real.ts`.
 
 ## Features
 
