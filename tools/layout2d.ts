@@ -16,6 +16,12 @@ export const VIEW_2D = { azimuth: -38, elevation: 30 };
 /** Not drawn: too small or purely internal plumbing. */
 export const EXCLUDE_2D = ['fasteners', 'wing-spar'];
 
+/** Drawn as part of another part (one outline, one hover target). */
+export const MERGE_2D: Record<string, string> = {
+  'pod-segment-port': 'boom-port',
+  'pod-segment-starboard': 'boom-starboard',
+};
+
 const WING_UP = 0.34;
 const wingOut = 0.75;
 const boomOut = 0.42;

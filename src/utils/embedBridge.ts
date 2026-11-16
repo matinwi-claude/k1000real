@@ -7,7 +7,7 @@
  * Commands are harmless view changes on a read-only visualization, so any origin may
  * send them. See EMBED.md for the full list.
  */
-import { getState, useStore, type CameraView, type LightingMode, type SectionAxis } from '../store';
+import { getState, useStore, type CameraView, type LightingMode } from '../store';
 import { COMPONENT_MAP, getComponent } from '../data/components';
 import { engineRef } from '../engine/engineRef';
 import { actions } from './actions';
@@ -42,9 +42,6 @@ function handle(cmd: string, value: unknown) {
     case 'xray':
       set({ view: value ? 'xray' : 'exterior' });
       return;
-    case 'section':
-      set({ section: (['top', 'side', 'front'] as const).includes(value as SectionAxis) ? (value as SectionAxis) : null });
-      return;
     case 'lighting':
       if (LIGHTS.includes(value as LightingMode)) set({ lighting: value as LightingMode });
       return;
@@ -52,7 +49,7 @@ function handle(cmd: string, value: unknown) {
       set({ autoRotate: !!value });
       return;
     case 'reset':
-      set({ selected: null, explode: 0, view: 'exterior', section: null, mode: 'explore', hidden: {} });
+      set({ selected: null, explode: 0, view: 'exterior', mode: 'explore', hidden: {} });
       engineRef.current?.setCameraView('reset');
       return;
   }

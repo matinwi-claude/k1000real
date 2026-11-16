@@ -28,10 +28,6 @@ export function ComponentInspector() {
           <dt>Group</dt>
           <dd>{spec.group}</dd>
         </div>
-        <div>
-          <dt>Material</dt>
-          <dd>{spec.material}</dd>
-        </div>
       </dl>
     </aside>
   );

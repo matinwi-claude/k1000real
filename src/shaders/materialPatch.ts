@@ -4,7 +4,6 @@
  *   - hover / selection highlight (fresnel-weighted accent lift)
  *   - dimming of non-selected components
  *   - X-RAY (fresnel rim, translucent) and INTERNAL (ghosted shell) views
- *   - hatched cut caps for CROSS-SECTION mode (back faces exposed by the clip plane)
  *   - smooth fade when components are hidden/shown
  *   - noise dissolve with a glowing edge (fixed-wing configuration drops the VTOL pods)
  * Runs after <opaque_fragment>, i.e. in linear HDR space before tone mapping.
@@ -12,7 +11,6 @@
 export const MATERIAL_PATCH_UNIFORMS = /* glsl */ `
 uniform float uXray;
 uniform float uGhost;
-uniform float uSection;
 uniform vec3 uCapA;
 uniform vec3 uCapB;
 uniform vec3 uAccent;
@@ -82,13 +80,6 @@ export const MATERIAL_PATCH_FRAGMENT = /* glsl */ `
     float kT = uDissolve * 1.12 - 0.06;
     if ( kDn < kT ) discard;
     kCol += vec3( 0.45, 0.75, 1.0 ) * 4.0 * ( 1.0 - smoothstep( 0.0, 0.05, kDn - kT ) );
-  }
-
-  // cut caps
-  if ( uSection > 0.5 && !gl_FrontFacing ) {
-    float kH = step( 0.5, fract( ( gl_FragCoord.x - gl_FragCoord.y ) / 9.0 ) );
-    kCol = mix( uCapA, uCapB, 0.18 + 0.22 * kH ) * ( 1.0 - 0.6 * uDim );
-    kA = max( kA, uFade );
   }
 
   gl_FragColor = vec4( kCol, kA );

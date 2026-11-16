@@ -4,7 +4,6 @@ import { BrandLogo, ExploreMore, StatusPanel } from './components/StatusPanel';
 import { SettingsMenu, ToolRail, ViewButtons } from './components/Controls';
 import { ComponentInspector } from './components/ComponentInspector';
 import { ExplodedView } from './components/ExplodedView';
-import { SectionControl } from './components/SectionControl';
 import { FrameMarks } from './components/FrameMarks';
 import { IntroOverlay } from './components/IntroOverlay';
 import { EngineerPanel, ExitChip, Letterbox, Toast } from './components/Misc';
@@ -26,7 +25,6 @@ export default function App() {
   const mode = useStore((s) => s.mode);
   const selected = useStore((s) => s.selected);
   const explode = useStore((s) => s.explode);
-  const section = useStore((s) => s.section);
   const embed = useStore((s) => s.embed);
   const lighting = useStore((s) => s.lighting);
 
@@ -39,7 +37,7 @@ export default function App() {
     cinematic && 'is-cinematic',
     `mode-${mode}`,
     selected && 'has-selection',
-    (explode > 0.001 || section) && 'has-dock',
+    explode > 0.001 && 'has-dock',
     embed && 'is-embed',
     lighting === 'sky' && 'is-sky',
   ]
@@ -61,7 +59,6 @@ export default function App() {
         <ComponentInspector />
         <div className="k-dock">
           <ExplodedView />
-          <SectionControl />
         </div>
       </div>
       <Letterbox />

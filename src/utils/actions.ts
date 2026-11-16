@@ -1,4 +1,4 @@
-import { getState, useStore, type CameraView, type InteractionMode, type LightingMode, type SectionAxis, type ViewMode } from '../store';
+import { getState, useStore, type CameraView, type InteractionMode, type LightingMode, type ViewMode } from '../store';
 import { engineRef } from '../engine/engineRef';
 import { COMPONENTS, getComponent } from '../data/components';
 import { sound } from './sound';
@@ -27,16 +27,6 @@ export const actions = {
     const cur = getState().view;
     set({ view: cur === v ? 'exterior' : v, interacted: true });
     sound.toggle();
-  },
-  toggleSection(axis?: SectionAxis) {
-    const cur = getState().section;
-    if (axis) set({ section: cur === axis ? null : axis });
-    else set({ section: cur ? null : 'top' });
-    set({ interacted: true });
-    sound.toggle();
-  },
-  setSectionOffset(v: number) {
-    set({ sectionOffset: v });
   },
   setLighting(l: LightingMode) {
     set({ lighting: l });

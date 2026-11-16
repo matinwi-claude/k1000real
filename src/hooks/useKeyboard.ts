@@ -34,7 +34,6 @@ export function useKeyboard() {
         case 'e': return actions.toggleExplode();
         case 'i': return actions.setMode('inspect');
         case 'x': return actions.toggleView('xray');
-        case 's': return actions.toggleSection();
         case 'l': return actions.cycleLighting();
         case 'r': return actions.toggleAutoRotate();
         case 'f': return actions.focusSelected();

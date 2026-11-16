@@ -15,7 +15,7 @@ import { contours } from 'd3-contour';
 import { buildDroneModel } from '../src/engine/DroneModel';
 import { createMaterialLibrary } from '../src/engine/materials';
 import { loadPartModels, type PartModels } from '../src/engine/PartModels';
-import { LAYOUT_2D, LAYOUT_2D_PORTRAIT, VIEW_2D, EXCLUDE_2D } from './layout2d';
+import { LAYOUT_2D, LAYOUT_2D_PORTRAIT, VIEW_2D, EXCLUDE_2D, MERGE_2D } from './layout2d';
 
 const VARIANT = new URLSearchParams(location.search).get('variant') === 'portrait' ? 'portrait' : 'landscape';
 const PLACES = VARIANT === 'portrait' ? { ...LAYOUT_2D, ...LAYOUT_2D_PORTRAIT } : LAYOUT_2D;
@@ -65,30 +65,33 @@ function run(cad: PartModels) {
       const cur = right.clone().multiplyScalar(c.dot(right)).add(up.clone().multiplyScalar(c.dot(up)));
       node.group.position.add(want.sub(cur));
     }
-    keep.push(node.id);
+    if (!MERGE_2D[node.id]) keep.push(node.id);
   }
   scene.updateMatrixWorld(true);
 
   // ── meshes that take part (opaque geometry only)
   const meshes: { mesh: THREE.Mesh; id: string; idx: number }[] = [];
   keep.forEach((id, i) => {
-    const node = model.nodes.get(id)!;
-    node.group.traverse((o) => {
-      const m = o as THREE.Mesh;
-      if ((o as THREE.Sprite).isSprite) o.visible = false;
-      if (!m.isMesh) return;
-      if ((m as unknown as THREE.InstancedMesh).isInstancedMesh) {
-        m.visible = false;
-        return;
-      }
-      const mat = m.material as THREE.Material;
-      if (mat.transparent || mat.depthWrite === false || (m.geometry as THREE.PlaneGeometry).type === 'PlaneGeometry') {
-        m.visible = false;
-        return;
-      }
-      if (m.userData.componentId !== id) return;
-      meshes.push({ mesh: m, id, idx: i + 1 });
-    });
+    // parts merged into this one (MERGE_2D) share its id and outline
+    const sources = [id, ...Object.keys(MERGE_2D).filter((k) => MERGE_2D[k] === id)];
+    for (const src of sources) {
+      model.nodes.get(src)!.group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if ((o as THREE.Sprite).isSprite) o.visible = false;
+        if (!m.isMesh) return;
+        if ((m as unknown as THREE.InstancedMesh).isInstancedMesh) {
+          m.visible = false;
+          return;
+        }
+        const mat = m.material as THREE.Material;
+        if (mat.transparent || mat.depthWrite === false || (m.geometry as THREE.PlaneGeometry).type === 'PlaneGeometry') {
+          m.visible = false;
+          return;
+        }
+        if (m.userData.componentId !== src) return;
+        meshes.push({ mesh: m, id, idx: i + 1 });
+      });
+    }
   });
   // fasteners hosted by visible parts
   for (const node of model.nodes.values()) for (const f of node.fastenerMeshes) f.visible = false;

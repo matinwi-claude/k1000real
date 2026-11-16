@@ -2,7 +2,6 @@ import { create } from 'zustand';
 
 export type InteractionMode = 'explore' | 'inspect';
 export type ViewMode = 'exterior' | 'xray';
-export type SectionAxis = 'top' | 'side' | 'front';
 export type LightingMode = 'studio' | 'sky' | 'night' | 'inspection';
 export type Configuration = 'fixed-wing' | 'evtol';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
@@ -29,8 +28,6 @@ export interface State {
 
   explode: number;
   view: ViewMode;
-  section: SectionAxis | null;
-  sectionOffset: number;
   lighting: LightingMode;
   autoRotate: boolean;
   freeCam: boolean;
@@ -82,8 +79,6 @@ export const useStore = create<State>((set, get) => ({
 
   explode: 0,
   view: 'exterior',
-  section: null,
-  sectionOffset: 0,
   lighting: 'studio',
   autoRotate: true,
   freeCam: false,

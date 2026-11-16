@@ -1,7 +1,7 @@
 /**
  * DroneEngine — owns the WebGL renderer, scene, camera rig, post-processing,
  * interaction (hover / click), and all animated state (explode, x-ray,
- * section, lighting, overlays). React talks to it through the zustand store and a
+ * lighting, overlays). React talks to it through the zustand store and a
  * handful of imperative methods (camera views, focus, stats).
  */
 import * as THREE from 'three';
@@ -16,8 +16,6 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 import { getState, useStore, type CameraView, type State } from '../store';
 import { COMPONENT_MAP, VTOL_ONLY } from '../data/components';
 
-/** Half-range of the cross-section cut slider per axis, in metres (illustrative scale). */
-export const SECTION_RANGE = { top: 0.15, side: 2.6, front: 1.3 } as const;
 import { LOWEST_Y } from '../data/layout';
 import { buildDroneModel, type ComponentNode, type DroneModel } from './DroneModel';
 import type { PartModels } from './PartModels';
@@ -100,11 +98,6 @@ export class DroneEngine {
   private explodeCur = 0;
   private xrayCur = 0;
   private ghostCur = 0;
-  private sectionAmt = 0;
-  private sectionActive = false;
-  private sectionAxis: 'top' | 'side' | 'front' = 'top';
-  private sectionPlane = new THREE.Plane(new THREE.Vector3(0, -1, 0), 10);
-  private sectionVisual!: THREE.Group;
   private viewOffsetCur = 0;
   private bobAmt = 1;
   private spinSpeed = 0;
@@ -191,13 +184,12 @@ export class DroneEngine {
 
     this.setupEnvironment();
     this.setupModel();
-    this.setupSectionVisual();
     this.bindEvents();
     this.resize();
 
     this.applyInitialCamera();
     this.unsub = useStore.subscribe((s, p) => this.onState(s, p));
-    this.onState(getState(), { ...getState(), lighting: 'studio', section: null, freeCam: false, selected: null } as State);
+    this.onState(getState(), { ...getState(), lighting: 'studio', freeCam: false, selected: null } as State);
     this.light = clonePreset(LIGHT_PRESETS[getState().lighting]);
     this.explodeCur = getState().explode;
     this.raf = requestAnimationFrame(this.loop);
@@ -338,27 +330,6 @@ export class DroneEngine {
     this.model.root.add(this.guides);
   }
 
-  private setupSectionVisual() {
-    const g = new THREE.Group();
-    const plane = new THREE.Mesh(
-      new THREE.PlaneGeometry(1, 1),
-      new THREE.MeshBasicMaterial({ color: '#4f9dff', transparent: true, opacity: 0.045, side: THREE.DoubleSide, depthWrite: false }),
-    );
-    const edge = new THREE.LineSegments(
-      new THREE.EdgesGeometry(new THREE.PlaneGeometry(1, 1)),
-      new THREE.LineBasicMaterial({ color: '#7fc0ff', transparent: true, opacity: 0.5 }),
-    );
-    const cross = new THREE.LineSegments(
-      new THREE.BufferGeometry().setAttribute('position', new THREE.Float32BufferAttribute([-0.5, 0, 0, 0.5, 0, 0, 0, -0.5, 0, 0, 0.5, 0], 3)),
-      new THREE.LineDashedMaterial({ color: '#7fc0ff', transparent: true, opacity: 0.35, dashSize: 0.02, gapSize: 0.015 }),
-    );
-    cross.computeLineDistances();
-    g.add(plane, edge, cross);
-    g.visible = false;
-    this.sectionVisual = g;
-    this.scene.add(g);
-  }
-
   // ─────────────────────────────────────────────────────────── camera
   private fitDistance() {
     // portrait screens: the long wing needs extra room horizontally
@@ -475,13 +446,6 @@ export class DroneEngine {
       this.configureControls(s.freeCam);
       if (!s.freeCam) this.setCameraView('reset');
     }
-    if (s.section !== p.section) {
-      if (s.section) {
-        this.sectionAxis = s.section;
-        this.enableSection(true);
-      }
-      // disabling is finished in the loop once the cut animates out
-    }
     if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration) this.pickDirty = true;
     if (s.configuration !== p.configuration && s.configuration === 'fixed-wing' && s.selected && VTOL_ONLY.has(s.selected)) {
       useStore.setState({ selected: null });
@@ -514,27 +478,6 @@ export class DroneEngine {
       useStore.setState({ wireframe: false, spinTest: false });
     }
     this.needsRender = true;
-  }
-
-  private enableSection(on: boolean) {
-    this.sectionActive = on;
-    this.renderer.localClippingEnabled = on;
-    globalUniforms.uSection.value = on ? 1 : 0;
-    for (const node of this.model.nodes.values()) {
-      for (const m of node.materials) {
-        if (on) {
-          if (m.userData.baseSide === undefined) m.userData.baseSide = m.side;
-          m.clippingPlanes = [this.sectionPlane];
-          m.side = THREE.DoubleSide;
-        } else {
-          m.clippingPlanes = null;
-          m.side = m.userData.baseSide ?? THREE.FrontSide;
-        }
-        m.needsUpdate = true;
-      }
-    }
-    this.sectionVisual.visible = on;
-    this.pickDirty = true;
   }
 
   // ─────────────────────────────────────────────────────────── events
@@ -717,11 +660,9 @@ export class DroneEngine {
   private pick(): THREE.Intersection | null {
     if (this.pickDirty) this.rebuildPickTargets();
     this.raycaster.setFromCamera(this.pointer, this.camera);
-    const clip = this.sectionActive && this.sectionAmt > 0.02;
-    (this.raycaster as THREE.Raycaster & { firstHitOnly?: boolean }).firstHitOnly = !clip;
+    (this.raycaster as THREE.Raycaster & { firstHitOnly?: boolean }).firstHitOnly = true;
     const hits = this.raycaster.intersectObjects(this.pickTargets, false);
     for (const h of hits) {
-      if (clip && this.sectionPlane.distanceToPoint(h.point) < 0) continue;
       if (!h.object.userData.componentId) continue;
       return h;
     }
@@ -846,8 +787,6 @@ export class DroneEngine {
     globalUniforms.uXray.value = this.xrayCur;
     globalUniforms.uGhost.value = this.ghostCur;
 
-    // ── section
-    if (this.sectionActive) active = this.updateSection(s, k) || active;
 
     // ── bob / idle float
     const bobT = !this.reducedMotion && (s.autoRotate || s.presentation || s.cinematic) ? 1 : 0;
@@ -969,48 +908,6 @@ export class DroneEngine {
       sp.scale.setScalar(0.05 + night * 0.07);
     }
     document.documentElement.style.setProperty('--vignette', L.vignette.toFixed(3));
-  }
-
-  private updateSection(s: State, k: number) {
-    const on = !!s.section;
-    if (s.section) this.sectionAxis = s.section;
-    this.sectionAmt = approach(this.sectionAmt, on ? 1 : 0, k);
-    const axis = this.sectionAxis;
-    const range = SECTION_RANGE[axis];
-    const base = axis === 'top' ? 0.05 : axis === 'front' ? -0.25 : 0;
-    const cut = base + s.sectionOffset * range;
-    const far = axis === 'top' ? 1.0 : axis === 'side' ? 3.2 : 1.6;
-    const c = far + (cut - far) * easeInOut(clamp(this.sectionAmt, 0, 1));
-    const n = axis === 'top' ? new THREE.Vector3(0, -1, 0) : axis === 'side' ? new THREE.Vector3(-1, 0, 0) : new THREE.Vector3(0, 0, -1);
-    this.sectionPlane.normal.copy(n);
-    this.sectionPlane.constant = c;
-    // visual quad
-    const v = this.sectionVisual;
-    v.position.set(0, 0, 0);
-    v.rotation.set(0, 0, 0);
-    if (axis === 'top') {
-      v.rotation.x = -Math.PI / 2;
-      v.position.set(0, c, -0.25);
-      v.scale.set(5.6, 3.2, 1);
-    } else if (axis === 'side') {
-      v.rotation.y = Math.PI / 2;
-      v.position.set(c, 0.1, -0.25);
-      v.scale.set(3.2, 0.95, 1);
-    } else {
-      v.position.set(0, 0.1, c);
-      v.scale.set(5.6, 0.95, 1);
-    }
-    v.children.forEach((ch) => {
-      const m = (ch as THREE.Mesh).material as THREE.Material & { opacity: number };
-      if (m.userData.base === undefined) m.userData.base = m.opacity;
-      m.opacity = m.userData.base * this.sectionAmt;
-    });
-    if (!on && this.sectionAmt < 0.01) {
-      this.sectionAmt = 0;
-      this.enableSection(false);
-      return true;
-    }
-    return Math.abs(this.sectionAmt - (on ? 1 : 0)) > 0.001 || true;
   }
 
   private updateComponents(s: State, k: number, dt: number) {

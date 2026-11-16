@@ -18,32 +18,26 @@ export interface AtlasLabel {
   kind: 'group' | 'detail';
 }
 
-const LIFT_PORT = ['boom-port', 'pod-segment-port', 'lift-motor-02', 'lift-motor-03', 'lift-prop-02', 'lift-prop-03'];
-const LIFT_STBD = ['boom-starboard', 'pod-segment-starboard', 'lift-motor-01', 'lift-motor-04', 'lift-prop-01', 'lift-prop-04'];
+const LIFT_PORT = ['boom-port', 'lift-motor-02', 'lift-motor-03', 'lift-prop-02', 'lift-prop-03'];
+const LIFT_STBD = ['boom-starboard', 'lift-motor-01', 'lift-motor-04', 'lift-prop-01', 'lift-prop-04'];
 
 export const LABELS: AtlasLabel[] = [
-  { kind: 'group', text: 'Outer Wing', sub: 'Port · solar', ids: ['wing-port', 'solar-port', 'aileron-port', 'pitot'], at: [1330, 248] },
-  { kind: 'group', text: 'Outer Wing', sub: 'Starboard · solar', ids: ['wing-starboard', 'solar-starboard', 'aileron-starboard'], at: [70, 690] },
+  { kind: 'group', text: 'Portside Wing', ids: ['wing-port', 'solar-port', 'aileron-port', 'pitot'], at: [1330, 248] },
+  { kind: 'group', text: 'Starboard Wing', ids: ['wing-starboard', 'solar-starboard', 'aileron-starboard'], at: [70, 690] },
   { kind: 'group', text: 'Center Wing', ids: ['wing-center'], at: [668, 296] },
-  { kind: 'group', text: 'VTOL Pod', sub: 'Port', ids: LIFT_PORT, at: [1238, 478] },
-  { kind: 'group', text: 'VTOL Pod', sub: 'Starboard', ids: LIFT_STBD, at: [640, 700] },
+  { kind: 'group', text: 'VTOL', ids: LIFT_PORT, at: [1238, 478] },
+  { kind: 'group', text: 'VTOL', ids: LIFT_STBD, at: [640, 700] },
   {
     kind: 'group',
     text: 'Tail',
     ids: ['tail-boom', 'rudder', 'horizontal-stabilizer', 'elevator', 'solar-tail'],
     at: [646, 178],
   },
-  {
-    kind: 'group',
-    text: 'Fuselage',
-    ids: ['fuselage', 'avionics-hatch', 'antenna-01', 'antenna-02', 'battery'],
-    at: [962, 458],
-  },
 
-  { kind: 'detail', text: 'HD40', ids: ['eo-ir'], row: true },
+  { kind: 'detail', text: 'HD40 LVV', ids: ['eo-ir'], row: true },
   { kind: 'detail', text: 'Battery', ids: ['battery'], row: true },
   { kind: 'detail', text: 'ATNE', ids: ['atne'], row: true },
-  { kind: 'detail', text: 'Starlink', ids: ['starlink'], row: true },
-  { kind: 'detail', text: 'Silvus Tx', ids: ['silvus'], row: true },
+  { kind: 'detail', text: 'StarShield', ids: ['starlink'], row: true },
+  { kind: 'detail', text: 'Silvus 4200', ids: ['silvus'], row: true },
   { kind: 'detail', text: 'Silvus 4400', ids: ['silvus-4400'], row: true },
 ];

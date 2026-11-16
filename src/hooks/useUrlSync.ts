@@ -15,8 +15,6 @@ export function useUrlSync() {
         s.explode === p.explode &&
         s.view === p.view &&
         s.lighting === p.lighting &&
-        s.section === p.section &&
-        s.sectionOffset === p.sectionOffset &&
         s.presentation === p.presentation &&
         s.camParam === p.camParam
       )

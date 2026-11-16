@@ -1,4 +1,4 @@
-import type { LightingMode, SectionAxis, State } from '../store';
+import type { LightingMode, State } from '../store';
 import { COMPONENT_MAP } from '../data/components';
 
 /**
@@ -6,7 +6,6 @@ import { COMPONENT_MAP } from '../data/components';
  *   mode=inspection             component=motor-04
  *   view=exploded,xray          explode=0..1
  *   light=studio|sky|night|inspection
- *   section=top|side|front      cut=-1..1
  *   present=1  cam=px,py,pz,tx,ty,tz
  */
 export function readUrlState(search = window.location.search): Partial<State> {
@@ -23,10 +22,6 @@ export function readUrlState(search = window.location.search): Partial<State> {
   if (ex !== null && Number.isFinite(Number(ex))) out.explode = Math.min(1, Math.max(0, Number(ex)));
   const light = q.get('light') as LightingMode | null;
   if (light && ['studio', 'sky', 'night', 'inspection'].includes(light)) out.lighting = light;
-  const section = q.get('section') as SectionAxis | null;
-  if (section && ['top', 'side', 'front'].includes(section)) out.section = section;
-  const cut = q.get('cut');
-  if (cut !== null && Number.isFinite(Number(cut))) out.sectionOffset = Math.min(1, Math.max(-1, Number(cut)));
   if (q.get('present') === '1') out.presentation = true;
   const cam = q.get('cam');
   if (cam) out.camParam = cam;
@@ -53,10 +48,6 @@ export function writeUrlState(s: State) {
   if (views.length) q.set('view', views.join(','));
   if (s.explode > 0.001 && s.explode < 0.999) q.set('explode', s.explode.toFixed(2));
   if (s.lighting !== 'studio') q.set('light', s.lighting);
-  if (s.section) {
-    q.set('section', s.section);
-    if (Math.abs(s.sectionOffset) > 0.001) q.set('cut', s.sectionOffset.toFixed(2));
-  }
   if (s.presentation) q.set('present', '1');
   if (s.camParam && s.interacted) q.set('cam', s.camParam);
   const str = q.toString().replace(/%2C/g, ',');

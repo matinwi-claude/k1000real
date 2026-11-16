@@ -629,7 +629,7 @@ export const COMPONENTS: DroneComponent[] = [
   // ───────────────────────── CAMERA
   {
     id: 'eo-ir',
-    name: 'HD40',
+    name: 'HD40 LVV',
     category: 'payload',
     system: 'ISR Imaging',
     type: 'Stabilised EO/IR Gimbal',
@@ -670,12 +670,12 @@ export const COMPONENTS: DroneComponent[] = [
 
   {
     id: 'starlink',
-    name: 'Starlink',
+    name: 'StarShield',
     category: 'payload',
     system: 'Mission Payload',
-    type: 'Starlink Terminal',
+    type: 'StarShield Terminal',
     partNumber: 'K1-PLD-S01',
-    description: 'Starlink satellite terminal payload.',
+    description: 'StarShield satellite terminal payload.',
     position: [0, 0, -0.33],
     location: 'Payload',
     relatedComponents: [],
@@ -708,10 +708,10 @@ export const COMPONENTS: DroneComponent[] = [
   },
   {
     id: 'silvus',
-    name: 'Silvus Tx',
+    name: 'Silvus 4200',
     category: 'communications',
     system: 'Communications',
-    type: 'Silvus OEM Radio',
+    type: 'Silvus 4200 OEM Radio',
     partNumber: 'K1-COM-S01',
     description: 'Silvus OEM radio module.',
     position: [0, -0.025, -0.039],

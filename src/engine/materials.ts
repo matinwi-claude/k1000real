@@ -6,7 +6,6 @@ import { MATERIAL_PATCH_FRAGMENT, MATERIAL_PATCH_UNIFORMS, MATERIAL_PATCH_VERTEX
 export const globalUniforms = {
   uXray: { value: 0 },
   uGhost: { value: 0 },
-  uSection: { value: 0 },
   uCapA: { value: new THREE.Color('#1a3550') },
   uCapB: { value: new THREE.Color('#6fb7ff') },
   uAccent: { value: new THREE.Color('#5aa8ff') },

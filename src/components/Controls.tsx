@@ -28,7 +28,6 @@ function RailButton({ active, onClick, icon, label, hint }: { active?: boolean; 
 export function ToolRail() {
   const explode = useStore((s) => s.explode);
   const view = useStore((s) => s.view);
-  const section = useStore((s) => s.section);
   const embed = useStore((s) => s.embed);
   const embedOpen = useStore((s) => s.embedOpen);
   return (
@@ -36,7 +35,6 @@ export function ToolRail() {
       <div className="k-rail-group">
         <RailButton active={explode > 0.01} onClick={actions.toggleExplode} icon={<IconExplode />} label="EXPLODE" hint="E" />
         <RailButton active={view === 'xray'} onClick={() => actions.toggleView('xray')} icon={<IconXray />} label="X-RAY" hint="X" />
-        <RailButton active={!!section} onClick={() => actions.toggleSection()} icon={<IconSection />} label="SECTION" hint="S" />
       </div>
       {!embed && (
         <>
@@ -150,7 +148,6 @@ export function SettingsMenu() {
               <span><kbd>I</kbd> inspect</span>
               <span><kbd>L</kbd> lighting</span>
               <span><kbd>X</kbd> x-ray</span>
-              <span><kbd>S</kbd> section</span>
               <span><kbd>F</kbd> focus</span>
               <span><kbd>H</kbd> hide part</span>
               <span><kbd>ESC</kbd> back</span>

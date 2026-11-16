@@ -1,6 +1,6 @@
 # K1000 Interactive
 
-An explorable digital-twin website for the **Kraus Hamdani Aerospace K1000ULE**, a solar-recharged eVTOL UAV that flies for a very long time. The whole site is the aircraft: rotate it, zoom in on tiny parts, explode it, X-ray it, cut sections through it and inspect any of its 43 components.
+An explorable digital-twin website for the **Kraus Hamdani Aerospace K1000ULE**, a solar-recharged eVTOL UAV that flies for a very long time. The whole site is the aircraft: rotate it, zoom in on tiny parts, explode it, X-ray it and inspect any of its 43 components.
 
 Built with React, TypeScript, Vite and Three.js, and deployed on Cloudflare Workers (static assets + a tiny `/api/status` Worker).
 
@@ -88,12 +88,11 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 - **Views:**
   - **Exploded:** animated, staggered separation of the assemblies, controlled with an ASSEMBLY slider. Guide lines connect each part to where it belongs.
   - **X-ray:** fresnel-style see-through rendering.
-  - **Cross-section:** cut from the top, side or front with a slider, showing hatched cut faces.
 - **Tools:**
   - Lighting presets: Studio, Sky, Night and Inspection.
 - **Shareable URL state:**
   - `?mode=inspection&component=lift-motor-04`
-  - `?view=exploded` · `?view=xray` · `?section=side&cut=0.2`
+  - `?view=exploded` · `?view=xray`
   - `?light=night&cam=…`
   - Use **Copy link** in settings.
 - **Easter eggs:**
@@ -104,7 +103,7 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 
 ### Keyboard
 
-`1–5` views · `E` explode · `I` inspect · `X` x-ray · `S` section · `L` lighting · `R` auto-rotate · `F` focus · `H` hide part · `Esc` back
+`1–5` views · `E` explode · `I` inspect · `X` x-ray · `L` lighting · `R` auto-rotate · `F` focus · `H` hide part · `Esc` back
 
 ## Performance
 
@@ -117,11 +116,11 @@ An exploded, isometric line drawing of every part, styled like a technical broch
 ```
 src/
   components/   DroneViewer, ComponentInspector, Controls, ExplodedView,
-                SectionControl, StatusPanel, IntroOverlay, …
+                StatusPanel, IntroOverlay, …
   data/         components.ts (component database), layout.ts (traced proportions)
   engine/       DroneEngine (renderer, camera, interaction, animation), DroneModel (generated model),
                 GltfModel (real-model loader), Hud (SVG overlay), materials, lighting, geometry, textures
-  shaders/      material patch (highlight / x-ray / ghost / section caps), floor grid
+  shaders/      material patch (highlight / x-ray / ghost / dissolve), floor grid
   hooks/        idle fade, keyboard, URL sync
   utils/        actions, URL state, sound
 worker/         index.ts — Cloudflare Worker (/api/status), assets served from dist/

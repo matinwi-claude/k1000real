@@ -74,7 +74,6 @@ viewer.select('eo-ir');        // fly to and inspect a component (null clears)
 viewer.view('top');              // reset | front | side | top | bottom
 viewer.explode(1);               // 0 = assembled … 1 = fully exploded
 viewer.send('xray', true);       // x-ray on/off
-viewer.send('section', 'side');  // top | side | front | null
 viewer.send('lighting', 'night');
 viewer.send('mode', 'inspect');  // explore | inspect
 viewer.send('autoRotate', false);
