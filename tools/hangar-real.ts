@@ -6,7 +6,7 @@
  * behind the aircraft roll apart; low sun pours in through the haze, sweeps across the airframe
  * and throws its shadow toward the lens. Then the
  * high-bay lights flicker on row by row. Then a cut to a high port-quarter angle that cranes down
- * and round, revealing the whole aircraft, with a small title at the end.
+ * and round, revealing the whole aircraft.
  *
  * Rendered offline one deterministic frame at a time (tools/render-hangar.mjs). Open
  * /tools/hangar-real.html?t=7 in the dev server to preview one moment.
@@ -38,12 +38,11 @@ const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
 
 // ── timeline (seconds)
-const DURATION = 18;
-const DOOR_START = 1.0;
-const DOOR_END = 9.6;
-const ROW_ON = [8.5, 8.75, 9.0, 9.25]; // high-bay rows, back to front
-const CUT = 10.0; // cut to the second angle once every high bay has flickered on
-const TITLE_IN = 14.6;
+const DURATION = 12;
+const DOOR_START = 0.6;
+const DOOR_END = 6.8;
+const ROW_ON = [5.7, 5.9, 6.1, 6.3]; // high-bay rows, back to front
+const CUT = 7.0; // cut to the second angle once every high bay has flickered on
 
 // ── hangar (metres; aircraft nose toward +Z, port = +X; the doors are in the starboard wall, x = HX0)
 const HX0 = -14;
@@ -1050,46 +1049,6 @@ async function main() {
     renderer.setRenderTarget(null);
   };
 
-  // ── end title
-  const hud = new THREE.Scene();
-  const hudCam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  await document.fonts.load('300 80px Inter').catch(() => undefined);
-  await document.fonts.load('400 24px Inter').catch(() => undefined);
-  const logo = new Image();
-  logo.src = '/brand/kraus-hamdani-aerospace.png';
-  await logo.decode().catch(() => undefined);
-  const titleCanvas = document.createElement('canvas');
-  titleCanvas.width = W;
-  titleCanvas.height = H;
-  {
-    const g = titleCanvas.getContext('2d')!;
-    const s = H / 1080;
-    const x0 = 120 * s;
-    const yb = H - 150 * s;
-    g.fillStyle = '#fff';
-    g.textAlign = 'left';
-    g.textBaseline = 'alphabetic';
-    g.font = `300 ${Math.round(74 * s)}px Inter`;
-    (g as unknown as { letterSpacing: string }).letterSpacing = `${Math.round(16 * s)}px`;
-    g.fillText('K1000ULE', x0, yb);
-    g.fillStyle = 'rgba(255,255,255,0.75)';
-    g.fillRect(x0, yb + 26 * s, 64 * s, 2 * s);
-    g.font = `400 ${Math.round(21 * s)}px Inter`;
-    (g as unknown as { letterSpacing: string }).letterSpacing = `${Math.round(7 * s)}px`;
-    g.fillStyle = 'rgba(255,255,255,0.72)';
-    g.fillText('ULTRA LONG ENDURANCE  ·  SOLAR eVTOL', x0, yb + 70 * s);
-    if (logo.naturalWidth) {
-      const lw = 190 * s;
-      const lh = (lw * logo.naturalHeight) / logo.naturalWidth;
-      g.globalAlpha = 0.8;
-      g.drawImage(logo, W - 120 * s - lw, yb + 52 * s - lh, lw, lh);
-    }
-  }
-  const titleTex = new THREE.CanvasTexture(titleCanvas);
-  titleTex.colorSpace = THREE.SRGBColorSpace;
-  const titleMat = new THREE.MeshBasicMaterial({ map: titleTex, transparent: true, opacity: 0, toneMapped: false, depthTest: false });
-  hud.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), titleMat));
-
   // ── image-based lighting: the hangar seen from the aircraft (without it), rebuilt as light changes
   const pmrem = new THREE.PMREMGenerator(renderer);
   let envRT: THREE.WebGLRenderTarget | null = null;
@@ -1146,7 +1105,7 @@ async function main() {
 
     // camera: shot 1 is one continuous eased push; at CUT a hard cut to the high side angle
     if (t < CUT) {
-      const u = smooth(-2.5, 12.5 + 1.5, t);
+      const u = smooth(-2.0, CUT + 3.0, t);
       camera.position.lerpVectors(CAM_FROM, CAM_TO, u);
       tmp.lerpVectors(LOOK_FROM, LOOK_TO, u);
       if (camera.fov !== FOV) { camera.fov = FOV; camera.updateProjectionMatrix(); }
@@ -1169,12 +1128,7 @@ async function main() {
     composite.uniforms.uAmbHaze.value.set(0.55, 0.6, 0.66).multiplyScalar(0.004 + 0.012 * openFrac + 0.015 * bays);
 
     grade.uniforms.uTime.value = t;
-    titleMat.opacity = smooth(TITLE_IN, TITLE_IN + 0.9, t);
-    renderer.autoClear = true;
     composer.render();
-    renderer.autoClear = false;
-    renderer.render(hud, hudCam);
-    renderer.autoClear = true;
     return renderer.domElement.toDataURL('image/png');
   };
 
