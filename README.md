@@ -15,6 +15,16 @@ npm run build            # typecheck + production build → dist/
 npm run preview:worker   # build, then run the real Worker + static assets locally (wrangler dev)
 ```
 
+## Password for the 3D viewer
+
+The 2D parts atlas (`/parts`) is public. The 3D viewer and its model file need a password: the browser shows its own login prompt (any user name, unless `VIEWER_USER` is set). Set the password once as a Worker secret — until it is set, the 3D viewer answers with a "password has not been set" page:
+
+```bash
+npx wrangler secret put VIEWER_PASSWORD
+```
+
+Run the same command again to change it. Locally, put `VIEWER_PASSWORD=...` in a `.dev.vars` file (git-ignored) for `npm run preview:worker`.
+
 ## Deploy to Cloudflare
 
 The site deploys as a **Cloudflare Worker with Static Assets**. Everything is set in `wrangler.toml`:

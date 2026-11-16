@@ -1,6 +1,7 @@
 # Cloudflare Worker + Static Assets.
 # `wrangler deploy` runs the Vite build (see [build]) and uploads ./dist as static
-# assets. The Worker script only handles /api/* (e.g. /api/status).
+# assets. The Worker runs first for every request: the 3D viewer is password protected
+# (set it with `npx wrangler secret put VIEWER_PASSWORD`); the 2D parts atlas is public.
 name = "k1000real"
 main = "worker/index.ts"
 compatibility_date = "2026-09-01"
@@ -12,7 +13,7 @@ command = "npm run build"
 directory = "./dist"
 binding = "ASSETS"
 not_found_handling = "single-page-application"
-run_worker_first = ["/api/*"]
+run_worker_first = true
 
 [observability]
 enabled = true
