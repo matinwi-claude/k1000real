@@ -1,6 +1,7 @@
 /**
  * Hangar reveal: a short cinematic of the K1000ULE in a dark hangar while rows of
  * ceiling light strips switch on from front to back, then floor-standing LED panels.
+ * Once they are all on, it cuts to a high side view that orbits slowly round the whole aircraft.
  *
  * Rendered offline, one deterministic frame at a time: tools/render-hangar.mjs opens
  * this page with Playwright, calls window.__render(t) for every frame and encodes
@@ -31,8 +32,8 @@ declare global {
 const Q = new URLSearchParams(location.search);
 const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
-const SHOT1 = 6; // head-on reveal
-const SHOT2 = 2.6; // elevated three-quarter view from the front port side
+const SHOT1 = 4.4; // head-on reveal; cut once every strip and floor panel has flickered on
+const SHOT2 = 6.6; // high side view of the whole aircraft
 const DURATION = SHOT1 + SHOT2;
 
 // ── hangar layout (metres; aircraft nose toward +Z, camera in front of it)
@@ -45,11 +46,12 @@ const STAND_TOP = 1.05; // fuselage belly height on the display stand
 const CAM_START = new THREE.Vector3(0, 0.82, 7.3);
 const CAM_END = new THREE.Vector3(0, 0.8, 6.8);
 const CAM_LOOK = new THREE.Vector3(0, 1.6, 0);
-// shot 2: orbit slowly around the aircraft from above and to the side
-const ORBIT_LOOK = [new THREE.Vector3(-0.6, 0.75, -0.1), new THREE.Vector3(0.15, 0.72, 0.15)];
-const ORBIT_HEIGHT = [2.95, 2.85];
-const ORBIT_RADIUS = [6.4, 6.25];
-const ORBIT_AZIMUTH = [(-58 * Math.PI) / 180, (-46 * Math.PI) / 180]; // 0 = straight ahead of the nose, negative = port side
+// shot 2: high on the port side, just under the light strips, a slow orbit round toward the nose
+const ORBIT_LOOK = [new THREE.Vector3(0, 0.7, -0.4), new THREE.Vector3(0, 0.7, -0.2)];
+const ORBIT_HEIGHT = [3.2, 3.1]; // just under the light strips
+const ORBIT_RADIUS = [5.4, 5.1];
+const ORBIT_AZIMUTH = [(-92 * Math.PI) / 180, (-72 * Math.PI) / 180]; // 0 = straight ahead of the nose, negative = port side
+const FOV2 = 48;
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -513,8 +515,12 @@ async function main() {
       const u = smooth(0, SHOT1, t);
       camera.position.lerpVectors(CAM_START, CAM_END, u);
       camera.lookAt(CAM_LOOK);
+      if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
     } else {
-      const u = (t - SHOT1) / SHOT2; // linear drift, so the cut lands on a moving camera
+      if (camera.fov !== FOV2) { camera.fov = FOV2; camera.updateProjectionMatrix(); }
+      // eases out only, so the cut lands on a moving camera
+      const v = (t - SHOT1) / SHOT2;
+      const u = v * (2 - v) * 0.85 + v * 0.15;
       const lerp = (r: number[]) => r[0] + (r[1] - r[0]) * u;
       const az = lerp(ORBIT_AZIMUTH);
       const rad = lerp(ORBIT_RADIUS);
