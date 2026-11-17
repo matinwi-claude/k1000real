@@ -75,7 +75,7 @@ Single parts can be swapped for real CAD while every other part keeps its genera
    - `offset`: metres to shift the part after conversion, so it lines up with the rest of the aircraft.
    - `default`: the component id and material for the whole file.
    - `pieces` (optional): send some of the file's separate bodies to other components. Rules use the source coordinates, e.g. `{ "min_z_gt": -20, "center_x_gt": 40 }`.
-3. Run `python3 tools/import-parts.py`. It needs `pip install trimesh scipy networkx rtree fast-simplification` and Node. Add `"keep": 0.3` to a source to simplify heavy meshes to that fraction of their triangles. It writes `public/models/parts.glb`, which the viewer loads automatically.
+3. Run `python3 tools/import-parts.py`. It needs `pip install trimesh scipy networkx rtree fast-simplification` and Node. CAD that arrives as STEP is converted first with `python3 tools/step-to-stl.py in.step out.stl` (needs `pip install cadquery-ocp`). Add `"keep": 0.3` to a source to simplify heavy meshes to that fraction of their triangles. It writes `public/models/parts.glb`, which the viewer loads automatically.
 4. Regenerate the 2D drawing (see below) so the parts atlas shows the new geometry.
 
 ## 2D parts atlas (`/parts`)

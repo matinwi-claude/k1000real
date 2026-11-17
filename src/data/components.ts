@@ -669,6 +669,24 @@ export const COMPONENTS: DroneComponent[] = [
   },
 
   {
+    id: 'nsp3',
+    name: 'NSP-3',
+    category: 'payload',
+    system: 'Mission Payload',
+    type: 'NSP-3 V2 Antenna Pod',
+    partNumber: 'K1-PLD-N01',
+    description: 'NSP-3 V2 antenna pod payload.',
+    position: [0, 0, 0],
+    location: 'Payload',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
+  {
     id: 'starlink',
     name: 'StarShield',
     category: 'payload',
@@ -766,6 +784,7 @@ const SPECS: Record<string, SpecSheet> = {
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },
   starlink: { group: 'Payload', material: 'Aluminum' },
+  nsp3: { group: 'Payload', material: 'Aluminum' },
   silvus: { group: 'Feature', material: 'Aluminum' },
   'silvus-4400': { group: 'Feature', material: 'Aluminum' },
 };

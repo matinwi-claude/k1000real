@@ -717,6 +717,27 @@
         "id": "starlink",
         "material": "grey"
       }
+    },
+    {
+      "file": "nsp3-antenna-pod.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "keep": 0.5,
+      "$comment": "NSP-3 V2 antenna pod (converted from nsp3-antenna-pod.step with tools/step-to-stl.py): 2D atlas only",
+      "default": {
+        "id": "nsp3",
+        "material": "grey"
+      }
     }
   ]
 }

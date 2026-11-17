@@ -36,6 +36,7 @@ export const LABELS: AtlasLabel[] = [
 
   { kind: 'detail', text: 'HD40 LVV', ids: ['eo-ir'], row: true },
   { kind: 'detail', text: 'Battery', ids: ['battery'], row: true },
+  { kind: 'detail', text: 'NSP-3', ids: ['nsp3'], row: true },
   { kind: 'detail', text: 'ATNE', ids: ['atne'], row: true },
   { kind: 'detail', text: 'StarShield', ids: ['starlink'], row: true },
   { kind: 'detail', text: 'Silvus 4200', ids: ['silvus'], row: true },
