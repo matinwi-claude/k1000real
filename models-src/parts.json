@@ -731,7 +731,7 @@
         0.0598,
         -0.105
       ],
-      "keep": 0.5,
+      "keep": 0.25,
       "$comment": "SAR pod (NSP-3 V2, converted from nsp3-antenna-pod.step with tools/step-to-stl.py): under the starboard center wing",
       "default": {
         "id": "sar",

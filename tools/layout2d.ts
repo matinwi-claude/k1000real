@@ -65,13 +65,13 @@ export const LAYOUT_2D: Record<string, Place> = {
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
   // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
-  'eo-ir': { screen: [0.15, -1.15], scale: 1.75 },
-  battery: { screen: [0.62, -1.15], scale: 1.0 },
-  sar: { screen: [1.09, -1.15], scale: 0.56 },
-  atne: { screen: [1.56, -1.1], scale: 0.85 },
-  starlink: { screen: [2.03, -1.15], scale: 0.95 },
-  silvus: { screen: [2.48, -1.15], scale: 3.0 },
-  'silvus-4400': { screen: [2.9, -1.15], scale: 2.8 },
+  'eo-ir': { screen: [-0.2, -1.15], scale: 1.75 },
+  battery: { screen: [0.33, -1.15], scale: 1.0 },
+  sar: { screen: [0.86, -1.15], scale: 0.56 },
+  atne: { screen: [1.39, -1.1], scale: 0.85 },
+  starlink: { screen: [1.92, -1.15], scale: 0.95 },
+  silvus: { screen: [2.43, -1.15], scale: 3.0 },
+  'silvus-4400': { screen: [2.92, -1.15], scale: 2.8 },
 };
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */

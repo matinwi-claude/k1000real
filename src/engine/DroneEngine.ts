@@ -40,8 +40,8 @@ const easeInOut = (t: number) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t 
 const clamp = (x: number, a: number, b: number) => Math.min(b, Math.max(a, x));
 const approach = (cur: number, target: number, k: number) => cur + (target - cur) * k;
 
-/** Parts that show a dashed guide line back to where they belong when exploded. */
-const GUIDE_IDS = new Set(['battery', 'eo-ir']);
+/** Payloads that show a dashed guide line back to where they belong when exploded. */
+const GUIDE_IDS = new Set(['battery', 'eo-ir', 'sar']);
 
 export interface EngineDom {
   /** optional real model (glTF scene) that replaces the procedural geometry */

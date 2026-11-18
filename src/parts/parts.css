@@ -171,7 +171,8 @@
   text-transform: uppercase;
 }
 .pa-label.detail b {
-  font-size: 11px;
+  /* shrinks a little on mid-size screens so the loose-part row never collides */
+  font-size: clamp(9.5px, 0.78vw, 11px);
   font-weight: 500;
   letter-spacing: 0.02em;
   color: var(--pa-text);
