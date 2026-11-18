@@ -23,7 +23,7 @@ The 2D parts atlas (`/parts`) is public. The 3D viewer and its model file need a
 npx wrangler secret put VIEWER_PASSWORD
 ```
 
-Run the same command again to change it. Locally, put `VIEWER_PASSWORD=...` in a `.dev.vars` file (git-ignored) for `npm run preview:worker`.
+Run the same command again to change it. If the site is a Cloudflare **Pages** project, `functions/_middleware.ts` applies the same gate: add `VIEWER_PASSWORD` under the project's Settings → Variables and Secrets, as an encrypted (secret) value. Locally, put `VIEWER_PASSWORD=...` in a `.dev.vars` file (git-ignored) for `npm run preview:worker`.
 
 ## Deploy to Cloudflare
 

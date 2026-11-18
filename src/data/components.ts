@@ -676,7 +676,7 @@ export const COMPONENTS: DroneComponent[] = [
     type: 'SAR Pod (NSP-3 V2)',
     partNumber: 'K1-PLD-N01',
     description: 'SAR payload pod mounted under the starboard center wing, just behind the leading edge.',
-    position: [-0.5, 0.06, 0.28],
+    position: [-0.5, 0.084, 0.22],
     location: 'Under the starboard center wing',
     relatedComponents: ['wing-center'],
     status: 'operational',
