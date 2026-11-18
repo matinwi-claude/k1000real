@@ -625,6 +625,23 @@ export const COMPONENTS: DroneComponent[] = [
     explode: [0.25, -0.15, 0.3],
     explodeDelay: 0.2,
   },
+  {
+    id: 'pitot-tail',
+    name: 'Tail Pitot',
+    category: 'sensors',
+    system: 'Air Data',
+    type: 'Airspeed Probe',
+    partNumber: 'K1-SNS-P02',
+    description: 'Forward-facing pitot probe near the top of the vertical fin leading edge.',
+    position: [0, 0.452, -1.578],
+    location: 'Tail · fin leading edge',
+    relatedComponents: ['tail-boom', 'pitot'],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+  },
 
   // ───────────────────────── CAMERA
   {
@@ -797,6 +814,7 @@ const SPECS: Record<string, SpecSheet> = {
   battery: { group: 'Feature', material: 'Lithium-ion cells' },
   'antenna-01': { group: 'Sensor', material: 'Plastic' },
   'antenna-02': { group: 'Sensor', material: 'Plastic' },
+  'pitot-tail': { group: 'Sensor', material: 'Aluminum' },
   pitot: { group: 'Sensor', material: 'Aluminum probe · 3D-printed cover' },
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },

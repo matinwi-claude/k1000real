@@ -227,6 +227,15 @@
       },
       "pieces": [
         {
+          "id": "pitot-tail",
+          "material": "grey",
+          "where": {
+            "min_y_gt": 1770,
+            "max_y_lt": 1885,
+            "min_z_gt": 300
+          }
+        },
+        {
           "id": "rudder",
           "material": "shell",
           "where": {
@@ -722,14 +731,14 @@
       "file": "nsp3-antenna-pod.stl",
       "units": "mm",
       "axes": [
-        "-z",
+        "z",
         "y",
-        "x"
+        "-x"
       ],
       "offset": [
         -0.5,
         0.0836,
-        0.0325
+        0.3075
       ],
       "keep": 0.25,
       "$comment": "SAR pod (NSP-3 V2, converted from nsp3-antenna-pod.step with tools/step-to-stl.py): under the starboard center wing",
