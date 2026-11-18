@@ -610,7 +610,7 @@ export const COMPONENTS: DroneComponent[] = [
   // ───────────────────────── SENSORS
   {
     id: 'pitot',
-    name: 'Pitot Probe & Cover',
+    name: 'Underwing Pitot',
     category: 'sensors',
     system: 'Air Data',
     type: 'Airspeed Probe',

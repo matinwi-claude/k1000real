@@ -25,8 +25,8 @@ export const LABELS: AtlasLabel[] = [
   { kind: 'group', text: 'Portside Wing', ids: ['wing-port', 'solar-port', 'aileron-port'], at: [1330, 248] },
   { kind: 'group', text: 'Starboard Wing', ids: ['wing-starboard', 'solar-starboard', 'aileron-starboard'], at: [70, 690] },
   { kind: 'group', text: 'Center Wing', ids: ['wing-center'], at: [668, 296] },
-  { kind: 'group', text: 'VTOL', ids: LIFT_PORT, at: [1085, 452] },
-  { kind: 'group', text: 'VTOL', ids: LIFT_STBD, at: [572, 652] },
+  { kind: 'group', text: 'VTOL', ids: LIFT_PORT, at: [1055, 452] },
+  { kind: 'group', text: 'VTOL', ids: LIFT_STBD, at: [542, 652] },
   {
     kind: 'group',
     text: 'Tail',
