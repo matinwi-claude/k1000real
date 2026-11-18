@@ -1,7 +1,8 @@
 /**
  * Hangar reveal: a short cinematic of the K1000ULE in a dark hangar while rows of
  * ceiling light strips switch on from front to back, then floor-standing LED panels.
- * Once they are all on, it cuts to a high side view that orbits slowly round the whole aircraft.
+ * One continuous shot: it starts head-on, circles the whole aircraft, rising over the tail, and
+ * comes back to the front before fading to black.
  *
  * Rendered offline, one deterministic frame at a time: tools/render-hangar.mjs opens
  * this page with Playwright, calls window.__render(t) for every frame and encodes
@@ -32,9 +33,9 @@ declare global {
 const Q = new URLSearchParams(location.search);
 const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
-const SHOT1 = 4.4; // head-on reveal; cut once every strip and floor panel has flickered on
-const SHOT2 = 6.6; // high side view of the whole aircraft
-const DURATION = SHOT1 + SHOT2;
+const DURATION = 14;
+const ORBIT = [1.5, 12.8]; // the camera circles the aircraft once, starting slowly while the strips come on
+const FADE = [12.6, 14]; // fade to black back at the front
 
 // ── hangar layout (metres; aircraft nose toward +Z, camera in front of it)
 const N_STRIPS = 22;
@@ -43,15 +44,14 @@ const STRIP_HALF = 2.5;
 const STRIP_Z0 = 0.9; // nearest strip
 const STRIP_DZ = 0.55;
 const STAND_TOP = 1.05; // fuselage belly height on the display stand
-const CAM_START = new THREE.Vector3(0, 0.82, 7.3);
-const CAM_END = new THREE.Vector3(0, 0.8, 6.8);
-const CAM_LOOK = new THREE.Vector3(0, 1.6, 0);
-// shot 2: high on the port side, just under the light strips, a slow orbit round toward the nose
-const ORBIT_LOOK = [new THREE.Vector3(0, 0.7, -0.4), new THREE.Vector3(0, 0.7, -0.2)];
-const ORBIT_HEIGHT = [3.2, 3.1]; // just under the light strips
-const ORBIT_RADIUS = [5.4, 5.1];
-const ORBIT_AZIMUTH = [(-92 * Math.PI) / 180, (-72 * Math.PI) / 180]; // 0 = straight ahead of the nose, negative = port side
-const FOV2 = 48;
+// one continuous shot: head-on in front of the nose, then a full circle round the aircraft, rising
+// up the sides and over the tail and coming back down to the front
+const CAM_RADIUS = 7.3;
+const CAM_HEIGHT = 0.82;
+const CAM_LOOK = new THREE.Vector3(0, 1.6, 0); // head-on: frames the light strips above the aircraft
+const ORBIT_LOOK = new THREE.Vector3(0, 1.2, -0.3); // round the side and back: the aircraft itself
+const ORBIT_RISE = 1.85; // extra height over the tail (stays under the strips)
+const ORBIT_IN = 1.0; // how much closer the camera comes round the side and back
 
 const smooth = (a: number, b: number, x: number) => {
   const t = Math.min(1, Math.max(0, (x - a) / (b - a)));
@@ -190,12 +190,13 @@ const GradeShader = {
     tDiffuse: { value: null as THREE.Texture | null },
     uTime: { value: 0 },
     uAspect: { value: W / H },
+    uFade: { value: 1 },
   },
   vertexShader: /* glsl */ `
     varying vec2 vUv;
     void main() { vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
   fragmentShader: /* glsl */ `
-    uniform sampler2D tDiffuse; uniform float uTime; uniform float uAspect;
+    uniform sampler2D tDiffuse; uniform float uTime; uniform float uAspect; uniform float uFade;
     varying vec2 vUv;
     float h(vec2 p) { return fract(sin(dot(p, vec2(12.9898, 78.233)) + uTime * 3.1) * 43758.5453); }
     void main() {
@@ -205,7 +206,7 @@ const GradeShader = {
       vec2 q = (vUv - 0.5) * vec2(uAspect, 1.0);
       col *= mix(1.0, smoothstep(1.25, 0.35, length(q)), 0.85);
       col += (h(vUv * 1000.0) - 0.5) * 0.018;
-      gl_FragColor = vec4(max(col, 0.0), c.a);
+      gl_FragColor = vec4(max(col, 0.0) * uFade, c.a);
     }`,
 };
 
@@ -481,6 +482,7 @@ async function main() {
   };
 
   const STRIP_RADIANCE = 3.2;
+  const tmp = new THREE.Vector3();
   window.__duration = DURATION;
   window.__render = (t: number) => {
     // ceiling strips; the first one glows faintly from the start
@@ -509,25 +511,16 @@ async function main() {
     contactMat.opacity = 0.7 * Math.max(ceiling, 0.15 * (panelSum / 40));
     updateEnv(`${litSum}|${panelSum}|${Math.round(wall * 10)}`);
 
-    // slow push-in
-    if (t < SHOT1) {
-      // slow push-in
-      const u = smooth(0, SHOT1, t);
-      camera.position.lerpVectors(CAM_START, CAM_END, u);
-      camera.lookAt(CAM_LOOK);
-      if (camera.fov !== 34) { camera.fov = 34; camera.updateProjectionMatrix(); }
-    } else {
-      if (camera.fov !== FOV2) { camera.fov = FOV2; camera.updateProjectionMatrix(); }
-      // eases out only, so the cut lands on a moving camera
-      const v = (t - SHOT1) / SHOT2;
-      const u = v * (2 - v) * 0.85 + v * 0.15;
-      const lerp = (r: number[]) => r[0] + (r[1] - r[0]) * u;
-      const az = lerp(ORBIT_AZIMUTH);
-      const rad = lerp(ORBIT_RADIUS);
-      // port side is +x, the nose points to +z
-      camera.position.set(Math.sin(-az) * rad, lerp(ORBIT_HEIGHT), Math.cos(az) * rad);
-      camera.lookAt(new THREE.Vector3().lerpVectors(ORBIT_LOOK[0], ORBIT_LOOK[1], u));
-    }
+    // camera: one continuous orbit; w is 0 at the front and 1 behind the tail
+    const o = smooth(ORBIT[0], ORBIT[1], t);
+    const az = -2 * Math.PI * o; // negative = round the port side first (port is +x, nose +z)
+    const w = Math.sin(Math.PI * o);
+    const rad = CAM_RADIUS - 0.35 * smooth(0, 3, t) - ORBIT_IN * w;
+    camera.position.set(Math.sin(-az) * rad, CAM_HEIGHT + ORBIT_RISE * w * w * (3 - 2 * w), Math.cos(az) * rad);
+    camera.lookAt(tmp.lerpVectors(CAM_LOOK, ORBIT_LOOK, Math.pow(w, 0.6)));
+    const fov = 34 + 8 * w;
+    if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
+    grade.uniforms.uFade.value = 1 - smooth(FADE[0], FADE[1], t);
     grade.uniforms.uTime.value = t;
     composer.render();
     return renderer.domElement.toDataURL('image/png');
