@@ -67,7 +67,7 @@ export const LAYOUT_2D: Record<string, Place> = {
   // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
   'eo-ir': { screen: [0.15, -1.15], scale: 1.75 },
   battery: { screen: [0.62, -1.15], scale: 1.0 },
-  nsp3: { screen: [1.09, -1.15], scale: 0.56 },
+  sar: { screen: [1.09, -1.15], scale: 0.56 },
   atne: { screen: [1.56, -1.1], scale: 0.85 },
   starlink: { screen: [2.03, -1.15], scale: 0.95 },
   silvus: { screen: [2.48, -1.15], scale: 3.0 },
@@ -78,7 +78,7 @@ export const LAYOUT_2D: Record<string, Place> = {
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
   'eo-ir': { screen: [-1.95, -3.7], scale: 3.6 },
   battery: { screen: [-0.65, -3.7], scale: 2.2 },
-  nsp3: { screen: [0.65, -3.7], scale: 1.25 },
+  sar: { screen: [0.65, -3.7], scale: 1.25 },
   atne: { screen: [1.95, -3.85], scale: 1.6 },
   starlink: { screen: [-1.4, -5.3], scale: 2.1 },
   silvus: { screen: [0.05, -5.3], scale: 6 },

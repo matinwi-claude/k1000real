@@ -722,20 +722,19 @@
       "file": "nsp3-antenna-pod.stl",
       "units": "mm",
       "axes": [
-        "x",
-        "z",
-        "-y"
+        "-z",
+        "y",
+        "x"
       ],
       "offset": [
-        0,
-        0,
-        0
+        -0.5,
+        0.0598,
+        -0.105
       ],
-      "atlasOnly": true,
       "keep": 0.5,
-      "$comment": "NSP-3 V2 antenna pod (converted from nsp3-antenna-pod.step with tools/step-to-stl.py): 2D atlas only",
+      "$comment": "SAR pod (NSP-3 V2, converted from nsp3-antenna-pod.step with tools/step-to-stl.py): under the starboard center wing",
       "default": {
-        "id": "nsp3",
+        "id": "sar",
         "material": "grey"
       }
     }
