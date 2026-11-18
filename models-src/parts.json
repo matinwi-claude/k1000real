@@ -738,6 +738,26 @@
         "material": "grey"
       },
       "scale": 0.5
+    },
+    {
+      "file": "mod-payload.stl",
+      "units": "mm",
+      "axes": [
+        "-x",
+        "y",
+        "-z"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "atlasOnly": true,
+      "$comment": "MOD payload, built by tools/make-mod-payload.py: 2D atlas only",
+      "default": {
+        "id": "mod",
+        "material": "grey"
+      }
     }
   ]
 }

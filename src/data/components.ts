@@ -78,7 +78,7 @@ export interface DroneComponent {
 }
 
 /** Shown in the Specifications panel. */
-export type SpecGroup = 'Airframe' | 'Payload' | 'Feature';
+export type SpecGroup = 'Airframe' | 'Payload' | 'Sensor' | 'Feature';
 export interface SpecSheet {
   group: SpecGroup;
   material: string;
@@ -686,6 +686,24 @@ export const COMPONENTS: DroneComponent[] = [
     explodeDelay: 0,
   },
   {
+    id: 'mod',
+    name: 'MOD',
+    category: 'payload',
+    system: 'Mission Payload',
+    type: 'MOD Payload',
+    partNumber: 'K1-PLD-M01',
+    description: 'MOD payload module.',
+    position: [0, 0, 0],
+    location: 'Payload',
+    relatedComponents: [],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+    atlasOnly: true,
+  },
+  {
     id: 'starlink',
     name: 'StarShield',
     category: 'payload',
@@ -777,13 +795,14 @@ const SPECS: Record<string, SpecSheet> = {
   'solar-starboard': { group: 'Feature', material: 'Solar cells' },
   'solar-tail': { group: 'Feature', material: 'Solar cells' },
   battery: { group: 'Feature', material: 'Lithium-ion cells' },
-  'antenna-01': { group: 'Feature', material: 'Plastic' },
-  'antenna-02': { group: 'Feature', material: 'Plastic' },
-  pitot: { group: 'Feature', material: 'Aluminum probe · 3D-printed cover' },
+  'antenna-01': { group: 'Sensor', material: 'Plastic' },
+  'antenna-02': { group: 'Sensor', material: 'Plastic' },
+  pitot: { group: 'Sensor', material: 'Aluminum probe · 3D-printed cover' },
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },
   starlink: { group: 'Payload', material: 'Aluminum' },
   sar: { group: 'Payload', material: 'Aluminum' },
+  mod: { group: 'Payload', material: 'Aluminum' },
   silvus: { group: 'Feature', material: 'Aluminum' },
   'silvus-4400': { group: 'Feature', material: 'Aluminum' },
 };
