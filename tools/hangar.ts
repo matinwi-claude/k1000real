@@ -33,9 +33,10 @@ declare global {
 const Q = new URLSearchParams(location.search);
 const W = Number(Q.get('w') ?? 1920);
 const H = Number(Q.get('h') ?? 1080);
-const DURATION = 14;
-const ORBIT = [1.5, 12.8]; // the camera circles the aircraft once, starting slowly while the strips come on
-const FADE = [12.6, 14]; // fade to black back at the front
+const DURATION = 18.5;
+const ORBIT = [1.5, 17.0]; // the camera circles the aircraft once, starting slowly while the strips come on
+const ORBIT_RAMP = 0.25; // fraction of the orbit spent easing in (and again easing out); steady speed between
+const FADE = [16.8, 18.5]; // fade to black back at the front
 
 // ── hangar layout (metres; aircraft nose toward +Z, camera in front of it)
 const N_STRIPS = 22;
@@ -50,7 +51,7 @@ const CAM_RADIUS = 7.3;
 const CAM_HEIGHT = 0.82;
 const CAM_LOOK = new THREE.Vector3(0, 1.6, 0); // head-on: frames the light strips above the aircraft
 const ORBIT_LOOK = new THREE.Vector3(0, 1.2, -0.3); // round the side and back: the aircraft itself
-const ORBIT_RISE = 1.85; // extra height over the tail (stays under the strips)
+const ORBIT_RISE = 2.15; // extra height round the sides and over the tail (stays under the strips)
 const ORBIT_IN = 1.0; // how much closer the camera comes round the side and back
 
 const smooth = (a: number, b: number, x: number) => {
@@ -61,6 +62,21 @@ const hash = (n: number) => {
   const s = Math.sin(n * 127.1 + 311.7) * 43758.5453;
   return s - Math.floor(s);
 };
+/**
+ * Orbit progress 0→1 for u in 0→1: speed eases up from rest (smoothstep-shaped, so no jolt), holds
+ * steady through the middle, and eases back to rest at the same rate.
+ */
+function orbitProgress(u: number) {
+  const r = ORBIT_RAMP;
+  const vmax = 1 / (1 - r);
+  const ramp = (x: number) => {
+    const X = Math.min(1, Math.max(0, x / r));
+    return vmax * r * (X ** 3 - X ** 4 / 2);
+  };
+  if (u <= r) return ramp(u);
+  if (u >= 1 - r) return 1 - ramp(1 - u);
+  return vmax * (r / 2 + (u - r));
+}
 /** A fluorescent-style switch-on: a couple of flickers, then full and steady. */
 function flickerOn(t: number, t0: number, seed: number) {
   const d = t - t0;
@@ -512,12 +528,13 @@ async function main() {
     updateEnv(`${litSum}|${panelSum}|${Math.round(wall * 10)}`);
 
     // camera: one continuous orbit; w is 0 at the front and 1 behind the tail
-    const o = smooth(ORBIT[0], ORBIT[1], t);
+    const o = orbitProgress((t - ORBIT[0]) / (ORBIT[1] - ORBIT[0]));
     const az = -2 * Math.PI * o; // negative = round the port side first (port is +x, nose +z)
     const w = Math.sin(Math.PI * o);
     const rad = CAM_RADIUS - 0.35 * smooth(0, 3, t) - ORBIT_IN * w;
-    camera.position.set(Math.sin(-az) * rad, CAM_HEIGHT + ORBIT_RISE * w * w * (3 - 2 * w), Math.cos(az) * rad);
-    camera.lookAt(tmp.lerpVectors(CAM_LOOK, ORBIT_LOOK, Math.pow(w, 0.6)));
+    const up = 1 - (1 - w) * (1 - w); // climbs early, flat across the sides and back
+    camera.position.set(Math.sin(-az) * rad, CAM_HEIGHT + ORBIT_RISE * up, Math.cos(az) * rad);
+    camera.lookAt(tmp.lerpVectors(CAM_LOOK, ORBIT_LOOK, up));
     const fov = 34 + 8 * w;
     if (camera.fov !== fov) { camera.fov = fov; camera.updateProjectionMatrix(); }
     grade.uniforms.uFade.value = 1 - smooth(FADE[0], FADE[1], t);
