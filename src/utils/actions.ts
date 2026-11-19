@@ -110,6 +110,7 @@ export const actions = {
     if (s.freeCam) return set({ freeCam: false });
     if (s.embedOpen) return set({ embedOpen: false });
     if (s.settingsOpen) return set({ settingsOpen: false });
+    if (s.buildOpen) return set({ buildOpen: false });
     if (s.selected) return set({ selected: null });
     if (s.mode !== 'explore') return set({ mode: 'explore' });
   },

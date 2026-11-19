@@ -100,3 +100,12 @@ export const IconEmbed = ({ size, ...p }: P) => (
     <path d="M8 7 3 12l5 5M16 7l5 5-5 5M13.5 5l-3 14" />
   </svg>
 );
+
+export const IconBuild = ({ size, ...p }: P) => (
+  <svg {...base(size)} {...p}>
+    <path d="M5 6.5h14M5 12h14M5 17.5h14" />
+    <circle cx="9" cy="6.5" r="1.8" fill="currentColor" stroke="none" />
+    <circle cx="15" cy="12" r="1.8" fill="currentColor" stroke="none" />
+    <circle cx="11" cy="17.5" r="1.8" fill="currentColor" stroke="none" />
+  </svg>
+);

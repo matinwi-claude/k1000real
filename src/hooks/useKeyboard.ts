@@ -38,6 +38,7 @@ export function useKeyboard() {
         case 'r': return actions.toggleAutoRotate();
         case 'f': return actions.focusSelected();
         case 'h': return actions.hideSelected();
+        case 'b': return s.embed ? undefined : useStore.setState({ buildOpen: !s.buildOpen });
         case '?': return useStore.setState({ settingsOpen: !s.settingsOpen });
       }
     };

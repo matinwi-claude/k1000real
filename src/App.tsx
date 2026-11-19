@@ -2,6 +2,7 @@ import { useStore } from './store';
 import { DroneViewer } from './components/DroneViewer';
 import { BrandLogo, ExploreMore, StatusPanel } from './components/StatusPanel';
 import { SettingsMenu, ToolRail, ViewButtons } from './components/Controls';
+import { BuildPanel } from './components/BuildPanel';
 import { ComponentInspector } from './components/ComponentInspector';
 import { ExplodedView } from './components/ExplodedView';
 import { FrameMarks } from './components/FrameMarks';
@@ -27,6 +28,7 @@ export default function App() {
   const explode = useStore((s) => s.explode);
   const embed = useStore((s) => s.embed);
   const lighting = useStore((s) => s.lighting);
+  const buildOpen = useStore((s) => s.buildOpen);
 
   const cls = [
     'app',
@@ -40,6 +42,7 @@ export default function App() {
     explode > 0.001 && 'has-dock',
     embed && 'is-embed',
     lighting === 'sky' && 'is-sky',
+    buildOpen && !embed && 'is-building',
   ]
     .filter(Boolean)
     .join(' ');
@@ -55,6 +58,7 @@ export default function App() {
         <ViewButtons />
         <BrandLogo />
         <ExploreMore />
+        {!embed && <BuildPanel />}
         <EngineerPanel />
         <ComponentInspector />
         <div className="k-dock">

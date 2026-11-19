@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { useStore, type CameraView, type LightingMode } from '../store';
 import { actions } from '../utils/actions';
 import {
+  IconBuild,
   IconClose,
   IconExplode,
   IconEmbed,
@@ -30,6 +31,7 @@ export function ToolRail() {
   const view = useStore((s) => s.view);
   const embed = useStore((s) => s.embed);
   const embedOpen = useStore((s) => s.embedOpen);
+  const buildOpen = useStore((s) => s.buildOpen);
   return (
     <nav className="k-rail fade-on-idle" aria-label="Inspection tools">
       <div className="k-rail-group">
@@ -38,6 +40,10 @@ export function ToolRail() {
       </div>
       {!embed && (
         <>
+          <div className="k-rail-sep" />
+          <div className="k-rail-group">
+            <RailButton active={buildOpen} onClick={() => useStore.setState({ buildOpen: !buildOpen, settingsOpen: false })} icon={<IconBuild />} label="BUILD" hint="B" />
+          </div>
           <div className="k-rail-sep" />
           <div className="k-rail-group">
             <RailButton
@@ -150,6 +156,7 @@ export function SettingsMenu() {
               <span><kbd>X</kbd> x-ray</span>
               <span><kbd>F</kbd> focus</span>
               <span><kbd>H</kbd> hide part</span>
+              <span><kbd>B</kbd> build</span>
               <span><kbd>ESC</kbd> back</span>
             </div>
           </section>

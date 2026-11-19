@@ -15,6 +15,7 @@ import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment
 
 import { getState, useStore, type CameraView, type State } from '../store';
 import { COMPONENT_MAP, VTOL_ONLY } from '../data/components';
+import { isAbsent } from '../data/build';
 
 import { LOWEST_Y } from '../data/layout';
 import { buildDroneModel, type ComponentNode, type DroneModel } from './DroneModel';
@@ -446,8 +447,8 @@ export class DroneEngine {
       this.configureControls(s.freeCam);
       if (!s.freeCam) this.setCameraView('reset');
     }
-    if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration) this.pickDirty = true;
-    if (s.configuration !== p.configuration && s.configuration === 'fixed-wing' && s.selected && VTOL_ONLY.has(s.selected)) {
+    if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads) this.pickDirty = true;
+    if ((s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads) && s.selected && isAbsent(s, s.selected, VTOL_ONLY)) {
       useStore.setState({ selected: null });
     }
     if (s.explode >= 0.5 && p.explode < 0.5 && !s.cinematic) {
@@ -642,7 +643,7 @@ export class DroneEngine {
     this.pickTargets = [];
     for (const node of this.model.nodes.values()) {
       if (s.hidden[node.id]) continue;
-      if (s.configuration === 'fixed-wing' && VTOL_ONLY.has(node.id)) continue;
+      if (isAbsent(s, node.id, VTOL_ONLY)) continue;
       if (xrayish && node.data.layer === 'exterior') continue;
       for (const m of node.meshes) {
         if (m.userData.componentId === 'fasteners') {
@@ -937,7 +938,7 @@ export class DroneEngine {
       } else if (d.id === 'cruise-prop') {
         node.spin.rotation.z = this.spinAngle * 0.8 + local * 0.6;
       }
-      if (local > 0.001 && GUIDE_IDS.has(d.id) && (ex[0] || ex[1] || ex[2])) {
+      if (local > 0.001 && GUIDE_IDS.has(d.id) && node.dissolve < 0.5 && (ex[0] || ex[1] || ex[2])) {
         guidePos.setXYZ(gi * 2, node.basePosition.x, node.basePosition.y, node.basePosition.z);
         guidePos.setXYZ(gi * 2 + 1, px, py, pz);
         gi++;
@@ -956,8 +957,8 @@ export class DroneEngine {
         if (Math.abs(node.fade - fadeT) < 0.004) node.fade = fadeT;
         changed = true;
       }
-      // fixed-wing: the VTOL pods dissolve away (and rebuild when switching back)
-      const dissolveT = s.configuration === 'fixed-wing' && VTOL_ONLY.has(d.id) ? 1 : 0;
+      // parts not in the current build (VTOL pods in fixed-wing, solar cells, unfitted payloads) dissolve away
+      const dissolveT = isAbsent(s, d.id, VTOL_ONLY) ? 1 : 0;
       if (node.dissolve !== dissolveT) {
         const step = Math.min(1, dt * 0.7);
         node.dissolve = dissolveT > node.dissolve ? Math.min(dissolveT, node.dissolve + step) : Math.max(dissolveT, node.dissolve - step);
