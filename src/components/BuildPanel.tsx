@@ -157,35 +157,44 @@ export function BuildPanel() {
               </button>
             ))}
           </fieldset>
-          <fieldset>
-            <legend>03 · Payloads</legend>
-            {BUILD_PAYLOADS.map(({ id }) => {
-              const on = payloads.includes(id);
-              return (
-                <button
-                  key={id}
-                  role="checkbox"
-                  aria-checked={on}
-                  className={`k-opt ${on ? 'on' : ''}`}
-                  onPointerEnter={(e) => e.pointerType === 'mouse' && showPreview(id, e.currentTarget)}
-                  onPointerLeave={(e) => e.pointerType === 'mouse' && setPreview(null)}
-                  onFocus={(e) => e.currentTarget.matches(':focus-visible') && showPreview(id, e.currentTarget)}
-                  onBlur={() => setPreview((p) => (p?.touch ? p : null))}
-                  onClick={(e) => {
-                    toggle(id);
-                    if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') {
-                      showPreview(id, e.currentTarget, true);
-                      window.clearTimeout(tapTimer.current);
-                      tapTimer.current = window.setTimeout(() => setPreview(null), 3000);
-                    }
-                  }}
-                >
-                  <i className="box" />
-                  {COMPONENT_MAP[id]?.name ?? id}
-                </button>
-              );
-            })}
-          </fieldset>
+          {(
+            [
+              ['radio', '03', 'Radios'],
+              ['payload', '04', 'Payloads'],
+            ] as const
+          ).map(([kind, n, title]) => (
+            <fieldset key={kind}>
+              <legend>
+                {n} · {title}
+              </legend>
+              {BUILD_PAYLOADS.filter((p) => p.kind === kind).map(({ id }) => {
+                const on = payloads.includes(id);
+                return (
+                  <button
+                    key={id}
+                    role="checkbox"
+                    aria-checked={on}
+                    className={`k-opt ${on ? 'on' : ''}`}
+                    onPointerEnter={(e) => e.pointerType === 'mouse' && showPreview(id, e.currentTarget)}
+                    onPointerLeave={(e) => e.pointerType === 'mouse' && setPreview(null)}
+                    onFocus={(e) => e.currentTarget.matches(':focus-visible') && showPreview(id, e.currentTarget)}
+                    onBlur={() => setPreview((p) => (p?.touch ? p : null))}
+                    onClick={(e) => {
+                      toggle(id);
+                      if ((e.nativeEvent as PointerEvent).pointerType !== 'mouse') {
+                        showPreview(id, e.currentTarget, true);
+                        window.clearTimeout(tapTimer.current);
+                        tapTimer.current = window.setTimeout(() => setPreview(null), 3000);
+                      }
+                    }}
+                  >
+                    <i className="box" />
+                    {COMPONENT_MAP[id]?.name ?? id}
+                  </button>
+                );
+              })}
+            </fieldset>
+          ))}
         </div>
       </section>
       {preview && (
