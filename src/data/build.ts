@@ -1,7 +1,7 @@
 import type { Configuration, PowerOption } from '../store';
 
 /**
- * "Build Your Own K1000" data. Only flight hours are shown; weights stay internal.
+ * "Build Your Own K1000" data: flight hours and the total payload weight are shown.
  *
  * Flight hours per configuration with solar and no payload: fixed wing 24 h, eVTOL 12 h (Kraus Hamdani).
  * Non-solar halves them (PLACEHOLDER — to confirm).
@@ -35,14 +35,21 @@ export const BUILD_PAYLOADS: { id: string; kind: 'radio' | 'payload'; weightLb: 
 export const SOLAR_PARTS = new Set(['solar-port', 'solar-starboard', 'solar-tail']);
 export const BUILD_PAYLOAD_IDS = new Set(BUILD_PAYLOADS.map((p) => p.id));
 
+/** Total weight of the fitted payloads and radios, in pounds. */
+export function payloadWeightLb(payloads: string[]) {
+  return BUILD_PAYLOADS.reduce((sum, p) => sum + (payloads.includes(p.id) ? p.weightLb : 0), 0);
+}
+
 export function flightHours(configuration: Configuration, power: PowerOption, payloads: string[]) {
   const totalLb = BUILD_PAYLOADS.reduce((sum, p) => sum + (payloads.includes(p.id) ? p.weightLb : 0), 0);
   return BASE_FLIGHT_HOURS[configuration][power] * Math.max(0.2, 1 - HOURS_LOST_PER_LB * totalLb);
 }
 
 /** True when a part is not on the aircraft in the current build (it dissolves away in 3D). */
-export function isAbsent(s: { configuration: Configuration; power: PowerOption; payloads: string[] }, id: string, vtolOnly: Set<string>) {
+export function isAbsent(s: { configuration: Configuration; power: PowerOption; payloads: string[]; buildOpen: boolean }, id: string, vtolOnly: Set<string>) {
   if (s.configuration === 'fixed-wing' && vtolOnly.has(id)) return true;
+  // power and payload choices only shape the aircraft while the builder is open; closing it shows the full aircraft
+  if (!s.buildOpen) return false;
   if (s.power === 'non-solar' && SOLAR_PARTS.has(id)) return true;
   return BUILD_PAYLOAD_IDS.has(id) && !s.payloads.includes(id);
 }

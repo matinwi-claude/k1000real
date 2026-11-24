@@ -447,8 +447,8 @@ export class DroneEngine {
       this.configureControls(s.freeCam);
       if (!s.freeCam) this.setCameraView('reset');
     }
-    if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads) this.pickDirty = true;
-    if ((s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads) && s.selected && isAbsent(s, s.selected, VTOL_ONLY)) {
+    if (s.hidden !== p.hidden || s.view !== p.view || s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads || s.buildOpen !== p.buildOpen) this.pickDirty = true;
+    if ((s.configuration !== p.configuration || s.power !== p.power || s.payloads !== p.payloads || s.buildOpen !== p.buildOpen) && s.selected && isAbsent(s, s.selected, VTOL_ONLY)) {
       useStore.setState({ selected: null });
     }
     if (s.explode >= 0.5 && p.explode < 0.5 && !s.cinematic) {

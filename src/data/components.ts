@@ -78,10 +78,12 @@ export interface DroneComponent {
 }
 
 /** Shown in the Specifications panel. */
-export type SpecGroup = 'Airframe' | 'Payload' | 'Sensor' | 'Feature';
+export type SpecGroup = 'Airframe' | 'Payload' | 'Sensor' | 'Propulsion' | 'Feature';
 export interface SpecSheet {
   group: SpecGroup;
   material: string;
+  /** extra rows for the specifications panel */
+  extra?: [string, string][];
 }
 
 export interface Category {
@@ -643,6 +645,24 @@ export const COMPONENTS: DroneComponent[] = [
     explodeDelay: 0,
   },
 
+  {
+    id: 'gps',
+    name: 'GPS',
+    category: 'sensors',
+    system: 'Navigation',
+    type: 'GPS Antenna',
+    partNumber: 'K1-SNS-G01',
+    description: 'GPS antenna dome on the fuselage spine, between the aft antennas.',
+    position: [0, 0.1, -0.37],
+    location: 'Fuselage · spine',
+    relatedComponents: ['fuselage', 'antenna-02'],
+    status: 'operational',
+    illustrativeSpecifications: [],
+    layer: 'structure',
+    explode: [0, 0, 0],
+    explodeDelay: 0,
+  },
+
   // ───────────────────────── CAMERA
   {
     id: 'eo-ir',
@@ -801,9 +821,9 @@ const CF = 'Carbon fiber';
 const SPECS: Record<string, SpecSheet> = {
   fuselage: { group: 'Airframe', material: CF },
   'avionics-hatch': { group: 'Airframe', material: CF },
-  'wing-center': { group: 'Airframe', material: CF },
-  'wing-port': { group: 'Airframe', material: CF },
-  'wing-starboard': { group: 'Airframe', material: CF },
+  'wing-center': { group: 'Airframe', material: CF, extra: [['Length (Entire Wing)', '6 m']] },
+  'wing-port': { group: 'Airframe', material: CF, extra: [['Length (Entire Wing)', '6 m']] },
+  'wing-starboard': { group: 'Airframe', material: CF, extra: [['Length (Entire Wing)', '6 m']] },
   'aileron-port': { group: 'Airframe', material: CF },
   'aileron-starboard': { group: 'Airframe', material: CF },
   'wing-spar': { group: 'Airframe', material: 'Wood' },
@@ -816,16 +836,16 @@ const SPECS: Record<string, SpecSheet> = {
   'horizontal-stabilizer': { group: 'Airframe', material: CF },
   elevator: { group: 'Airframe', material: CF },
   fasteners: { group: 'Airframe', material: 'Stainless steel' },
-  'cruise-motor': { group: 'Feature', material: 'Aluminum' },
-  'cruise-prop': { group: 'Feature', material: CF },
-  'lift-motor-01': { group: 'Feature', material: 'Aluminum' },
-  'lift-motor-02': { group: 'Feature', material: 'Aluminum' },
-  'lift-motor-03': { group: 'Feature', material: 'Aluminum' },
-  'lift-motor-04': { group: 'Feature', material: 'Aluminum' },
-  'lift-prop-01': { group: 'Feature', material: CF },
-  'lift-prop-02': { group: 'Feature', material: CF },
-  'lift-prop-03': { group: 'Feature', material: CF },
-  'lift-prop-04': { group: 'Feature', material: CF },
+  'cruise-motor': { group: 'Propulsion', material: 'Aluminum' },
+  'cruise-prop': { group: 'Propulsion', material: CF },
+  'lift-motor-01': { group: 'Propulsion', material: 'Aluminum' },
+  'lift-motor-02': { group: 'Propulsion', material: 'Aluminum' },
+  'lift-motor-03': { group: 'Propulsion', material: 'Aluminum' },
+  'lift-motor-04': { group: 'Propulsion', material: 'Aluminum' },
+  'lift-prop-01': { group: 'Propulsion', material: CF },
+  'lift-prop-02': { group: 'Propulsion', material: CF },
+  'lift-prop-03': { group: 'Propulsion', material: CF },
+  'lift-prop-04': { group: 'Propulsion', material: CF },
   'solar-port': { group: 'Feature', material: 'Solar cells' },
   'solar-starboard': { group: 'Feature', material: 'Solar cells' },
   'solar-tail': { group: 'Feature', material: 'Solar cells' },
@@ -833,6 +853,7 @@ const SPECS: Record<string, SpecSheet> = {
   'antenna-01': { group: 'Sensor', material: 'Plastic' },
   'antenna-02': { group: 'Sensor', material: 'Plastic' },
   'pitot-tail': { group: 'Sensor', material: 'Aluminum' },
+  gps: { group: 'Sensor', material: 'Plastic' },
   pitot: { group: 'Sensor', material: 'Aluminum probe · 3D-printed cover' },
   'eo-ir': { group: 'Payload', material: 'Aluminum' },
   atne: { group: 'Payload', material: 'Aluminum' },

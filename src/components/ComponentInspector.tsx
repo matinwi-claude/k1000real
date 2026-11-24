@@ -28,6 +28,12 @@ export function ComponentInspector() {
           <dt>Group</dt>
           <dd>{spec.group}</dd>
         </div>
+        {spec.extra?.map(([k, v]) => (
+          <div key={k}>
+            <dt>{k}</dt>
+            <dd>{v}</dd>
+          </div>
+        ))}
       </dl>
     </aside>
   );

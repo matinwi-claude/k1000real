@@ -61,6 +61,17 @@
             "center_x_lt": -40,
             "center_y_gt": 200
           }
+        },
+        {
+          "id": "gps",
+          "material": "shell",
+          "where": {
+            "center_x_gt": -30,
+            "center_x_lt": 30,
+            "min_y_gt": 560,
+            "max_y_lt": 700,
+            "min_z_gt": -33
+          }
         }
       ],
       "keep": 0.3

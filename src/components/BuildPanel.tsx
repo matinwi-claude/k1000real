@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore, type Configuration, type PowerOption } from '../store';
 import { COMPONENT_MAP, CATEGORIES } from '../data/components';
-import { BUILD_PAYLOADS, flightHours } from '../data/build';
+import { BUILD_PAYLOADS, flightHours, payloadWeightLb } from '../data/build';
 import { IconClose } from './Icons';
 
 type LinePart = {
@@ -122,6 +122,7 @@ export function BuildPanel() {
     <div className="k-build-stack" ref={stack}>
       <section className="k-build-stats" aria-live="polite">
         <Stat label="Flight Hours" value={hours} unit="hrs" digits={1} />
+        <Stat label="Weight" value={payloadWeightLb(payloads)} unit="lb" digits={1} />
       </section>
       <section className="k-build" aria-label="Build Your Own K1000">
         <header>
