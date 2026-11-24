@@ -767,6 +767,27 @@
         "id": "mod",
         "material": "grey"
       }
+    },
+    {
+      "file": "asi-snitch.stl",
+      "units": "mm",
+      "axes": [
+        "x",
+        "z",
+        "-y"
+      ],
+      "offset": [
+        0,
+        0,
+        0
+      ],
+      "keep": 0.3,
+      "atlasOnly": true,
+      "$comment": "ASI Snitch pod, cut from ASI_Snitch_Integration.stl (aircraft integration model): 2D atlas only",
+      "default": {
+        "id": "asi-snitch",
+        "material": "grey"
+      }
     }
   ]
 }

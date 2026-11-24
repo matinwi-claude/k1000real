@@ -1610,9 +1610,14 @@ input[type='range']::-moz-range-thumb {
 .k-build-stats {
   flex: none;
   display: grid;
-  grid-template-columns: auto auto auto;
-  justify-content: space-between;
   padding: 13px 18px;
+}
+.k-build-stats .k-stat {
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+}
+.k-build-stats .k-stat b {
+  font-size: 20px;
 }
 .k-stat {
   display: grid;

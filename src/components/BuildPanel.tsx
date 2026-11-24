@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore, type Configuration, type PowerOption } from '../store';
 import { COMPONENT_MAP, CATEGORIES } from '../data/components';
-import { BUILD_PAYLOADS, performance as estimate } from '../data/build';
+import { BUILD_PAYLOADS, flightHours } from '../data/build';
 import { IconClose } from './Icons';
 
 type LinePart = {
@@ -70,8 +70,8 @@ function Preview({ id }: { id: string }) {
     };
   }, [id]);
   const c = COMPONENT_MAP[id];
-  const pad = 6;
   const b = part?.box;
+  const pad = b ? 0.14 * Math.max(b[2] - b[0], b[3] - b[1]) : 0;
   return (
     <>
       <div className="k-preview-head">
@@ -107,7 +107,7 @@ export function BuildPanel() {
   }, [open]);
   if (!open) return null;
 
-  const perf = estimate(configuration, power, payloads);
+  const hours = flightHours(configuration, power, payloads);
   const showPreview = (id: string, el: HTMLElement, touch = false) => {
     const s = stack.current?.getBoundingClientRect();
     const r = el.getBoundingClientRect();
@@ -121,9 +121,7 @@ export function BuildPanel() {
   return (
     <div className="k-build-stack" ref={stack}>
       <section className="k-build-stats" aria-live="polite">
-        <Stat label="Endurance" value={perf.endurance} unit="hrs" digits={1} />
-        <Stat label="Range" value={perf.range} unit="km" />
-        <Stat label="Altitude" value={perf.altitude} unit="ft" />
+        <Stat label="Flight Hours" value={hours} unit="hrs" digits={1} />
       </section>
       <section className="k-build" aria-label="Build Your Own K1000">
         <header>

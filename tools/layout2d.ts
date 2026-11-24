@@ -65,24 +65,26 @@ export const LAYOUT_2D: Record<string, Place> = {
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
   // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
-  battery: { screen: [-0.3, -1.15], scale: 1.0 },
-  mod: { screen: [0.17, -1.15], scale: 1.7 },
-  'eo-ir': { screen: [0.62, -1.15], scale: 1.45 },
-  sar: { screen: [1.07, -1.15], scale: 1.12 },
-  atne: { screen: [1.52, -1.1], scale: 0.85 },
-  starlink: { screen: [1.99, -1.15], scale: 0.95 },
-  silvus: { screen: [2.46, -1.15], scale: 3.0 },
-  'silvus-4400': { screen: [2.92, -1.15], scale: 2.8 },
+  battery: { screen: [-0.85, -1.15], scale: 0.92 },
+  mod: { screen: [-0.38, -1.15], scale: 1.56 },
+  'eo-ir': { screen: [0.09, -1.15], scale: 1.33 },
+  sar: { screen: [0.56, -1.15], scale: 0.79 },
+  'asi-snitch': { screen: [1.03, -1.15], scale: 0.9 },
+  atne: { screen: [1.5, -1.1], scale: 0.78 },
+  starlink: { screen: [1.97, -1.15], scale: 0.87 },
+  silvus: { screen: [2.44, -1.15], scale: 2.76 },
+  'silvus-4400': { screen: [2.91, -1.15], scale: 2.58 },
 };
 
 /** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
 export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
-  battery: { screen: [-1.95, -3.7], scale: 2.2 },
-  mod: { screen: [-0.65, -3.7], scale: 3.75 },
-  'eo-ir': { screen: [0.65, -3.7], scale: 3.2 },
-  sar: { screen: [1.95, -3.7], scale: 2.5 },
-  atne: { screen: [-1.95, -5.3], scale: 1.6 },
-  starlink: { screen: [-0.65, -5.3], scale: 2.1 },
-  silvus: { screen: [0.65, -5.3], scale: 6 },
-  'silvus-4400': { screen: [1.95, -5.3], scale: 5.5 },
+  battery: { screen: [-1.6, -3.6], scale: 2.0 },
+  mod: { screen: [0, -3.6], scale: 3.45 },
+  'eo-ir': { screen: [1.6, -3.6], scale: 2.95 },
+  sar: { screen: [-1.6, -5.0], scale: 1.77 },
+  'asi-snitch': { screen: [0, -5.0], scale: 2.0 },
+  atne: { screen: [1.6, -5.0], scale: 1.47 },
+  starlink: { screen: [-1.6, -6.4], scale: 1.93 },
+  silvus: { screen: [0, -6.4], scale: 5.5 },
+  'silvus-4400': { screen: [1.6, -6.4], scale: 5.06 },
 };

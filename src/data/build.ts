@@ -1,48 +1,43 @@
 import type { Configuration, PowerOption } from '../store';
 
 /**
- * "Build Your Own K1000" data.
+ * "Build Your Own K1000" data. Only flight hours are shown; weights stay internal.
  *
- * Solar endurance per configuration is from Kraus Hamdani (fixed wing 24 h, eVTOL 12 h).
- * PLACEHOLDERS still to confirm: range, altitude, the non-solar figures and the payload costs.
- * Endurance and range are given per configuration × power with no payload fitted;
- * each payload then costs a fraction of endurance (and range in the same proportion).
+ * Flight hours per configuration with solar and no payload: fixed wing 24 h, eVTOL 12 h (Kraus Hamdani).
+ * Non-solar halves them (PLACEHOLDER — to confirm).
+ * Each fitted payload or radio costs flight time in proportion to its weight:
+ *   hours = base × (1 − HOURS_LOST_PER_LB × total lb)   (the rate is a PLACEHOLDER — to confirm)
  */
-export const BASE_PERFORMANCE: Record<Configuration, Record<PowerOption, { endurance: number; range: number; altitude: number }>> = {
-  'fixed-wing': {
-    solar: { endurance: 24, range: 1800, altitude: 15000 },
-    'non-solar': { endurance: 12, range: 900, altitude: 15000 },
-  },
-  evtol: {
-    solar: { endurance: 12, range: 900, altitude: 12000 },
-    'non-solar': { endurance: 6, range: 450, altitude: 12000 },
-  },
+export const BASE_FLIGHT_HOURS: Record<Configuration, Record<PowerOption, number>> = {
+  'fixed-wing': { solar: 24, 'non-solar': 12 },
+  evtol: { solar: 12, 'non-solar': 6 },
 };
 
-/** Radios and payloads offered in the builder (ids from src/data/components.ts) and their endurance cost. */
-export const BUILD_PAYLOADS: { id: string; kind: 'radio' | 'payload'; penalty: number }[] = [
-  { id: 'eo-ir', kind: 'payload', penalty: 0.06 },
-  { id: 'sar', kind: 'payload', penalty: 0.08 },
-  { id: 'mod', kind: 'payload', penalty: 0.05 },
-  { id: 'atne', kind: 'payload', penalty: 0.03 },
-  { id: 'starlink', kind: 'payload', penalty: 0.07 },
-  { id: 'silvus', kind: 'radio', penalty: 0.02 },
-  { id: 'silvus-4400', kind: 'radio', penalty: 0.03 },
+/** Fraction of flight time lost per pound carried. */
+export const HOURS_LOST_PER_LB = 0.035;
+
+const KG_TO_LB = 2.20462;
+const lb = (kg: number) => kg * KG_TO_LB;
+
+/** Radios and payloads offered in the builder (ids from src/data/components.ts) and their weight in pounds. */
+export const BUILD_PAYLOADS: { id: string; kind: 'radio' | 'payload'; weightLb: number; confirmed: boolean }[] = [
+  { id: 'eo-ir', kind: 'payload', weightLb: lb(0.75), confirmed: true }, // HD40 LVV 750 g
+  { id: 'sar', kind: 'payload', weightLb: 2.0, confirmed: false },
+  { id: 'mod', kind: 'payload', weightLb: 1.5, confirmed: false },
+  { id: 'asi-snitch', kind: 'payload', weightLb: 2.0, confirmed: false },
+  { id: 'atne', kind: 'payload', weightLb: 1.0, confirmed: false },
+  { id: 'starlink', kind: 'payload', weightLb: 2.0, confirmed: false },
+  { id: 'silvus', kind: 'radio', weightLb: lb(0.116), confirmed: true }, // Silvus 4200 116 g
+  { id: 'silvus-4400', kind: 'radio', weightLb: lb(1.14), confirmed: true }, // Silvus 4400 1.14 kg
 ];
 
 /** Parts that leave the 3D aircraft for a given build (solar cells, payloads not fitted). */
 export const SOLAR_PARTS = new Set(['solar-port', 'solar-starboard', 'solar-tail']);
 export const BUILD_PAYLOAD_IDS = new Set(BUILD_PAYLOADS.map((p) => p.id));
 
-export function performance(configuration: Configuration, power: PowerOption, payloads: string[]) {
-  const base = BASE_PERFORMANCE[configuration][power];
-  let f = 1;
-  for (const p of BUILD_PAYLOADS) if (payloads.includes(p.id)) f *= 1 - p.penalty;
-  return {
-    endurance: base.endurance * f,
-    range: base.range * f,
-    altitude: base.altitude,
-  };
+export function flightHours(configuration: Configuration, power: PowerOption, payloads: string[]) {
+  const totalLb = BUILD_PAYLOADS.reduce((sum, p) => sum + (payloads.includes(p.id) ? p.weightLb : 0), 0);
+  return BASE_FLIGHT_HOURS[configuration][power] * Math.max(0.2, 1 - HOURS_LOST_PER_LB * totalLb);
 }
 
 /** True when a part is not on the aircraft in the current build (it dissolves away in 3D). */
