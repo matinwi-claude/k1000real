@@ -84,7 +84,9 @@
     var wrap = document.createElement('div');
     wrap.style.cssText =
       'position:relative;width:100%;overflow:hidden;background:' + bg + ';border-radius:' + radius + 'px;' +
-      (height ? 'height:' + parseInt(height, 10) + 'px;' : 'aspect-ratio:' + aspect + ';');
+      (height ? 'height:' + parseInt(height, 10) + 'px;' : 'aspect-ratio:' + aspect + ';') +
+      // parts atlas on a phone: taller than 16:10 so the drawing and the payload strip both fit
+      (parts && !height && !attr(el, 'aspect') ? 'min-height:min(560px,130vw);' : '');
 
     var iframe = document.createElement('iframe');
     iframe.title = parts ? 'K1000ULE interactive parts atlas' : 'K1000ULE interactive 3D viewer';

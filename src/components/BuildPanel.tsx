@@ -12,7 +12,7 @@ type LinePart = {
   box: number[];
 };
 let lineart: Promise<Map<string, LinePart>> | null = null;
-const loadLineart = () => (lineart ??= import('../parts/lineart.json').then((m) => new Map((m.default.parts as LinePart[]).map((p) => [p.id, p]))));
+const loadLineart = () => (lineart ??= import('../parts/lineart-payloads.json').then((m) => new Map((m.default.parts as LinePart[]).map((p) => [p.id, p]))));
 
 const CONFIGS: { id: Configuration; label: string }[] = [
   { id: 'fixed-wing', label: 'Fixed Wing' },

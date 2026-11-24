@@ -15,10 +15,18 @@ import { contours } from 'd3-contour';
 import { buildDroneModel } from '../src/engine/DroneModel';
 import { createMaterialLibrary } from '../src/engine/materials';
 import { loadPartModels, type PartModels } from '../src/engine/PartModels';
-import { LAYOUT_2D, LAYOUT_2D_PORTRAIT, VIEW_2D, EXCLUDE_2D, MERGE_2D } from './layout2d';
+import { LAYOUT_2D, VIEW_2D, EXCLUDE_2D, MERGE_2D } from './layout2d';
+import { BUILD_PAYLOADS } from '../src/data/build';
 
-const VARIANT = new URLSearchParams(location.search).get('variant') === 'portrait' ? 'portrait' : 'landscape';
-const PLACES = VARIANT === 'portrait' ? { ...LAYOUT_2D, ...LAYOUT_2D_PORTRAIT } : LAYOUT_2D;
+const VARIANT_Q = new URLSearchParams(location.search).get('variant');
+const VARIANT = VARIANT_Q === 'payloads' ? 'payloads' : 'landscape';
+const PAYLOADS = BUILD_PAYLOADS.map((p) => p.id);
+// payloads / radios are drawn on their own (thumbnails for the atlas side panel and the 3D builder), never in the aircraft drawing
+const PLACES: typeof LAYOUT_2D =
+  VARIANT === 'payloads'
+    ? Object.fromEntries(PAYLOADS.map((id, i) => [id, { screen: [i * 1.1, 0] as [number, number], scale: (LAYOUT_2D[id]?.scale ?? 1) * 1.5 }]))
+    : LAYOUT_2D;
+const SKIP = (id: string) => EXCLUDE_2D.includes(id) || (VARIANT === 'payloads' ? !PAYLOADS.includes(id) && !PAYLOADS.includes(MERGE_2D[id] ?? '') : PAYLOADS.includes(id));
 
 const OUT_W = 1600; // viewBox width
 const PX = 4400; // raster width used for hidden-line removal
@@ -50,7 +58,7 @@ function run(cad: PartModels) {
   // ── exploded 2D layout
   const keep: string[] = [];
   for (const node of model.nodes.values()) {
-    if (EXCLUDE_2D.includes(node.id)) {
+    if (SKIP(node.id)) {
       node.group.visible = false;
       continue;
     }

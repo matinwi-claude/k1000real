@@ -64,8 +64,9 @@ export const LAYOUT_2D: Record<string, Place> = {
   rudder: { offset: [0, 0, -0.08] },
   pitot: { offset: port([wingOut, WING_UP - 0.06, 0.06]) },
 
-  // enlarged detail parts, one row in the bottom right (screen = metres right / up of the model origin)
-  battery: { screen: [-0.85, -1.15], scale: 0.92 },
+  // loose parts (screen = metres right / up of the model origin). Payloads / radios only set the scale of
+  // their thumbnails (tools/lineart.ts ?variant=payloads); they are not drawn on the aircraft sheet.
+  battery: { screen: [0.1, -0.95], scale: 1.0 },
   mod: { screen: [-0.38, -1.15], scale: 1.56 },
   'eo-ir': { screen: [0.09, -1.15], scale: 1.33 },
   sar: { screen: [0.56, -1.15], scale: 0.79 },
@@ -76,15 +77,3 @@ export const LAYOUT_2D: Record<string, Place> = {
   'silvus-4400': { screen: [2.91, -1.15], scale: 2.58 },
 };
 
-/** Portrait (phone) variant: the loose parts stack under the aircraft instead of around it. */
-export const LAYOUT_2D_PORTRAIT: Record<string, Place> = {
-  battery: { screen: [-1.6, -3.6], scale: 2.0 },
-  mod: { screen: [0, -3.6], scale: 3.45 },
-  'eo-ir': { screen: [1.6, -3.6], scale: 2.95 },
-  sar: { screen: [-1.6, -5.0], scale: 1.77 },
-  'asi-snitch': { screen: [0, -5.0], scale: 2.0 },
-  atne: { screen: [1.6, -5.0], scale: 1.47 },
-  starlink: { screen: [-1.6, -6.4], scale: 1.93 },
-  silvus: { screen: [0, -6.4], scale: 5.5 },
-  'silvus-4400': { screen: [1.6, -6.4], scale: 5.06 },
-};

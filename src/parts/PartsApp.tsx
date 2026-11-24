@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { LABELS, type AtlasLabel } from './labels';
-import { AIRCRAFT, CATEGORIES, COMPONENTS, COMPONENT_MAP, specSheet, type CategoryId, type DroneComponent } from '../data/components';
-import { EmbedCodeDialog } from '../components/EmbedCodeDialog';
-import { IconClose, IconEmbed } from '../components/Icons';
+import { AIRCRAFT, CATEGORIES, COMPONENT_MAP, type CategoryId } from '../data/components';
+import { BUILD_PAYLOADS } from '../data/build';
+import { IconClose } from '../components/Icons';
 
 interface Part {
   id: string;
@@ -14,16 +14,16 @@ interface Part {
 }
 
 export interface LineArt {
-  variant: 'landscape' | 'portrait';
+  variant: string;
   viewBox: number[];
   parts: Part[];
 }
 
+/** Payloads and radios: shown in the side panel (not on the aircraft drawing); the only parts with a specs panel. */
+const ITEMS = BUILD_PAYLOADS.map((p) => p.id).filter((id) => COMPONENT_MAP[id]);
+const ITEM_KIND = Object.fromEntries(BUILD_PAYLOADS.map((p) => [p.id, p.kind])) as Record<string, 'radio' | 'payload'>;
+const IS_ITEM = new Set(ITEMS);
 const CAT_ORDER = CATEGORIES.map((c) => c.id);
-const ORDER: string[] = COMPONENTS.filter((c) => !['fasteners', 'wing-spar', 'pod-segment-port', 'pod-segment-starboard'].includes(c.id))
-  .sort((a, b) => CAT_ORDER.indexOf(a.category) - CAT_ORDER.indexOf(b.category) || COMPONENTS.indexOf(a) - COMPONENTS.indexOf(b))
-  .map((c) => c.id);
-const CAT_COUNT = Object.fromEntries(CATEGORIES.map((c) => [c.id, ORDER.filter((id) => COMPONENT_MAP[id].category === c.id).length]));
 
 // ───────────────────────────────────────────── URL options (also used when embedded)
 const params = new URLSearchParams(window.location.search);
@@ -49,22 +49,21 @@ interface View {
   y: number;
 }
 
-type PartState = '' | 'hi' | 'sel' | 'rel' | 'dim';
+/** An aircraft part (or labelled assembly) tapped / clicked: highlighted with its name, no specs panel. */
+interface Pin {
+  ids: string[];
+  name: string;
+  at: [number, number];
+}
+
+type PartState = '' | 'hi' | 'sel' | 'dim';
 
 /** One component of the drawing. */
 const PartShape = memo(function PartShape({ p, state, dotR, delay }: { p: Part; state: PartState; dotR: number; delay: number }) {
   const c = COMPONENT_MAP[p.id];
   const small = p.box ? Math.max(p.box[2] - p.box[0], p.box[3] - p.box[1]) < 26 : true;
   return (
-    <g
-      className={`pa-part ${state}`}
-      data-part={p.id}
-      tabIndex={0}
-      role="button"
-      aria-label={`${c.name}, ${c.partNumber}`}
-      aria-pressed={state === 'sel'}
-      style={{ animationDelay: `${delay}s` }}
-    >
+    <g className={`pa-part ${state}`} data-part={p.id} tabIndex={0} role="button" aria-label={c.name} aria-pressed={state === 'sel'} style={{ animationDelay: `${delay}s` }}>
       {p.region && <path className="pa-fill" d={p.region} />}
       {p.dd && <path className="pa-detail" d={p.dd} />}
       <path className="pa-line" d={p.d} />
@@ -74,27 +73,57 @@ const PartShape = memo(function PartShape({ p, state, dotR, delay }: { p: Part; 
   );
 });
 
-export function PartsApp({ art }: { art: LineArt }) {
-  const [VW, VH] = art.viewBox;
-  const PARTS = useMemo(() => art.parts.filter((p) => COMPONENT_MAP[p.id] && p.d), [art]);
+/** A payload / radio drawing, fitted to its own box. */
+function Thumb({ p }: { p: Part | undefined }) {
+  const b = p?.box;
+  if (!p || !b) return <svg className="pa-thumb" />;
+  const pad = 0.12 * Math.max(b[2] - b[0], b[3] - b[1]);
+  return (
+    <svg className="pa-thumb" viewBox={`${b[0] - pad} ${b[1] - pad} ${b[2] - b[0] + pad * 2} ${b[3] - b[1] + pad * 2}`} preserveAspectRatio="xMidYMid meet" aria-hidden>
+      {p.region && <path className="fill" d={p.region} />}
+      {p.dd && <path className="detail" d={p.dd} />}
+      <path className="line" d={p.d} />
+    </svg>
+  );
+}
+
+export function PartsApp({ art, payloadArt }: { art: LineArt; payloadArt: LineArt }) {
+  const PARTS = useMemo(() => art.parts.filter((p) => COMPONENT_MAP[p.id] && p.d && !IS_ITEM.has(p.id)), [art]);
   const PART_MAP = useMemo(() => Object.fromEntries(PARTS.map((p) => [p.id, p])) as Record<string, Part>, [PARTS]);
-  const portrait = art.variant === 'portrait';
+  const THUMBS = useMemo(() => Object.fromEntries(payloadArt.parts.map((p) => [p.id, p])) as Record<string, Part>, [payloadArt]);
+  const DRAWN = useMemo(() => PARTS.map((p) => p.id), [PARTS]);
+  const CAT_COUNT = useMemo(() => Object.fromEntries(CATEGORIES.map((c) => [c.id, DRAWN.filter((id) => COMPONENT_MAP[id].category === c.id).length])), [DRAWN]);
+
+  // the drawing's content box (viewBox units): parts plus label anchors
+  const content = useMemo(() => {
+    let x0 = Infinity, y0 = Infinity, x1 = -Infinity, y1 = -Infinity;
+    const add = (x: number, y: number) => {
+      x0 = Math.min(x0, x);
+      y0 = Math.min(y0, y);
+      x1 = Math.max(x1, x);
+      y1 = Math.max(y1, y);
+    };
+    for (const p of PARTS) if (p.box) add(p.box[0], p.box[1]), add(p.box[2], p.box[3]);
+    for (const l of LABELS) if (l.at) add(l.at[0], l.at[1]);
+    return { x: x0 - 12, y: y0 - 12, w: x1 - x0 + 24, h: y1 - y0 + 40 };
+  }, [PARTS]);
+
   const wrap = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 1200, h: 800 });
   const [view, setView] = useState<View>({ k: 1, x: 0, y: 0 });
-  const [selected, setSelected] = useState<string | null>(opt.component);
+  const [selected, setSelected] = useState<string | null>(opt.component && IS_ITEM.has(opt.component) ? opt.component : null);
+  const [pin, setPin] = useState<Pin | null>(null);
   const [hoverPart, setHoverPart] = useState<string | null>(null);
   const [hoverGroup, setHoverGroup] = useState<string[] | null>(null);
   const [filter, setFilter] = useState<CategoryId | null>(opt.category);
   const [tip, setTip] = useState<{ id: string; x: number; y: number } | null>(null);
-  const [embedOpen, setEmbedOpen] = useState(false);
   const [active, setActive] = useState(!EMBED);
   const [hint, setHint] = useState(false);
   const [gesturing, setGesturing] = useState(false);
   const viewRef = useRef(view);
   viewRef.current = view;
 
-  // ── layout: fit the drawing into the container, then apply zoom / pan
+  // ── layout: fit the drawing into the free area, then apply zoom / pan
   useEffect(() => {
     const el = wrap.current!;
     const ro = new ResizeObserver(() => setSize({ w: el.clientWidth, h: el.clientHeight }));
@@ -102,20 +131,27 @@ export function PartsApp({ art }: { art: LineArt }) {
     setSize({ w: el.clientWidth, h: el.clientHeight });
     return () => ro.disconnect();
   }, []);
-  const compact = size.w < 720;
-  // the drawing makes room for the details panel (side drawer, or bottom sheet on phones)
-  const panelOpen = !!selected;
-  const top = compact ? 56 : 72;
-  const bottom = compact ? (panelOpen ? Math.round(size.h * 0.62) : 64) : 64;
-  const side = compact ? 8 : 28;
-  const right = !compact && panelOpen && size.w > 900 ? 372 : 0;
-  const s0 = Math.min((size.w - side * 2 - right) / VW, (size.h - top - bottom) / VH);
-  const t0x = (size.w - right - VW * s0) / 2;
-  const t0y = top + (size.h - top - bottom - VH * s0) / 2;
+  /** phones / narrow embeds: filters on top, payload strip (or specs sheet) at the bottom */
+  const compact = size.w < 900 || size.h < 420;
+  const short = size.h < 560;
+  const panelW = size.w >= 1100 ? 272 : 236;
+  // portrait phones / tablets: the width-fitted drawing leaves room below, so payloads get a grid there
+  const drawH = Math.round((content.h * (size.w - 20)) / content.w);
+  const tallH = size.h - 48 - drawH - 28;
+  const tall = compact && tallH > 250;
+  const stripH = tall ? tallH : short ? 104 : 128;
+  const sheetH = tall ? Math.max(tallH, 300) : Math.min(Math.round(size.h * 0.6), 400);
+  const top = compact ? 48 : 20;
+  const bottom = compact ? (selected ? sheetH : stripH) + 8 : 64;
+  const left = compact ? 10 : 28;
+  const right = compact ? 10 : panelW + 44;
+  const s0 = Math.min((size.w - left - right) / content.w, (size.h - top - bottom) / content.h);
+  const t0x = left + (size.w - left - right - content.w * s0) / 2 - content.x * s0;
+  const t0y = top + (size.h - top - bottom - content.h * s0) / 2 - content.y * s0;
   const s = s0 * view.k;
   const tx = t0x * view.k + view.x;
   const ty = t0y * view.k + view.y;
-  const toScreen = useCallback((p: [number, number]) => [p[0] * s + tx, p[1] * s + ty] as const, [s, tx, ty]);
+  const toScreen = useCallback((p: readonly [number, number]) => [p[0] * s + tx, p[1] * s + ty] as const, [s, tx, ty]);
 
   const zoomAt = useCallback(
     (qx: number, qy: number, f: number) => {
@@ -123,46 +159,74 @@ export function PartsApp({ art }: { art: LineArt }) {
       const k = Math.min(8, Math.max(1, v.k * f));
       if (k === 1) return setView({ k: 1, x: 0, y: 0 });
       // keep the drawing point under (qx, qy) fixed
-      const bx = t0x * v.k + v.x, by = t0y * v.k + v.y;
-      const nx = qx - ((qx - bx) * k) / v.k, ny = qy - ((qy - by) * k) / v.k;
+      const bx = t0x * v.k + v.x,
+        by = t0y * v.k + v.y;
+      const nx = qx - ((qx - bx) * k) / v.k,
+        ny = qy - ((qy - by) * k) / v.k;
       setView({ k, x: nx - t0x * k, y: ny - t0y * k });
     },
     [t0x, t0y],
   );
 
-  // ── selection + bridge
+  // ── selection (payloads / radios) and pins (aircraft parts)
   const select = useCallback((id: string | null) => {
-    setSelected(id);
+    setSelected(id && IS_ITEM.has(id) ? id : null);
     setTip(null);
   }, []);
+  const pinPart = useCallback(
+    (id: string | null) => {
+      const p = id ? PART_MAP[id] : null;
+      setPin(p?.c ? { ids: [p.id], name: COMPONENT_MAP[p.id].name, at: p.c } : null);
+      setTip(null);
+    },
+    [PART_MAP],
+  );
+  const pinLabel = useCallback(
+    (l: AtlasLabel) => {
+      if (l.ids.length === 1) return pinPart(pin?.ids[0] === l.ids[0] ? null : l.ids[0]);
+      setPin((cur) => (cur && cur.ids === l.ids ? null : { ids: l.ids, name: l.text, at: labelAt(l, PART_MAP) }));
+    },
+    [PART_MAP, pin, pinPart],
+  );
+
   useEffect(() => {
     const c = selected ? COMPONENT_MAP[selected] : null;
     post({ k1000: 'select', id: selected, name: c?.name ?? null, category: c?.category ?? null });
   }, [selected]);
   useEffect(() => {
-    post({ k1000: 'ready', components: ORDER, page: 'parts' });
+    if (opt.component && !IS_ITEM.has(opt.component)) pinPart(opt.component);
+  }, [pinPart]);
+  useEffect(() => {
+    post({ k1000: 'ready', components: ITEMS, page: 'parts' });
     const onMsg = (e: MessageEvent) => {
       const d = e.data as { k1000?: string; value?: unknown };
       if (!d || typeof d !== 'object' || typeof d.k1000 !== 'string') return;
-      if (d.k1000 === 'select') select(typeof d.value === 'string' && ORDER.includes(d.value) ? d.value : null);
+      if (d.k1000 === 'select') {
+        const id = typeof d.value === 'string' ? d.value : null;
+        if (id && IS_ITEM.has(id)) select(id);
+        else {
+          select(null);
+          pinPart(id);
+        }
+      }
       if (d.k1000 === 'category') setFilter(CAT_ORDER.includes(d.value as CategoryId) ? (d.value as CategoryId) : null);
       if (d.k1000 === 'reset') {
         select(null);
+        setPin(null);
         setFilter(null);
         setView({ k: 1, x: 0, y: 0 });
       }
     };
     window.addEventListener('message', onMsg);
     return () => window.removeEventListener('message', onMsg);
-  }, [select]);
+  }, [select, pinPart]);
 
   const step = useCallback(
     (dir: 1 | -1) => {
-      const list = filter ? ORDER.filter((id) => COMPONENT_MAP[id].category === filter) : ORDER;
-      const i = selected ? list.indexOf(selected) : -1;
-      select(list[(i + dir + list.length) % list.length]);
+      const i = selected ? ITEMS.indexOf(selected) : -1;
+      select(ITEMS[(i + dir + ITEMS.length) % ITEMS.length]);
     },
-    [filter, selected, select],
+    [selected, select],
   );
 
   // ── keyboard
@@ -170,21 +234,27 @@ export function PartsApp({ art }: { art: LineArt }) {
     const onKey = (e: KeyboardEvent) => {
       if (e.target instanceof HTMLInputElement) return;
       if (e.key === 'Escape') {
-        if (embedOpen) setEmbedOpen(false);
-        else if (selected) select(null);
+        if (selected) select(null);
+        else if (pin) setPin(null);
         else if (filter) setFilter(null);
         else setView({ k: 1, x: 0, y: 0 });
       } else if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
-        if (selected) { e.preventDefault(); step(1); }
+        if (selected) {
+          e.preventDefault();
+          step(1);
+        }
       } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
-        if (selected) { e.preventDefault(); step(-1); }
+        if (selected) {
+          e.preventDefault();
+          step(-1);
+        }
       } else if (e.key === '+' || e.key === '=') zoomAt(size.w / 2, size.h / 2, 1.3);
       else if (e.key === '-') zoomAt(size.w / 2, size.h / 2, 1 / 1.3);
       else if (e.key === '0') setView({ k: 1, x: 0, y: 0 });
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [embedOpen, selected, filter, step, select, zoomAt, size]);
+  }, [selected, pin, filter, step, select, zoomAt, size]);
 
   // ── wheel zoom (embedded: only after the viewer was clicked, or with Ctrl/⌘)
   useEffect(() => {
@@ -192,7 +262,7 @@ export function PartsApp({ art }: { art: LineArt }) {
     let hintT = 0;
     let wheelT = 0;
     const onWheel = (e: WheelEvent) => {
-      if ((e.target as HTMLElement).closest('.pa-panel, .k-modal, .pa-legend')) return;
+      if ((e.target as HTMLElement).closest('.pa-items, .pa-legend')) return;
       if (!active && !e.ctrlKey && !e.metaKey) {
         setHint(true);
         clearTimeout(hintT);
@@ -210,7 +280,7 @@ export function PartsApp({ art }: { art: LineArt }) {
     return () => el.removeEventListener('wheel', onWheel);
   }, [active, zoomAt]);
 
-  // ── pointer: tap / click selects, drag pans, two fingers pinch-zoom
+  // ── pointer: tap / click pins a part, drag pans (when zoomed), two fingers pinch-zoom
   const gesture = useRef<{ pts: Map<number, { x: number; y: number }>; moved: number; target: string | null; last: { d: number; cx: number; cy: number } | null }>({
     pts: new Map(),
     moved: 0,
@@ -231,15 +301,19 @@ export function PartsApp({ art }: { art: LineArt }) {
     const move = (ev: PointerEvent) => {
       const p = g.pts.get(ev.pointerId);
       if (!p) return;
-      const nx = ev.clientX - r.left, ny = ev.clientY - r.top;
-      const dx = nx - p.x, dy = ny - p.y;
+      const nx = ev.clientX - r.left,
+        ny = ev.clientY - r.top;
+      const dx = nx - p.x,
+        dy = ny - p.y;
       p.x = nx;
       p.y = ny;
       g.moved += Math.abs(dx) + Math.abs(dy);
       if (g.moved > 4) setGesturing(true);
       if (g.pts.size >= 2) {
         const [a, b] = [...g.pts.values()];
-        const d = Math.hypot(a.x - b.x, a.y - b.y), cx = (a.x + b.x) / 2, cy = (a.y + b.y) / 2;
+        const d = Math.hypot(a.x - b.x, a.y - b.y),
+          cx = (a.x + b.x) / 2,
+          cy = (a.y + b.y) / 2;
         if (g.last) {
           zoomAt(cx, cy, d / g.last.d);
           setView((v) => (v.k > 1 ? { ...v, x: v.x + cx - g.last!.cx, y: v.y + cy - g.last!.cy } : v));
@@ -258,7 +332,7 @@ export function PartsApp({ art }: { art: LineArt }) {
         window.removeEventListener('pointermove', move);
         window.removeEventListener('pointerup', up);
         window.removeEventListener('pointercancel', up);
-        if (g.moved < 6 && ev.type === 'pointerup') select(g.target && g.target !== selected ? g.target : g.target ? selected : null);
+        if (g.moved < 6 && ev.type === 'pointerup') pinPart(g.target && !(pin?.ids.length === 1 && pin.ids[0] === g.target) ? g.target : null);
       }
     };
     if (g.pts.size === 1) {
@@ -276,40 +350,45 @@ export function PartsApp({ art }: { art: LineArt }) {
   };
 
   // ── what is highlighted
-  const sel = selected ? COMPONENT_MAP[selected] : null;
   const states = useMemo(() => {
     const out: Record<string, PartState> = {};
     const hot = new Set(hoverGroup ?? (hoverPart ? [hoverPart] : []));
-    const rel = new Set(sel?.relatedComponents ?? []);
-    const focus = hot.size > 0 || !!sel || !!filter;
-    for (const id of ORDER) {
+    const pinned = new Set(pin?.ids ?? []);
+    const focus = hot.size > 0 || pinned.size > 0 || !!filter;
+    for (const id of DRAWN) {
       const inFilter = !filter || COMPONENT_MAP[id].category === filter;
-      if (id === selected) out[id] = 'sel';
+      if (pinned.has(id)) out[id] = 'sel';
       else if (hot.has(id)) out[id] = 'hi';
       else if (!focus) out[id] = '';
-      else if (sel && rel.has(id) && hot.size === 0) out[id] = 'rel';
       else if (hot.size === 0 && filter && inFilter) out[id] = '';
       else out[id] = 'dim';
     }
     return out;
-  }, [hoverGroup, hoverPart, sel, selected, filter]);
+  }, [hoverGroup, hoverPart, pin, filter, DRAWN]);
 
   const delays = useMemo(() => {
     const out: Record<string, number> = {};
-    for (const p of PARTS) out[p.id] = REDUCED || !p.c ? 0 : 0.05 + (Math.hypot(p.c[0] - VW / 2, p.c[1] - VH / 2) / VW) * 0.9;
+    const cx = content.x + content.w / 2,
+      cy = content.y + content.h / 2;
+    for (const p of PARTS) out[p.id] = REDUCED || !p.c ? 0 : 0.05 + (Math.hypot(p.c[0] - cx, p.c[1] - cy) / content.w) * 0.9;
     return out;
-  }, [PARTS, VW, VH]);
+  }, [PARTS, content]);
 
-  const showGroup = opt.labels && s >= (compact ? 0.2 : 0.4);
-  const showDetail = opt.labels && s >= (compact ? 0.2 : 0.55);
+  // labels keep their size while the drawing scales: below this they would crowd the parts (tap a part to name it)
+  const showGroup = opt.labels && s >= 0.4;
+  const showDetail = opt.labels && s >= 0.4;
   const rootStyle = {
     ...(opt.accent ? { '--pa-hi': opt.accent } : {}),
     ...(opt.ink ? { '--pa-ink': opt.ink } : {}),
   } as React.CSSProperties;
   const tipC = tip ? COMPONENT_MAP[tip.id] : null;
+  const pinXY = pin ? toScreen(pin.at) : null;
 
   return (
-    <div className={`pa-root ${opt.light ? 'light' : ''} ${EMBED ? 'embed' : ''} ${compact ? 'compact' : ''}`} style={rootStyle}>
+    <div
+      className={`pa-root ${opt.light ? 'light' : ''} ${EMBED ? 'embed' : ''} ${compact ? 'compact' : ''} ${short ? 'short' : ''} ${tall ? 'tall' : ''} ${selected ? 'has-sel' : ''}`}
+      style={{ ...rootStyle, ['--pa-panel-w' as string]: `${panelW}px`, ['--pa-sheet-h' as string]: `${sheetH}px`, ['--pa-strip-h' as string]: `${stripH}px` }}
+    >
       <div
         ref={wrap}
         className={`pa-stage ${view.k > 1 ? 'zoomed' : ''}`}
@@ -323,7 +402,7 @@ export function PartsApp({ art }: { art: LineArt }) {
           const id = (e.target as Element).getAttribute?.('data-part');
           if (id && (e.key === 'Enter' || e.key === ' ')) {
             e.preventDefault();
-            select(id === selected ? null : id);
+            pinPart(pin?.ids[0] === id ? null : id);
           }
         }}
         onFocus={(e) => setHoverPart((e.target as Element).getAttribute?.('data-part') ?? null)}
@@ -338,116 +417,198 @@ export function PartsApp({ art }: { art: LineArt }) {
         </svg>
 
         {(showGroup || showDetail) && (
-          <div className={`pa-labels ${gesturing ? "" : "pa-ease-labels"}`} aria-hidden="true">
+          <div className={`pa-labels ${gesturing ? '' : 'pa-ease-labels'}`} aria-hidden="true">
             {LABELS.map((l, i) =>
-              (l.kind === 'group' ? showGroup && (!portrait || !!l.atPortrait || s >= 0.4) : showDetail) ? (
+              (l.kind === 'group' ? showGroup : showDetail) ? (
                 <Label
                   key={i}
                   l={l}
-                  pos={toScreen(labelAt(l, PART_MAP, portrait))}
-                  active={!!hoverGroup && hoverGroup === l.ids}
-                  dim={(!!sel || !!hoverGroup || !!hoverPart || !!filter) && !l.ids.some((id) => states[id] === 'hi' || states[id] === 'sel' || (filter && states[id] === ''))}
+                  pos={clampLabel(l, toScreen(labelAt(l, PART_MAP)), size.w - right, compact)}
+                  active={(!!hoverGroup && hoverGroup === l.ids) || pin?.ids === l.ids}
+                  dim={(!!pin || !!hoverGroup || !!hoverPart || !!filter) && !l.ids.some((id) => states[id] === 'hi' || states[id] === 'sel' || (filter && states[id] === ''))}
                   onHover={(on) => setHoverGroup(on ? l.ids : null)}
-                  onPick={() => select(l.ids.includes(selected ?? '') ? null : l.ids[0])}
+                  onPick={() => pinLabel(l)}
                 />
               ) : null,
             )}
           </div>
         )}
 
-        {tipC && tip && tip.id !== selected && (
+        {tipC && tip && !pin?.ids.includes(tip.id) && (
           <div className={`pa-tip ${tip.x > size.w - 240 ? 'flip' : ''}`} style={{ left: tip.x, top: tip.y }}>
             <b>{tipC.name}</b>
-            <span>
-              {CATEGORIES.find((c) => c.id === tipC.category)!.label}
-            </span>
+            <span>{CATEGORIES.find((c) => c.id === tipC.category)!.label}</span>
+          </div>
+        )}
+        {pin && pin.ids.length === 1 && pinXY && (
+          <div className={`pa-tip pinned ${pinXY[0] > size.w - right - 200 ? 'flip' : ''}`} style={{ left: pinXY[0], top: pinXY[1] }}>
+            <b>{pin.name}</b>
+            <span>{CATEGORIES.find((c) => c.id === COMPONENT_MAP[pin.ids[0]].category)!.label}</span>
           </div>
         )}
         {hint && <div className="pa-hint">Click the drawing, then scroll to zoom · or hold Ctrl / ⌘</div>}
       </div>
 
-      <header className="pa-head">
-        <a className="pa-brand" href={EMBED ? '/parts' : undefined} target={EMBED ? '_blank' : undefined} rel="noopener">
-          <span className="pa-logo">K1000ULE</span>
-          <span className="pa-divider" aria-hidden>
-            |
-          </span>
-          <span className="pa-sub">PARTS ATLAS</span>
-        </a>
-        <nav className="pa-actions">
-          <a className="pa-btn" href={`/${selected ? `?component=${selected}&mode=inspection` : ''}`} target={EMBED ? '_blank' : undefined} rel="noopener">
-            3D MODEL
-          </a>
-          {!EMBED && (
-            <button className="pa-btn" onClick={() => setEmbedOpen(true)}>
-              <IconEmbed size={14} /> EMBED
-            </button>
-          )}
-          {EMBED && (
-            <a className="pa-btn" href={`/parts${selected ? `?component=${selected}` : ''}`} target="_blank" rel="noopener">
-              OPEN FULL ↗
-            </a>
-          )}
-        </nav>
-      </header>
+      <div className="pa-legend" role="toolbar" aria-label="Highlight a system">
+        {CATEGORIES.filter((c) => CAT_COUNT[c.id]).map((c) => (
+          <button
+            key={c.id}
+            className={filter === c.id ? 'on' : ''}
+            aria-pressed={filter === c.id}
+            onClick={() => setFilter(filter === c.id ? null : c.id)}
+            onPointerEnter={(e) => e.pointerType === 'mouse' && setHoverGroup(DRAWN.filter((id) => COMPONENT_MAP[id].category === c.id))}
+            onPointerLeave={() => setHoverGroup(null)}
+          >
+            {c.label}
+            <i>{CAT_COUNT[c.id]}</i>
+          </button>
+        ))}
+      </div>
 
-      <footer className="pa-foot">
-        <div className="pa-legend" role="toolbar" aria-label="Filter by system">
-          {CATEGORIES.filter((c) => CAT_COUNT[c.id]).map((c) => (
-            <button
-              key={c.id}
-              className={filter === c.id ? 'on' : ''}
-              aria-pressed={filter === c.id}
-              onClick={() => setFilter(filter === c.id ? null : c.id)}
-              onPointerEnter={(e) => e.pointerType === 'mouse' && setHoverGroup(ORDER.filter((id) => COMPONENT_MAP[id].category === c.id))}
-              onPointerLeave={() => setHoverGroup(null)}
-            >
-              {c.label}
-              <i>{CAT_COUNT[c.id]}</i>
-            </button>
-          ))}
-        </div>
+      {(!compact || view.k > 1) && (
         <div className="pa-zoom">
-          <button onClick={() => zoomAt(size.w / 2, size.h / 2, 1 / 1.4)} aria-label="Zoom out">
-            −
-          </button>
+          {!compact && (
+            <button onClick={() => zoomAt(size.w / 2, size.h / 2, 1 / 1.4)} aria-label="Zoom out">
+              −
+            </button>
+          )}
           <button onClick={() => setView({ k: 1, x: 0, y: 0 })} aria-label="Fit drawing" className="pa-fit">
-            {Math.round(view.k * 100)}%
+            {compact ? 'FIT' : `${Math.round(view.k * 100)}%`}
           </button>
-          <button onClick={() => zoomAt(size.w / 2, size.h / 2, 1.4)} aria-label="Zoom in">
-            +
-          </button>
+          {!compact && (
+            <button onClick={() => zoomAt(size.w / 2, size.h / 2, 1.4)} aria-label="Zoom in">
+              +
+            </button>
+          )}
         </div>
-      </footer>
-
-
-      {sel && <InfoPanel c={sel} onClose={() => select(null)} onStep={step} />}
-
-      {embedOpen && (
-        <EmbedCodeDialog
-          onClose={() => setEmbedOpen(false)}
-          initialTarget="parts"
-          current={{ parts: selected ? { component: selected } : {}, '3d': selected ? { component: selected } : {} }}
-        />
       )}
+
+      <ItemsPanel selected={selected} thumbs={THUMBS} compact={compact} onSelect={select} onStep={step} />
     </div>
   );
 }
 
-function labelAt(l: AtlasLabel, PART_MAP: Record<string, Part>, portrait: boolean): [number, number] {
-  if (portrait && l.atPortrait) return l.atPortrait;
-  if (l.at && !(portrait && l.portraitAuto)) return l.at;
+/** Payloads & radios: a scrolling list (right side on desktop, a bottom strip on phones) that opens a specs view. */
+function ItemsPanel({
+  selected,
+  thumbs,
+  compact,
+  onSelect,
+  onStep,
+}: {
+  selected: string | null;
+  thumbs: Record<string, Part>;
+  compact: boolean;
+  onSelect: (id: string | null) => void;
+  onStep: (d: 1 | -1) => void;
+}) {
+  const list = useRef<HTMLDivElement>(null);
+  const c = selected ? COMPONENT_MAP[selected] : null;
+  // keep the list where it was when coming back from a specs view
+  const scroll = useRef(0);
+  useEffect(() => {
+    if (!selected && list.current) {
+      if (compact) list.current.scrollLeft = scroll.current;
+      else list.current.scrollTop = scroll.current;
+    }
+  }, [selected, compact]);
+  const remember = () => {
+    if (list.current) scroll.current = compact ? list.current.scrollLeft : list.current.scrollTop;
+  };
+
+  if (c && selected) {
+    return (
+      <aside className="pa-items detail" key={selected} aria-label={`${c.name} specifications`} onPointerDown={(e) => e.stopPropagation()}>
+        <header>
+          <button className="pa-back" onClick={() => onSelect(null)} aria-label="Back to payloads and radios">
+            ←
+          </button>
+          <h2>Specifications</h2>
+          <button className="pa-x" onClick={() => onSelect(null)} aria-label="Close specifications">
+            <IconClose size={15} />
+          </button>
+        </header>
+        <div className="pa-body">
+          <div className="pa-hero">
+            <Thumb p={thumbs[selected]} />
+          </div>
+          <dl className="pa-specs">
+            <div>
+              <dt>Name</dt>
+              <dd>{c.name}</dd>
+            </div>
+            <div>
+              <dt>Type</dt>
+              <dd>{ITEM_KIND[selected] === 'radio' ? 'Radio' : 'Payload'}</dd>
+            </div>
+          </dl>
+        </div>
+        <footer>
+          <button onClick={() => onStep(-1)} aria-label="Previous item">
+            ←
+          </button>
+          <span>
+            {ITEMS.indexOf(selected) + 1} / {ITEMS.length}
+          </span>
+          <button onClick={() => onStep(1)} aria-label="Next item">
+            →
+          </button>
+        </footer>
+      </aside>
+    );
+  }
+
+  const groups: { kind: 'payload' | 'radio'; title: string }[] = [
+    { kind: 'payload', title: 'Payloads' },
+    { kind: 'radio', title: 'Radios' },
+  ];
+  return (
+    <aside className="pa-items" aria-label="Payloads and radios" onPointerDown={(e) => e.stopPropagation()}>
+      <header>
+        <h2>Payloads &amp; Radios</h2>
+        <span>{ITEMS.length}</span>
+      </header>
+      <div className="pa-items-list" ref={list}>
+        {groups.map((g) => (
+          <section key={g.kind}>
+            <h3>{g.title}</h3>
+            <div className="pa-cards">
+              {ITEMS.filter((id) => ITEM_KIND[id] === g.kind).map((id) => (
+                <button
+                  key={id}
+                  className="pa-card"
+                  onClick={() => {
+                    remember();
+                    onSelect(id);
+                  }}
+                >
+                  <Thumb p={thumbs[id]} />
+                  <b>{COMPONENT_MAP[id].name}</b>
+                </button>
+              ))}
+            </div>
+          </section>
+        ))}
+      </div>
+    </aside>
+  );
+}
+
+/** Keeps a label on screen (estimated text width). */
+function clampLabel(l: AtlasLabel, pos: readonly [number, number], maxX: number, compact: boolean): [number, number] {
+  const px = l.kind === 'group' ? (compact ? 10 : 13) * 0.86 : 7;
+  const w = l.text.length * px;
+  const align = l.align ?? (l.kind === 'detail' ? 'middle' : 'start');
+  const leftEdge = align === 'start' ? pos[0] : align === 'middle' ? pos[0] - w / 2 : pos[0] - w;
+  const shift = Math.min(0, maxX - 8 - (leftEdge + w)) + Math.max(0, 8 - leftEdge);
+  return [pos[0] + shift, pos[1]];
+}
+
+function labelAt(l: AtlasLabel, PART_MAP: Record<string, Part>): [number, number] {
+  if (l.at) return l.at;
   const p = PART_MAP[l.ids[0]];
   if (!p?.box) return [0, 0];
-  let bottom = p.box[3];
-  if (l.row) {
-    // loose parts laid out side by side share one baseline: the lowest part bottom of the row
-    for (const o of LABELS) {
-      const q = o.row ? PART_MAP[o.ids[0]]?.box : undefined;
-      if (q && q[1] < p.box[3] && q[3] > p.box[1]) bottom = Math.max(bottom, q[3]);
-    }
-  }
-  return [(p.box[0] + p.box[2]) / 2, bottom + 14];
+  return [(p.box[0] + p.box[2]) / 2, p.box[3] + 14];
 }
 
 function Label({
@@ -479,46 +640,5 @@ function Label({
       <b>{l.text}</b>
       {l.sub && <span>{l.sub}</span>}
     </button>
-  );
-}
-
-function InfoPanel({ c, onClose, onStep }: { c: DroneComponent; onClose: () => void; onStep: (d: 1 | -1) => void }) {
-  const spec = specSheet(c.id);
-  return (
-    <aside className="pa-panel" key={c.id} aria-label={`${c.name} specifications`} onPointerDown={(e) => e.stopPropagation()}>
-      <header>
-        <h2>Specifications</h2>
-        <button className="pa-x" onClick={onClose} aria-label="Close specifications">
-          <IconClose size={15} />
-        </button>
-      </header>
-      <div className="pa-body">
-        <dl className="pa-specs">
-          <div>
-            <dt>Name</dt>
-            <dd>{c.name}</dd>
-          </div>
-          <div>
-            <dt>Group</dt>
-            <dd>{spec.group}</dd>
-          </div>
-        </dl>
-      </div>
-      <footer>
-        <button onClick={() => onStep(-1)} aria-label="Previous part">
-          ←
-        </button>
-        {c.atlasOnly ? (
-          <span />
-        ) : (
-          <a href={`/?component=${c.id}&mode=inspection`} target={EMBED ? '_blank' : undefined} rel="noopener">
-            VIEW IN 3D ↗
-          </a>
-        )}
-        <button onClick={() => onStep(1)} aria-label="Next part">
-          →
-        </button>
-      </footer>
-    </aside>
   );
 }

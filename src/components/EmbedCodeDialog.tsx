@@ -42,7 +42,8 @@ export function EmbedCodeDialog({ onClose, initialTarget = '3d', current = {} }:
       return `<div ${attrs.join(' ')}></div>\n<script src="${origin}/embed.js" async></script>`;
     }
     const q = new URLSearchParams({ embed: '1', ...opts }).toString().replace(/%2C/g, ',');
-    const size = h ? `height:${h}px` : `aspect-ratio:${t.aspect}`;
+    // the parts atlas grows taller on phones so the drawing and its payload strip both fit
+    const size = h ? `height:${h}px` : `aspect-ratio:${t.aspect}${target === 'parts' ? ';min-height:min(560px,130vw)' : ''}`;
     return `<iframe src="${origin}${t.path}?${q}" title="${t.title}"\n  style="width:100%;${size};border:0;border-radius:12px"\n  allow="fullscreen" loading="lazy"></iframe>`;
   }, [format, keepView, cur, target, light, height, origin, t]);
 
