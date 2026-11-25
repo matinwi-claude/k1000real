@@ -17,3 +17,7 @@ run_worker_first = true
 
 [observability]
 enabled = true
+
+[vars]
+# Websites allowed to embed the viewer and the parts atlas (iframe / embed.js). Every other site is refused.
+EMBED_ORIGINS = "https://www.khaero.com https://khaero.com"

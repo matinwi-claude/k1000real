@@ -8,6 +8,24 @@ export interface AuthEnv {
   VIEWER_PASSWORD?: string;
   /** optional user name; if unset, any user name is accepted */
   VIEWER_USER?: string;
+  /**
+   * Websites allowed to embed the viewer / parts atlas in an iframe, comma or space separated
+   * (e.g. "https://www.khaero.com, https://khaero.com"). Every other site is refused by the browser.
+   */
+  EMBED_ORIGINS?: string;
+}
+
+/** Used when EMBED_ORIGINS is not set: only Kraus Hamdani's own website (and this site) may embed. */
+const DEFAULT_EMBED_ORIGINS = 'https://www.khaero.com https://khaero.com';
+
+/** Copy of a response with a frame-ancestors policy: only the allowed websites may embed it. */
+export function embedPolicy(res: Response, env: AuthEnv) {
+  const origins = (env.EMBED_ORIGINS ?? DEFAULT_EMBED_ORIGINS)
+    .split(/[\s,]+/)
+    .filter((o) => /^https?:\/\/[a-z0-9.*-]+(:\d+)?$/i.test(o));
+  const out = new Response(res.body, res);
+  out.headers.set('Content-Security-Policy', `frame-ancestors 'self' ${origins.join(' ')}`.trim());
+  return out;
 }
 
 /** Served without a login: the 2D atlas, its scripts/styles/fonts and the brand images. */

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useStore, type Configuration, type PowerOption } from '../store';
+import { useStore, type Configuration, type PowerOption, type Season } from '../store';
 import { COMPONENT_MAP, CATEGORIES } from '../data/components';
 import { BUILD_PAYLOADS, flightHours, payloadWeightLb } from '../data/build';
 import { IconClose } from './Icons';
@@ -21,6 +21,10 @@ const CONFIGS: { id: Configuration; label: string }[] = [
 const POWER: { id: PowerOption; label: string }[] = [
   { id: 'solar', label: 'Solar' },
   { id: 'non-solar', label: 'Non-Solar' },
+];
+const SEASONS: { id: Season; label: string }[] = [
+  { id: 'summer', label: 'Summer' },
+  { id: 'winter', label: 'Winter' },
 ];
 
 /** Eases a displayed number toward its target. */
@@ -96,6 +100,7 @@ export function BuildPanel() {
   const open = useStore((s) => s.buildOpen);
   const configuration = useStore((s) => s.configuration);
   const power = useStore((s) => s.power);
+  const season = useStore((s) => s.season);
   const payloads = useStore((s) => s.payloads);
   const [preview, setPreview] = useState<{ id: string; top: number; touch?: boolean } | null>(null);
   const stack = useRef<HTMLDivElement>(null);
@@ -107,7 +112,7 @@ export function BuildPanel() {
   }, [open]);
   if (!open) return null;
 
-  const hours = flightHours(configuration, power, payloads);
+  const hours = flightHours(configuration, power, payloads, season);
   const showPreview = (id: string, el: HTMLElement, touch = false) => {
     const s = stack.current?.getBoundingClientRect();
     const r = el.getBoundingClientRect();
@@ -156,10 +161,19 @@ export function BuildPanel() {
               </button>
             ))}
           </fieldset>
+          <fieldset>
+            <legend>03 · Season</legend>
+            {SEASONS.map((c) => (
+              <button key={c.id} role="radio" aria-checked={season === c.id} className={`k-opt ${season === c.id ? 'on' : ''}`} onClick={() => useStore.setState({ season: c.id })}>
+                <i className="dot" />
+                {c.label}
+              </button>
+            ))}
+          </fieldset>
           {(
             [
-              ['radio', '03', 'Radios'],
-              ['payload', '04', 'Payloads'],
+              ['radio', '04', 'Radios'],
+              ['payload', '05', 'Payloads'],
             ] as const
           ).map(([kind, n, title]) => (
             <fieldset key={kind}>

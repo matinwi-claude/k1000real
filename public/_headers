@@ -9,6 +9,5 @@
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
   Permissions-Policy: camera=(), microphone=(), geolocation=()
-  # The viewer is designed to be embedded on other sites. To restrict which sites may
-  # embed it, replace * with a list, e.g. frame-ancestors 'self' https://example.com
-  Content-Security-Policy: frame-ancestors *
+  # Which websites may embed the viewer is set by the Worker / Pages middleware
+  # (EMBED_ORIGINS in wrangler.toml, default: khaero.com only), not here.

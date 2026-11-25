@@ -5,6 +5,7 @@ export type ViewMode = 'exterior' | 'xray';
 export type LightingMode = 'studio' | 'sky' | 'night' | 'inspection';
 export type Configuration = 'fixed-wing' | 'evtol';
 export type PowerOption = 'solar' | 'non-solar';
+export type Season = 'summer' | 'winter';
 export type CameraView = 'reset' | 'front' | 'side' | 'top' | 'bottom' | 'rear';
 
 export interface State {
@@ -38,6 +39,7 @@ export interface State {
   /** Build Your Own K1000 */
   buildOpen: boolean;
   power: PowerOption;
+  season: Season;
   payloads: string[];
   engineer: boolean;
   spinTest: boolean;
@@ -92,6 +94,7 @@ export const useStore = create<State>((set, get) => ({
   configuration: 'evtol',
   buildOpen: false,
   power: 'solar',
+  season: 'summer',
   payloads: ['eo-ir', 'sar'],
   engineer: false,
   spinTest: false,

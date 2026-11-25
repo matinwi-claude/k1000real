@@ -1,4 +1,4 @@
-import type { Configuration, PowerOption } from '../store';
+import type { Configuration, PowerOption, Season } from '../store';
 
 /**
  * "Build Your Own K1000" data: flight hours and the total payload weight are shown.
@@ -12,6 +12,9 @@ export const BASE_FLIGHT_HOURS: Record<Configuration, Record<PowerOption, number
   'fixed-wing': { solar: 24, 'non-solar': 12 },
   evtol: { solar: 12, 'non-solar': 6 },
 };
+
+/** Winter costs this many flight hours (shorter days, colder batteries), after the payload deduction. */
+export const WINTER_HOURS_LOST = 10;
 
 /** Fraction of flight time lost per pound carried. */
 export const HOURS_LOST_PER_LB = 0.035;
@@ -40,9 +43,9 @@ export function payloadWeightLb(payloads: string[]) {
   return BUILD_PAYLOADS.reduce((sum, p) => sum + (payloads.includes(p.id) ? p.weightLb : 0), 0);
 }
 
-export function flightHours(configuration: Configuration, power: PowerOption, payloads: string[]) {
-  const totalLb = BUILD_PAYLOADS.reduce((sum, p) => sum + (payloads.includes(p.id) ? p.weightLb : 0), 0);
-  return BASE_FLIGHT_HOURS[configuration][power] * Math.max(0.2, 1 - HOURS_LOST_PER_LB * totalLb);
+export function flightHours(configuration: Configuration, power: PowerOption, payloads: string[], season: Season = 'summer') {
+  const hours = BASE_FLIGHT_HOURS[configuration][power] * Math.max(0.2, 1 - HOURS_LOST_PER_LB * payloadWeightLb(payloads));
+  return Math.max(0, hours - (season === 'winter' ? WINTER_HOURS_LOST : 0));
 }
 
 /** True when a part is not on the aircraft in the current build (it dissolves away in 3D). */

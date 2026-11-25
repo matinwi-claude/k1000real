@@ -56,6 +56,8 @@ Use `<div data-k1000="parts"></div>` instead to embed the **2D parts atlas**: an
 
 The embedded viewer doesn't take over the host page's scrolling, loads lazily, pauses while off-screen, and can be controlled from the host page (`viewer.select('eo-ir')`, `viewer.explode(1)`, …). See **[EMBED.md](EMBED.md)** for options, the API, events and allowed-domain settings, and `/embed-demo.html` for a live example.
 
+**Only your own website can embed it.** Browsers refuse to show the viewer or the parts atlas inside any site not listed in `EMBED_ORIGINS` (`wrangler.toml`, default `https://www.khaero.com https://khaero.com`). To allow another domain (a staging or builder preview domain, for example), add it there, separated by spaces, and redeploy; on a Pages project set `EMBED_ORIGINS` under Settings → Variables and Secrets instead. The embed code itself is only shown inside the password-protected 3D viewer (rail → EMBED).
+
 ## Using the real K1000ULE model
 
 Put a glTF binary at **`public/models/k1000ule.glb`**. If it's there, it replaces the generated model automatically. If it's missing, the generated model is used.

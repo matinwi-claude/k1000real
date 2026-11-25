@@ -6,7 +6,7 @@
  * viewer page and the CAD model it loads — sits behind a browser login prompt (HTTP Basic
  * auth). The password is a Worker secret: `npx wrangler secret put VIEWER_PASSWORD`.
  */
-import { authorised, isPublic, loginPrompt, privateCopy, type AuthEnv } from './auth';
+import { authorised, embedPolicy, isPublic, loginPrompt, privateCopy, type AuthEnv } from './auth';
 
 interface Env extends AuthEnv {
   ASSETS: Fetcher;
@@ -37,8 +37,8 @@ export default {
     if (url.pathname.startsWith('/api/')) {
       return new Response(JSON.stringify({ error: 'not found' }), { status: 404, headers: { 'content-type': 'application/json' } });
     }
-    if (isPublic(url.pathname)) return env.ASSETS.fetch(request);
+    if (isPublic(url.pathname)) return embedPolicy(await env.ASSETS.fetch(request), env);
     if (!(await authorised(request, env))) return loginPrompt(!!env.VIEWER_PASSWORD);
-    return privateCopy(await env.ASSETS.fetch(request), url.pathname);
+    return embedPolicy(privateCopy(await env.ASSETS.fetch(request), url.pathname), env);
   },
 } satisfies ExportedHandler<Env>;
