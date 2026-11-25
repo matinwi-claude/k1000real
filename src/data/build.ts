@@ -13,7 +13,7 @@ export const BASE_FLIGHT_HOURS: Record<Configuration, Record<PowerOption, number
   evtol: { solar: 12, 'non-solar': 6 },
 };
 
-/** Winter costs this many flight hours (shorter days, colder batteries), after the payload deduction. */
+/** Winter costs a solar aircraft this many flight hours (less sunlight), after the payload deduction. Non-solar is unaffected. */
 export const WINTER_HOURS_LOST = 10;
 
 /** Fraction of flight time lost per pound carried. */
@@ -45,7 +45,7 @@ export function payloadWeightLb(payloads: string[]) {
 
 export function flightHours(configuration: Configuration, power: PowerOption, payloads: string[], season: Season = 'summer') {
   const hours = BASE_FLIGHT_HOURS[configuration][power] * Math.max(0.2, 1 - HOURS_LOST_PER_LB * payloadWeightLb(payloads));
-  return Math.max(0, hours - (season === 'winter' ? WINTER_HOURS_LOST : 0));
+  return Math.max(0, hours - (season === 'winter' && power === 'solar' ? WINTER_HOURS_LOST : 0));
 }
 
 /** True when a part is not on the aircraft in the current build (it dissolves away in 3D). */
